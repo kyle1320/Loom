@@ -4,7 +4,7 @@ import EventEmitter from '../util/EventEmitter';
 import Project from './Project';
 import IllegalArgumentKeyError from '../errors/IllegalArgumentKeyError';
 
-const validityRegex = /^[a-zA-Z0-9_-]+$/;
+const validityRegex = /^[a-zA-Z0-9_-.]+$/;
 
 namespace Attribute {
   export type SerializedData = {

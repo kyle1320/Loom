@@ -32,9 +32,12 @@ class LObject {
     }
   }
 
-  public *getAttributes() {
+  // attributes can use dots to indicate parts of a path
+  public *getAttributes(path: string = '') {
+    if (path) path += '.';
+
     for (var key in this.attributes) {
-      yield this.attributes[key];
+      if (key.startsWith(path)) yield this.attributes[key];
     }
   }
 
