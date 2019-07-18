@@ -8,8 +8,14 @@ import Extension from "../extensions/Extension";
 import BasicFieldExtension from "../extensions/BasicFields";
 
 class Project {
+  public static readonly defaultExtensions: Extension[] = [
+    BasicFieldExtension
+  ];
+
   public readonly objects: ObjectStore;
   public readonly fields: FieldStore;
+
+  public readonly extensions: Extension[] = [];
 
   private readonly fieldTypes: {
     [key: string]: Field.Deserializer
@@ -22,8 +28,7 @@ class Project {
     this.objects = new ObjectStore();
     this.fields = new FieldStore();
 
-    // TODO: move this?
-    this.addExtensions(new BasicFieldExtension());
+    Project.defaultExtensions.forEach(e => this.addExtension(e));
   }
 
   public makeObject(
@@ -54,8 +59,8 @@ class Project {
     }
   }
 
-  public addExtensions(...extensions: Extension[]) {
-    extensions.forEach(e => e.init(this));
+  public addExtension(ext: Extension) {
+    ext.init(this);
   }
 
   public serialize(): Project.SerializedData {
