@@ -1,7 +1,8 @@
 import { makeElement } from '../../util/dom';
-import Attribute from '../../../common/data/Attribute';
 
 import './AttributeEditor.scss';
+import BasicAttribute from '../../../common/extensions/BasicAttributes/BasicAttribute';
+import Attribute from '../../../common/data/Attribute';
 
 export default class AttributeEditor {
   private attr: Attribute;
@@ -15,32 +16,21 @@ export default class AttributeEditor {
     this.element = <div className='attribute-editor'>
       {attr.key}: {
         this.value = <div className='attribute' contentEditable='true' onclick={() => {}}>
-          {this.attr.raw()}
+          {this.attr.get()}
         </div>
       }
     </div>;
 
-    this.value.addEventListener('input', () => {
-      this.update(this.value.innerHTML);
-    });
-
-    this.update();
+    if (attr instanceof BasicAttribute) {
+      this.value.addEventListener('input', () => {
+        attr.set(this.value.innerHTML);
+      });
+    }
 
     this.attr.on('update', () => this.update());
   }
 
-  private update(value = this.attr.raw()) {
-    this.attr.set(value);
-
-    var newValue = this.attr.computedParts()
-      .map(p => typeof p === 'string' ? p : (
-        <span contentEditable='false' title={p.id}>
-          {p.computed()}
-        </span>
-      ).outerHTML).join('');
-
-    if (newValue !== this.value.innerHTML) {
-      this.value.innerHTML = newValue;
-    }
+  private update() {
+    this.value.innerHTML = this.attr.get();
   }
 }

@@ -1,5 +1,6 @@
 import Attribute from './Attribute';
 import Project from './Project';
+import BasicAttribute from '../extensions/BasicAttributes/BasicAttribute';
 
 namespace LObject {
   export type SerializedData = {
@@ -46,7 +47,7 @@ class LObject {
   }
 
   public addOwnAttribute(key: string, value: string) {
-    this.attributes[key] = new Attribute(this.project, this, key, value);
+    this.attributes[key] = new BasicAttribute(this.project, this, key, value);
   }
 
   public serialize(): LObject.SerializedData {
@@ -70,7 +71,7 @@ class LObject {
     );
 
     data.ownAttributes
-      .map(a => Attribute.deserialize(project, a, obj))
+      .map(a => project.deserializeAttribute(a, obj))
       .forEach(attr => obj.attributes[attr.key] = attr);
 
     return obj;

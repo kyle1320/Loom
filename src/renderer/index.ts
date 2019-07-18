@@ -8,7 +8,7 @@ window.addEventListener('load', function () {
   obj1.addOwnAttribute('primaryColor', 'red');
 
   var obj2 = project.makeObject('user');
-  obj2.addOwnAttribute('border', `1px solid {${obj1.id}.primaryColor}`);
+  obj2.addOwnAttribute('border', `1px solid {${obj1.id}|primaryColor}`);
 
   var obj3 = project.makeObject('user', obj2);
   obj3.addOwnAttribute('attr6', `some value`);
