@@ -1,7 +1,7 @@
 import Attribute from './Attribute';
 import IllegalArgumentKeyError from '../errors/IllegalArgumentKeyError';
 
-const validityRegex = /^[a-zA-Z0-9_-]+$/;
+const validityRegex = /^[a-zA-Z0-9_.-]+$/;
 
 export default class AttributeStore {
   private attrs: Map<string, Attribute>;
