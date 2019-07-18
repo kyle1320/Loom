@@ -119,14 +119,12 @@ function diff<T>(
   onAdd: (el: T) => any,
   onRemove: (el: T) => any
 ) {
-  console.log(oldSorted, newSorted);
   var i = 0, j = 0;
   while (true) {
     if (i >= oldSorted.length) {
       if (j >= newSorted.length) {
         break;
       } else {
-        console.log('add');
         onAdd(newSorted[j]);
         j++;
       }

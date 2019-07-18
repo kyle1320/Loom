@@ -56,8 +56,6 @@ class Project {
   ): Attribute {
     var cls = this.attributeTypes[data.type];
 
-    console.log(this.attributeTypes);
-
     if (!cls) {
       throw new MissingAttributeTypeError();
     }
