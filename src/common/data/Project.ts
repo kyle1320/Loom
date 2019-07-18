@@ -1,28 +1,28 @@
 import ObjectStore from "./ObjectStore";
-import AttributeStore from "./AttributeStore";
+import FieldStore from "./FieldStore";
 import SerializationError from '../errors/SerializationError';
 import LObject from "./LObject";
-import Attribute from "./Attribute";
-import MissingAttributeTypeError from '../errors/MissingAttributeTypeError';
+import Field from "./Field";
+import MissingFieldTypeError from '../errors/MissingFieldTypeError';
 import Extension from "../extensions/Extension";
-import BasicAttributeExtension from "../extensions/BasicAttributes";
+import BasicFieldExtension from "../extensions/BasicFields";
 
 class Project {
   public readonly objects: ObjectStore;
-  public readonly attributes: AttributeStore;
+  public readonly fields: FieldStore;
 
-  private readonly attributeTypes: {
-    [key: string]: Attribute.Deserializer
+  private readonly fieldTypes: {
+    [key: string]: Field.Deserializer
   };
 
   public constructor() {
     this.objects = new ObjectStore();
-    this.attributes = new AttributeStore();
+    this.fields = new FieldStore();
 
-    this.attributeTypes = {};
+    this.fieldTypes = {};
 
     // TODO: move this?
-    this.addExtensions(new BasicAttributeExtension());
+    this.addExtensions(new BasicFieldExtension());
   }
 
   public makeObject(type: string, parent: null | string | LObject = null) {
@@ -33,8 +33,8 @@ class Project {
     return new LObject(this, type, parent);
   }
 
-  public addAttributeType(type: Attribute.Deserializer) {
-    this.attributeTypes[type.name] = type;
+  public addFieldType(type: Field.Deserializer) {
+    this.fieldTypes[type.name] = type;
   }
 
   public addExtensions(...extensions: Extension[]) {
@@ -50,14 +50,14 @@ class Project {
     };
   }
 
-  public deserializeAttribute(
-    data: Attribute.SerializedData,
+  public deserializeField(
+    data: Field.SerializedData,
     object: LObject
-  ): Attribute {
-    var cls = this.attributeTypes[data.type];
+  ): Field {
+    var cls = this.fieldTypes[data.type];
 
     if (!cls) {
-      throw new MissingAttributeTypeError();
+      throw new MissingFieldTypeError();
     }
 
     return cls.deserialize(this, data, object);

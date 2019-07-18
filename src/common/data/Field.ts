@@ -2,7 +2,7 @@ import LObject from './LObject';
 import EventEmitter from '../util/EventEmitter';
 import Project from './Project';
 
-namespace Attribute {
+namespace Field {
   export type SerializedData = {
     type: string,
     key: string,
@@ -12,19 +12,19 @@ namespace Attribute {
   export interface Deserializer extends Function {
     deserialize(
       project: Project,
-      data: Attribute.SerializedData,
+      data: Field.SerializedData,
       object: LObject
-    ): Attribute;
+    ): Field;
   }
 }
 
-interface Attribute extends EventEmitter<{ update: void }> {
+interface Field extends EventEmitter<{ update: void }> {
   readonly key: string
   readonly id: string;
 
   get(): string;
 
-  serialize(): Attribute.SerializedData;
+  serialize(): Field.SerializedData;
 }
 
-export default Attribute;
+export default Field;

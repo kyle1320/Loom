@@ -1,12 +1,12 @@
-import Attribute from "../../data/Attribute";
+import Field from "../../data/Field";
 import EventEmitter from "../../util/EventEmitter";
 import Project from "../../data/Project";
 import LObject from "../../data/LObject";
-import AttributeReferenceError from '../../errors/AttributeReferenceError';
+import FieldReferenceError from '../../errors/FieldReferenceError';
 
-export default class BasicAttribute extends EventEmitter<{
+export default class BasicField extends EventEmitter<{
   update: void
-}> implements Attribute {
+}> implements Field {
   public readonly id: string;
 
   private value: string = '';
@@ -27,7 +27,7 @@ export default class BasicAttribute extends EventEmitter<{
     this.update = this.update.bind(this);
     this.set(value);
 
-    project.attributes.store(this);
+    project.fields.store(this);
   }
 
   public set(value: string) {
@@ -37,11 +37,11 @@ export default class BasicAttribute extends EventEmitter<{
 
     var links = this.getLinks().sort();
     diff(this.links, links, l => {
-      var attr = this.project.attributes.fetch(l);
+      var attr = this.project.fields.fetch(l);
 
       if (attr) attr.on('update', this.update);
     }, l => {
-      var attr = this.project.attributes.fetch(l);
+      var attr = this.project.fields.fetch(l);
 
       if (attr) attr.removeListener('update', this.update);
     });
@@ -57,10 +57,10 @@ export default class BasicAttribute extends EventEmitter<{
   public get(): string {
     if (this.invalid) {
       this.computed = this.value.replace(/\{([^}]+)\}/g, (_, id) => {
-        var attr = this.project.attributes.fetch(id);
+        var attr = this.project.fields.fetch(id);
 
         if (!attr) {
-          throw new AttributeReferenceError();
+          throw new FieldReferenceError();
         }
 
         return attr.get();
@@ -70,9 +70,9 @@ export default class BasicAttribute extends EventEmitter<{
     return this.computed;
   }
 
-  public computedParts(): (Attribute | string)[] {
+  public computedParts(): (Field | string)[] {
     return this.value.split(/\{|\}/g).map((part, i) => {
-      return (i % 2 == 0) ? part : this.project.attributes.fetch(part) || "";
+      return (i % 2 == 0) ? part : this.project.fields.fetch(part) || "";
     }).filter(Boolean);
   }
 
@@ -96,9 +96,9 @@ export default class BasicAttribute extends EventEmitter<{
     this.emit('update');
   }
 
-  public serialize(): Attribute.SerializedData {
+  public serialize(): Field.SerializedData {
     return {
-      type: BasicAttribute.name,
+      type: BasicField.name,
       key: this.key,
       value: this.value
     };
@@ -106,10 +106,10 @@ export default class BasicAttribute extends EventEmitter<{
 
   public static deserialize(
     project: Project,
-    data: Attribute.SerializedData,
+    data: Field.SerializedData,
     object: LObject
-  ): Attribute {
-    return new BasicAttribute(project, object, data.key, data.value);
+  ): Field {
+    return new BasicField(project, object, data.key, data.value);
   }
 }
 

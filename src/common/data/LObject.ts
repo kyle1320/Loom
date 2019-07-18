@@ -1,20 +1,20 @@
-import Attribute from './Attribute';
+import Field from './Field';
 import Project from './Project';
-import BasicAttribute from '../extensions/BasicAttributes/BasicAttribute';
+import BasicField from '../extensions/BasicFields/BasicField';
 
 namespace LObject {
   export type SerializedData = {
     type: string,
     id: string,
     parentId: string | null,
-    ownAttributes: Attribute.SerializedData[];
+    ownFields: Field.SerializedData[];
   };
 }
 
 var counter = 0;
 
 class LObject {
-  private attributes: { [id: string]: Attribute };
+  private fields: { [id: string]: Field };
 
   public constructor(
     private project: Project,
@@ -22,32 +22,32 @@ class LObject {
     public readonly parent: LObject | null = null,
     public readonly id = String(counter++)
   ) {
-    this.attributes = Object.create(parent && parent.attributes);
+    this.fields = Object.create(parent && parent.fields);
 
     project.objects.store(this);
   }
 
-  public *getOwnAttributes() {
-    for (var key of Object.getOwnPropertyNames(this.attributes)) {
-      yield this.attributes[key];
+  public *getOwnFields() {
+    for (var key of Object.getOwnPropertyNames(this.fields)) {
+      yield this.fields[key];
     }
   }
 
-  // attributes can use dots to indicate parts of a path
-  public *getAttributes(path: string = '') {
+  // fields can use dots to indicate parts of a path
+  public *getFields(path: string = '') {
     if (path) path += '.';
 
-    for (var key in this.attributes) {
-      if (key.startsWith(path)) yield this.attributes[key];
+    for (var key in this.fields) {
+      if (key.startsWith(path)) yield this.fields[key];
     }
   }
 
-  public getAttribute(key: string): Attribute | undefined {
-    return this.attributes[key];
+  public getField(key: string): Field | undefined {
+    return this.fields[key];
   }
 
-  public addOwnAttribute(key: string, value: string) {
-    this.attributes[key] = new BasicAttribute(this.project, this, key, value);
+  public addOwnField(key: string, value: string) {
+    this.fields[key] = new BasicField(this.project, this, key, value);
   }
 
   public serialize(): LObject.SerializedData {
@@ -55,7 +55,7 @@ class LObject {
       type: this.type,
       id: this.id,
       parentId: this.parent && this.parent.id,
-      ownAttributes: [...this.getOwnAttributes()].map(attr => attr.serialize())
+      ownFields: [...this.getOwnFields()].map(attr => attr.serialize())
     };
   }
 
@@ -70,9 +70,9 @@ class LObject {
       data.id
     );
 
-    data.ownAttributes
-      .map(a => project.deserializeAttribute(a, obj))
-      .forEach(attr => obj.attributes[attr.key] = attr);
+    data.ownFields
+      .map(a => project.deserializeField(a, obj))
+      .forEach(attr => obj.fields[attr.key] = attr);
 
     return obj;
   }
