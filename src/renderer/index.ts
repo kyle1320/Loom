@@ -1,17 +1,18 @@
 import ObjectEditor from './components/ObjectEditor/ObjectEditor';
 import Project from '../common/data/Project';
+import BasicField from '../common/extensions/BasicFields/BasicField';
 
 window.addEventListener('load', function () {
   var project = new Project();
 
   var obj1 = project.makeObject('user');
-  obj1.addOwnField('primaryColor', 'red');
+  obj1.addOwnField(new BasicField(project, obj1, 'primaryColor', 'red'));
 
   var obj2 = project.makeObject('user');
-  obj2.addOwnField('border', `1px solid {${obj1.id}|primaryColor}`);
+  obj2.addOwnField(new BasicField(project, obj1, 'border', `1px solid {${obj1.id}|primaryColor}`));
 
   var obj3 = project.makeObject('user', obj2);
-  obj3.addOwnField('attr6', `some value`);
+  obj3.addOwnField(new BasicField(project, obj1, 'attr6', `some value`));
 
   // Make sure serialization works
   project = Project.deserialize(project.serialize());

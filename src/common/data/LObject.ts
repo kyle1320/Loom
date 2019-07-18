@@ -1,6 +1,5 @@
 import Field from './Field';
 import Project from './Project';
-import BasicField from '../extensions/BasicFields/BasicField';
 
 namespace LObject {
   export type SerializedData = {
@@ -19,7 +18,7 @@ class LObject {
   private fields: { [id: string]: Field };
 
   public constructor(
-    private project: Project,
+    project: Project,
     public readonly type: string,
     public readonly parent: LObject | null = null,
     public readonly id = String(counter++)
@@ -48,8 +47,8 @@ class LObject {
     return this.fields[key];
   }
 
-  public addOwnField(key: string, value: string) {
-    this.fields[key] = new BasicField(this.project, this, key, value);
+  public addOwnField(field: Field) {
+    this.fields[field.key] = field;
   }
 
   public serialize(): LObject.SerializedData {
