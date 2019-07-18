@@ -1,4 +1,3 @@
-import LObject from './LObject';
 import EventEmitter from '../util/EventEmitter';
 import Project from './Project';
 
@@ -12,22 +11,16 @@ namespace Field {
   export interface Deserializer extends Function {
     deserialize(
       project: Project,
-      data: Field.SerializedData,
-      object: LObject
+      data: Field.SerializedData
     ): Field;
   }
 }
 
 abstract class Field extends EventEmitter<{ update: void }> {
-  public readonly id: string
-
   protected constructor(
-    object: LObject,
     public readonly key: string
   ) {
     super();
-
-    this.id = `${object.id}|${key}`;
   }
 
   public abstract get(): string;

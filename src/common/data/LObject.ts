@@ -18,14 +18,11 @@ class LObject {
   private fields: { [id: string]: Field };
 
   public constructor(
-    project: Project,
     public readonly type: string,
     public readonly parent: LObject | null = null,
     public readonly id = String(counter++)
   ) {
     this.fields = Object.create(parent && parent.fields);
-
-    project.objects.store(this);
   }
 
   public *getOwnFields() {
@@ -65,14 +62,13 @@ class LObject {
     data: LObject.SerializedData
   ): LObject {
     var obj = new LObject(
-      project,
       data.type,
-      data.parentId && project.objects.fetch(data.parentId) || null,
+      data.parentId && project.getObject(data.parentId) || null,
       data.id
     );
 
     data.ownFields
-      .map(a => project.deserializeField(a, obj))
+      .map(a => project.deserializeField(a))
       .forEach(attr => obj.fields[attr.key] = attr);
 
     return obj;

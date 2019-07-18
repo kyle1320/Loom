@@ -1,6 +1,5 @@
 import Field from "../../data/Field";
 import Project from "../../data/Project";
-import LObject from "../../data/LObject";
 import FieldReferenceError from '../../errors/FieldReferenceError';
 
 export default class BasicField extends Field {
@@ -11,16 +10,13 @@ export default class BasicField extends Field {
 
   public constructor(
     private project: Project,
-    object: LObject,
     key: string,
     value: string
   ) {
-    super(object, key);
+    super(key);
 
     this.update = this.update.bind(this);
     this.set(value);
-
-    project.fields.store(this);
   }
 
   public set(value: string) {
@@ -30,11 +26,13 @@ export default class BasicField extends Field {
 
     var links = this.getLinks().sort();
     diff(this.links, links, l => {
-      var attr = this.project.fields.fetch(l);
+      var split = l.split('|');
+      var attr = this.project.getField(split[0], split[1]);
 
       if (attr) attr.on('update', this.update);
     }, l => {
-      var attr = this.project.fields.fetch(l);
+      var split = l.split('|');
+      var attr = this.project.getField(split[0], split[1]);
 
       if (attr) attr.removeListener('update', this.update);
     });
@@ -49,8 +47,9 @@ export default class BasicField extends Field {
 
   public get(): string {
     if (this.invalid) {
-      this.computed = this.value.replace(/\{([^}]+)\}/g, (_, id) => {
-        var attr = this.project.fields.fetch(id);
+      this.computed = this.value.replace(/\{([^}]+)\}/g, (_, l) => {
+        var split = l.split('|');
+        var attr = this.project.getField(split[0], split[1]);
 
         if (!attr) {
           throw new FieldReferenceError();
@@ -62,12 +61,6 @@ export default class BasicField extends Field {
     }
 
     return this.computed;
-  }
-
-  public computedParts(): (Field | string)[] {
-    return this.value.split(/\{|\}/g).map((part, i) => {
-      return (i % 2 == 0) ? part : this.project.fields.fetch(part) || "";
-    }).filter(Boolean);
   }
 
   private getLinks() {
@@ -100,10 +93,9 @@ export default class BasicField extends Field {
 
   public static deserialize(
     project: Project,
-    data: Field.SerializedData,
-    object: LObject
+    data: Field.SerializedData
   ): Field {
-    return new BasicField(project, object, data.key, data.value);
+    return new BasicField(project, data.key, data.value);
   }
 }
 

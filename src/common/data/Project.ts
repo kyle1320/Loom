@@ -1,5 +1,3 @@
-import ObjectStore from "./ObjectStore";
-import FieldStore from "./FieldStore";
 import SerializationError from '../errors/SerializationError';
 import LObject from "./LObject";
 import Field from "./Field";
@@ -12,10 +10,7 @@ class Project {
     BasicFieldExtension
   ];
 
-  public readonly objects: ObjectStore;
-  public readonly fields: FieldStore;
-
-  public readonly extensions: Extension[] = [];
+  private objects: Map<string, LObject>;
 
   private readonly fieldTypes: {
     [key: string]: Field.Deserializer
@@ -25,8 +20,7 @@ class Project {
   } = {};
 
   public constructor() {
-    this.objects = new ObjectStore();
-    this.fields = new FieldStore();
+    this.objects = new Map();
 
     Project.defaultExtensions.forEach(e => this.addExtension(e));
   }
@@ -36,15 +30,26 @@ class Project {
     parent: null | string | LObject = null
   ): LObject {
     if (typeof parent === 'string') {
-      parent = this.objects.fetch(parent) || null;
+      parent = this.objects.get(parent) || null;
     }
 
-    var obj  = new LObject(this, type, parent);
+    var obj = new LObject(type, parent);
     var initializers = this.objectInitializers[type] || [];
 
     initializers.forEach(i => i(obj));
 
+    this.objects.set(obj.id, obj);
+
     return obj;
+  }
+
+  public getObject(id: string): LObject | undefined {
+    return this.objects.get(id);
+  }
+
+  public getField(objId: string, key: string): Field | undefined {
+    var obj = this.objects.get(objId);
+    return obj && obj.getField(key)
   }
 
   public addFieldType(type: Field.Deserializer) {
@@ -63,26 +68,41 @@ class Project {
     ext.init(this);
   }
 
+  private *objectsInDependencyOrder() {
+    var seen = new Set();
+
+    function* visit(obj: LObject): IterableIterator<LObject> {
+      if (seen.has(obj)) return;
+
+      seen.add(obj);
+
+      if (obj.parent) yield* visit(obj.parent);
+
+      yield obj;
+    }
+
+    for (var obj of this.objects.values()) {
+      yield* visit(obj);
+    }
+  }
+
   public serialize(): Project.SerializedData {
     return {
       serializationVersion: Project.serializationVersion,
 
-      objects: [...this.objects.allInDependencyOrder()]
+      objects: [...this.objectsInDependencyOrder()]
         .map(obj => obj.serialize())
     };
   }
 
-  public deserializeField(
-    data: Field.SerializedData,
-    object: LObject
-  ): Field {
+  public deserializeField(data: Field.SerializedData): Field {
     var cls = this.fieldTypes[data.type];
 
     if (!cls) {
       throw new MissingFieldTypeError();
     }
 
-    return cls.deserialize(this, data, object);
+    return cls.deserialize(this, data);
   }
 
   public static deserialize(data: Project.SerializedData): Project {
@@ -93,7 +113,10 @@ class Project {
 
     var proj = new Project();
 
-    data.objects.forEach(o => LObject.deserialize(proj, o));
+    data.objects.forEach(o => {
+      var obj = LObject.deserialize(proj, o);
+      proj.objects.set(obj.id, obj);
+    });
 
     return proj;
   }
