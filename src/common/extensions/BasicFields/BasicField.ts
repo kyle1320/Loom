@@ -1,14 +1,9 @@
 import Field from "../../data/Field";
-import EventEmitter from "../../util/EventEmitter";
 import Project from "../../data/Project";
 import LObject from "../../data/LObject";
 import FieldReferenceError from '../../errors/FieldReferenceError';
 
-export default class BasicField extends EventEmitter<{
-  update: void
-}> implements Field {
-  public readonly id: string;
-
+export default class BasicField extends Field {
   private value: string = '';
   private computed: string = '';
   private invalid: boolean = true;
@@ -17,12 +12,10 @@ export default class BasicField extends EventEmitter<{
   public constructor(
     private project: Project,
     object: LObject,
-    public readonly key: string,
+    key: string,
     value: string
   ) {
-    super();
-
-    this.id = `${object.id}|${key}`;
+    super(object, key);
 
     this.update = this.update.bind(this);
     this.set(value);

@@ -18,13 +18,21 @@ namespace Field {
   }
 }
 
-interface Field extends EventEmitter<{ update: void }> {
-  readonly key: string
-  readonly id: string;
+abstract class Field extends EventEmitter<{ update: void }> {
+  public readonly id: string
 
-  get(): string;
+  protected constructor(
+    object: LObject,
+    public readonly key: string
+  ) {
+    super();
 
-  serialize(): Field.SerializedData;
+    this.id = `${object.id}|${key}`;
+  }
+
+  public abstract get(): string;
+
+  public abstract serialize(): Field.SerializedData;
 }
 
 export default Field;
