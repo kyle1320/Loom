@@ -9,6 +9,8 @@ namespace LObject {
     parentId: string | null,
     ownFields: Field.SerializedData[];
   };
+
+  export type Initializer = (obj: LObject) => any;
 }
 
 var counter = 0;

@@ -13,28 +13,45 @@ class Project {
 
   private readonly fieldTypes: {
     [key: string]: Field.Deserializer
-  };
+  } = {};
+  private readonly objectInitializers: {
+    [type: string]: LObject.Initializer[]
+  } = {};
 
   public constructor() {
     this.objects = new ObjectStore();
     this.fields = new FieldStore();
 
-    this.fieldTypes = {};
-
     // TODO: move this?
     this.addExtensions(new BasicFieldExtension());
   }
 
-  public makeObject(type: string, parent: null | string | LObject = null) {
+  public makeObject(
+    type: string,
+    parent: null | string | LObject = null
+  ): LObject {
     if (typeof parent === 'string') {
       parent = this.objects.fetch(parent) || null;
     }
 
-    return new LObject(this, type, parent);
+    var obj  = new LObject(this, type, parent);
+    var initializers = this.objectInitializers[type] || [];
+
+    initializers.forEach(i => i(obj));
+
+    return obj;
   }
 
   public addFieldType(type: Field.Deserializer) {
     this.fieldTypes[type.name] = type;
+  }
+
+  public addObjectInitializer(type: string, init: LObject.Initializer) {
+    if (type in this.objectInitializers) {
+      this.objectInitializers[type].push(init);
+    } else {
+      this.objectInitializers[type] = [init];
+    }
   }
 
   public addExtensions(...extensions: Extension[]) {
