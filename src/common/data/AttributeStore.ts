@@ -1,5 +1,5 @@
 import Attribute from './Attribute';
-import IllegalArgumentKeyError from '../errors/IllegalArgumentKeyError';
+import IllegalAttributeKeyError from '../errors/IllegalAttributeKeyError';
 
 const validityRegex = /^[a-zA-Z0-9_.-]+$/;
 
@@ -12,7 +12,7 @@ export default class AttributeStore {
 
   public store(attr: Attribute): void {
     if (!validityRegex.test(attr.key)) {
-      throw new IllegalArgumentKeyError(attr.key);
+      throw new IllegalAttributeKeyError(attr.key);
     }
 
     this.attrs.set(attr.id, attr);
