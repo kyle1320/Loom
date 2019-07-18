@@ -58,6 +58,7 @@ export default class BasicField extends Field {
 
         return attr.get();
       });
+      this.invalid = false;
     }
 
     return this.computed;
