@@ -3,6 +3,7 @@ import { makeElement } from '../../util/dom';
 
 import './ObjectEditor.scss';
 import FieldEditor from '../FieldEditor/FieldEditor';
+import ComponentPreview from '../ComponentPreview/ComponentPreview';
 
 export default class ObjectEditor {
   public readonly element: HTMLElement;
@@ -12,7 +13,8 @@ export default class ObjectEditor {
       <div className="object-id">Id: {object.id}</div>
       {object.parent &&
         <div className="object-id">Parent: {object.parent.id}</div>}
-      {[...object.getFields()].map(a => new FieldEditor(a).element)}
+      {[...object.getFieldNames()].map(n => new FieldEditor(object, n).element)}
+      {object.type === 'component' && new ComponentPreview(object).element}
     </div>;
   }
 }

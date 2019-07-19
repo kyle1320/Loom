@@ -2,35 +2,42 @@ import { makeElement } from '../../util/dom';
 
 import './FieldEditor.scss';
 import BasicField from '../../../common/extensions/BasicFields/BasicField';
-import Field from '../../../common/data/Field';
+import LObject from '../../../common/data/LObject';
+import FieldReferenceError from '../../../common/errors/FieldReferenceError';
 
 export default class FieldEditor {
-  private attr: Field;
   private value: HTMLElement;
 
   public readonly element: HTMLElement;
 
-  public constructor(attr: Field) {
-    this.attr = attr;
+  public constructor(
+    private obj: LObject,
+    private key: string
+  ) {
+    const field = obj.getField(key);
+
+    if (!field) {
+      throw new FieldReferenceError();
+    }
 
     this.element = <div className='field-editor'>
-      {attr.key}: {
-        this.value = <div className='field' contentEditable='true' onclick={() => {}}>
-          {this.attr.get()}
+      {key}: {
+        this.value = <div className='field' contentEditable={(field instanceof BasicField).toString()} onclick={() => {}}>
+          {obj.getFieldValue(key)}
         </div>
       }
     </div>;
 
-    if (attr instanceof BasicField) {
+    if (field instanceof BasicField) {
       this.value.addEventListener('input', () => {
-        attr.set(this.value.innerHTML);
+        field.set(this.value.textContent || '');
       });
     }
 
-    this.attr.on('update', () => this.update());
+    field.on('update', () => this.update());
   }
 
   private update() {
-    this.value.innerHTML = this.attr.get();
+    this.value.textContent = this.obj.getFieldValue(this.key);
   }
 }
