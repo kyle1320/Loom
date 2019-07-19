@@ -42,7 +42,7 @@ class BuildSystem {
 
     this.preBuild.forEach(b => b());
 
-    for (let obj of project.objects.all()) {
+    for (let obj of project.allObjects()) {
       this.runAll(this.objectBuild['*'], obj);
       this.runAll(this.objectBuild[obj.type], obj);
     }

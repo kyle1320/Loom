@@ -68,6 +68,10 @@ class Project {
     ext.init(this);
   }
 
+  public *allObjects() {
+    yield* this.objects.values();
+  }
+
   private *objectsInDependencyOrder() {
     var seen = new Set();
 
