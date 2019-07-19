@@ -1,6 +1,5 @@
 import Field from "../../data/Field";
 import Project from "../../data/Project";
-import FieldReferenceError from '../../errors/FieldReferenceError';
 
 export default class BasicField extends Field {
   private value: string = '';
@@ -8,7 +7,7 @@ export default class BasicField extends Field {
   private invalid: boolean = true;
   private links: string[] = [];
 
-  public constructor(
+  private constructor(
     private project: Project,
     key: string,
     value: string
@@ -49,13 +48,7 @@ export default class BasicField extends Field {
     if (this.invalid) {
       this.computed = this.value.replace(/\{([^}]+)\}/g, (_, l) => {
         var split = l.split('|');
-        var attr = this.project.getField(split[0], split[1]);
-
-        if (!attr) {
-          throw new FieldReferenceError();
-        }
-
-        return attr.get();
+        return this.project.getFieldValue(split[0], split[1]);
       });
       this.invalid = false;
     }
@@ -92,10 +85,13 @@ export default class BasicField extends Field {
   }
 
   public static deserialize(
-    project: Project,
     data: Field.SerializedData
-  ): Field {
-    return new BasicField(project, data.key, data.value);
+  ): Field.Factory.ProjectStep {
+    return BasicField.factory(data.key, data.value);
+  }
+
+  public static factory(key: string, value: string): Field.Factory.ProjectStep {
+    return project => () => new BasicField(project, key, value);
   }
 }
 

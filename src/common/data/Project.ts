@@ -3,11 +3,14 @@ import LObject from "./LObject";
 import Field from "./Field";
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
 import Extension from "../extensions/Extension";
-import BasicFieldExtension from "../extensions/BasicFields";
+import BasicFields from '../extensions/BasicFields';
+import ObjectReferenceError from '../errors/ObjectReferenceError';
+import Components from '../extensions/Components';
 
 class Project {
   public static readonly defaultExtensions: Extension[] = [
-    BasicFieldExtension
+    BasicFields,
+    Components
   ];
 
   private objects: Map<string, LObject>;
@@ -15,8 +18,8 @@ class Project {
   private readonly fieldTypes: {
     [key: string]: Field.Deserializer
   } = {};
-  private readonly objectInitializers: {
-    [type: string]: LObject.Initializer[]
+  private readonly defaultFields: {
+    [type: string]: Field.Factory.ProjectStep[]
   } = {};
 
   public constructor() {
@@ -34,9 +37,9 @@ class Project {
     }
 
     var obj = new LObject(type, parent);
-    var initializers = this.objectInitializers[type] || [];
+    var defaultFields = this.defaultFields[type] || [];
 
-    initializers.forEach(i => i(obj));
+    defaultFields.forEach(factory => obj.addOwnField(factory(this)));
 
     this.objects.set(obj.id, obj);
 
@@ -48,20 +51,32 @@ class Project {
   }
 
   public getField(objId: string, key: string): Field | undefined {
-    var obj = this.objects.get(objId);
-    return obj && obj.getField(key)
+    var obj = this.getObject(objId);
+
+    if (!obj) {
+      throw new ObjectReferenceError();
+    }
+
+    return obj.getField(key);
+  }
+
+  public getFieldValue(objId: string, key: string): string {
+    var obj = this.getObject(objId);
+
+    if (!obj) {
+      throw new ObjectReferenceError();
+    }
+
+    return obj.getFieldValue(key);
   }
 
   public addFieldType(type: Field.Deserializer) {
     this.fieldTypes[type.name] = type;
   }
 
-  public addObjectInitializer(type: string, init: LObject.Initializer) {
-    if (type in this.objectInitializers) {
-      this.objectInitializers[type].push(init);
-    } else {
-      this.objectInitializers[type] = [init];
-    }
+  public addDefaultFields(type: string, ...fields: Field.Factory.ProjectStep[]) {
+    var arr = this.defaultFields[type] || [];
+    this.defaultFields[type] = arr.concat(fields);
   }
 
   public addExtension(ext: Extension) {
@@ -85,7 +100,7 @@ class Project {
       yield obj;
     }
 
-    for (var obj of this.objects.values()) {
+    for (var obj of this.allObjects()) {
       yield* visit(obj);
     }
   }
@@ -99,14 +114,16 @@ class Project {
     };
   }
 
-  public deserializeField(data: Field.SerializedData): Field {
+  public deserializeField(
+    data: Field.SerializedData
+  ): Field.Factory.ObjectStep {
     var cls = this.fieldTypes[data.type];
 
     if (!cls) {
       throw new MissingFieldTypeError();
     }
 
-    return cls.deserialize(this, data);
+    return cls.deserialize(data)(this);
   }
 
   public static deserialize(data: Project.SerializedData): Project {

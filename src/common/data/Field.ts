@@ -1,7 +1,13 @@
 import EventEmitter from '../util/EventEmitter';
 import Project from './Project';
+import LObject from './LObject';
 
 namespace Field {
+  export namespace Factory {
+    export type ProjectStep = (project: Project) => Field.Factory.ObjectStep;
+    export type ObjectStep = (object: LObject) => Field;
+  }
+
   export type SerializedData = {
     type: string,
     key: string,
@@ -9,10 +15,7 @@ namespace Field {
   };
 
   export interface Deserializer extends Function {
-    deserialize(
-      project: Project,
-      data: Field.SerializedData
-    ): Field;
+    deserialize(data: Field.SerializedData): Field.Factory.ProjectStep;
   }
 }
 

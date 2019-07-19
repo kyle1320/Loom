@@ -1,5 +1,7 @@
 import Field from './Field';
 import Project from './Project';
+import FieldReferenceError from '../errors/FieldReferenceError';
+import EventEmitter from '../util/EventEmitter';
 
 namespace LObject {
   export type SerializedData = {
@@ -14,7 +16,10 @@ namespace LObject {
 
 var counter = 0;
 
-class LObject {
+class LObject extends EventEmitter<{
+  addField: Field,
+  removeField: Field
+}> {
   private fields: { [id: string]: Field };
 
   public constructor(
@@ -22,21 +27,33 @@ class LObject {
     public readonly parent: LObject | null = null,
     public readonly id = String(counter++)
   ) {
+    super();
+
     this.fields = Object.create(parent && parent.fields);
   }
 
-  public *getOwnFields() {
-    for (var key of Object.getOwnPropertyNames(this.fields)) {
-      yield this.fields[key];
-    }
+  public *getOwnFieldNames(): IterableIterator<string> {
+    yield* Object.getOwnPropertyNames(this.fields);
   }
 
   // fields can use dots to indicate parts of a path
-  public *getFields(path: string = '') {
+  public *getFieldNames(path: string = ''): IterableIterator<string> {
     if (path) path += '.';
 
     for (var key in this.fields) {
-      if (key.startsWith(path)) yield this.fields[key];
+      if (key.startsWith(path)) yield key;
+    }
+  }
+
+  public *getOwnFields(): IterableIterator<Field> {
+    for (var key of this.getOwnFieldNames()) {
+      yield this.getField(key)!;
+    }
+  }
+
+  public *getFields(path: string = ''): IterableIterator<Field> {
+    for (var key of this.getFieldNames(path)) {
+      yield this.getField(key)!;
     }
   }
 
@@ -44,8 +61,20 @@ class LObject {
     return this.fields[key];
   }
 
-  public addOwnField(field: Field) {
+  public getFieldValue(key: string): string {
+    var field = this.getField(key);
+
+    if (!field) {
+      throw new FieldReferenceError();
+    }
+
+    return field.get();
+  }
+
+  public addOwnField(factory: Field.Factory.ObjectStep) {
+    var field = factory(this);
     this.fields[field.key] = field;
+    this.emit('addField', field);
   }
 
   public serialize(): LObject.SerializedData {
@@ -67,9 +96,7 @@ class LObject {
       data.id
     );
 
-    data.ownFields
-      .map(a => project.deserializeField(a))
-      .forEach(attr => obj.fields[attr.key] = attr);
+    data.ownFields.map(f => obj.addOwnField(project.deserializeField(f)));
 
     return obj;
   }
