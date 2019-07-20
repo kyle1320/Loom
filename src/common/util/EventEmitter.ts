@@ -1,17 +1,16 @@
-type Callback<T> = T extends void ? () => any : (arg: T) => any;
+type Callback<T> = T extends void ? () => void : (arg: T) => void;
 
-type VoidKeys<T, K extends keyof T = keyof T> =
-  K extends (T[K] extends void ? K : never) ? K : never;
-type Listeners<T> =
-  {[name: string]: any} & {[K in keyof T]?: ((arg: T) => any)[]};
-type QueuedEvents<T> =
-  {[name: string]: any} & {[K in keyof T]?: T[K]};
+type VoidTypes<T, K extends keyof T = keyof T> =
+  T[K] extends void ? K : never;
+type NonVoidTypes<T, K extends keyof T = keyof T> =
+  T[K] extends void ? never : K;
+type Listeners<T> = {[K in keyof T]?: ((arg: T) => void)[]};
+type QueuedEvents<T> = {
+  [K in keyof T]?: (K extends VoidTypes<T> ? undefined : T[K])
+}
 
-export default class EventEmitter<
-T extends {[name: string]: any},
-VoidTypes = VoidKeys<T>,
-NonVoidTypes extends Exclude<keyof T, VoidTypes> = Exclude<keyof T, VoidTypes>
-> {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export default class EventEmitter<T extends {[name: string]: any}> {
   private _listeners: Listeners<T>;
 
   private _queued: QueuedEvents<T>;
@@ -23,29 +22,29 @@ NonVoidTypes extends Exclude<keyof T, VoidTypes> = Exclude<keyof T, VoidTypes>
     this._timeout = null;
   }
 
-  public on<K extends keyof T>(type: K, callback: Callback<T[K]>) {
-    var registered = this._listeners[type];
+  public on<K extends keyof T>(type: K, callback: Callback<T[K]>): void {
+    let registered = this._listeners[type];
 
     if (!registered) {
       registered = [] as Listeners<T>[K];
       this._listeners[type] = registered;
     }
 
-    registered.push(callback);
+    registered!.push(callback);
   }
 
-  public emit<K extends NonVoidTypes>(type: K, arg: T[K]): void;
-  public emit<K extends VoidTypes>(type: K): void;
+  public emit<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
+  public emit<K extends VoidTypes<T>>(type: K): void;
   public emit<K extends keyof T>(type: K, arg?: T[K]): void {
-    var registered = this._listeners[type];
+    const registered = this._listeners[type];
 
     if (registered) {
-      registered.forEach((cb: (arg: T) => any) => cb.call(this, arg!));
+      registered.forEach((cb: (arg: T) => void) => cb.call(this, arg!));
     }
   }
 
-  public emitOnceAsync<K extends NonVoidTypes>(type: K, arg: T[K]): void;
-  public emitOnceAsync<K extends VoidTypes>(type: K): void;
+  public emitOnceAsync<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
+  public emitOnceAsync<K extends VoidTypes<T>>(type: K): void;
   public emitOnceAsync<K extends keyof T>(type: K, arg?: T[K]): void {
     this._queued[type] = arg!;
 
@@ -53,21 +52,24 @@ NonVoidTypes extends Exclude<keyof T, VoidTypes> = Exclude<keyof T, VoidTypes>
       this._timeout = setTimeout(() => {
         this._timeout = null;
 
-        var queued = this._queued;
+        const queued = this._queued;
         this._queued = {};
 
-        for (var type in queued) {
-          this.emit(<any>type, queued[type]);
+        for (const type in queued) {
+          this.emit<any>(type, queued[type]!);
         }
       }, 0);
     }
   }
 
-  public removeListener<K extends keyof T>(type: K, callback: Callback<T[K]>) {
-    var registered = this._listeners[type];
+  public removeListener<K extends keyof T>(
+    type: K,
+    callback: Callback<T[K]>
+  ): void {
+    const registered = this._listeners[type];
 
     if (registered) {
-      var index = registered.indexOf(callback);
+      const index = registered.indexOf(callback);
 
       if (index >= 0) {
         registered.splice(index, 1);

@@ -1,5 +1,23 @@
-import Field from "../../data/Field";
-import Project from "../../data/Project";
+import Field from '../../data/Field';
+import Project from '../../data/Project';
+
+function diff<T>(
+  oldSorted: T[],
+  newSorted: T[],
+  onAdd: (el: T) => void,
+  onRemove: (el: T) => void
+): void {
+  let i = 0, j = 0;
+  while (i < oldSorted.length && j < newSorted.length) {
+    if (i >= oldSorted.length || oldSorted[i] > newSorted[j]) {
+      onAdd(newSorted[j]);
+      j++;
+    } else if (j >= newSorted.length || oldSorted[i] < newSorted[j]) {
+      onRemove(oldSorted[i]);
+      i++;
+    }
+  }
+}
 
 export default class BasicField extends Field {
   private value: string = '';
@@ -18,22 +36,22 @@ export default class BasicField extends Field {
     this.set(value);
   }
 
-  public set(value: string) {
+  public set(value: string): void {
     if (value === this.value) return;
 
     this.value = value;
 
-    var links = this.getLinks().sort();
+    const links = this.getLinks().sort();
     diff(this.links, links, l => {
-      var split = l.split('|');
-      var attr = this.project.getField(split[0], split[1]);
+      const split = l.split('|');
+      const field = this.project.getField(split[0], split[1]);
 
-      if (attr) attr.on('update', this.update);
+      if (field) field.on('update', this.update);
     }, l => {
-      var split = l.split('|');
-      var attr = this.project.getField(split[0], split[1]);
+      const split = l.split('|');
+      const field = this.project.getField(split[0], split[1]);
 
-      if (attr) attr.removeListener('update', this.update);
+      if (field) field.removeListener('update', this.update);
     });
     this.links = links;
 
@@ -47,7 +65,7 @@ export default class BasicField extends Field {
   public get(): string {
     if (this.invalid) {
       this.computed = this.value.replace(/\{([^}]+)\}/g, (_, l) => {
-        var split = l.split('|');
+        const split = l.split('|');
         return this.project.getFieldValue(split[0], split[1]);
       });
       this.invalid = false;
@@ -56,11 +74,11 @@ export default class BasicField extends Field {
     return this.computed;
   }
 
-  private getLinks() {
-    var re = /\{([^}]+)\}/g;
-    var links = [];
+  private getLinks(): string[] {
+    const re = /\{([^}]+)\}/g;
+    const links = [];
 
-    var matches = re.exec(this.value);
+    let matches = re.exec(this.value);
     while (matches) {
       links.push(matches[1]);
 
@@ -70,7 +88,7 @@ export default class BasicField extends Field {
     return links;
   }
 
-  public update() {
+  public update(): void {
     // TODO: if we are already invalid, does anyone care?
     this.invalid = true;
     this.emit('update');
@@ -92,37 +110,5 @@ export default class BasicField extends Field {
 
   public static factory(key: string, value: string): Field.Factory {
     return project => () => new BasicField(project, key, value);
-  }
-}
-
-function diff<T>(
-  oldSorted: T[],
-  newSorted: T[],
-  onAdd: (el: T) => any,
-  onRemove: (el: T) => any
-) {
-  var i = 0, j = 0;
-  while (true) {
-    if (i >= oldSorted.length) {
-      if (j >= newSorted.length) {
-        break;
-      } else {
-        onAdd(newSorted[j]);
-        j++;
-      }
-    } else {
-      if (j >= newSorted.length) {
-        onRemove(oldSorted[i]);
-        i++;
-      } else {
-        if (oldSorted[i] < newSorted[j]) {
-          onRemove(oldSorted[i]);
-          i++;
-        } else if (oldSorted[i] > newSorted[j]) {
-          onAdd(newSorted[j]);
-          j++;
-        }
-      }
-    }
   }
 }

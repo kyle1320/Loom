@@ -1,5 +1,5 @@
-import Field from "../../data/Field";
-import LObject from "../../data/LObject";
+import Field from '../../data/Field';
+import LObject from '../../data/LObject';
 
 export default class ComponentContentField extends Field {
   private value: string = '';
@@ -15,7 +15,7 @@ export default class ComponentContentField extends Field {
 
     this.addFieldListener(object.getField('html.tag'));
     this.addFieldListener(object.getField('html.innerContent'));
-    for (var attrField of object.getFields('html.attr')) {
+    for (const attrField of object.getFields('html.attr')) {
       this.addFieldListener(attrField);
     }
 
@@ -58,11 +58,11 @@ export default class ComponentContentField extends Field {
     this.emit('update');
   }
 
-  private addFieldListener(field: Field | undefined) {
+  private addFieldListener(field: Field | undefined): void {
     if (field) field.on('update', this.update);
   }
 
-  private removeFieldListener(field: Field | undefined) {
+  private removeFieldListener(field: Field | undefined): void {
     if (field) field.removeListener('update', this.update);
   }
 

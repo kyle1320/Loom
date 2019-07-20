@@ -8,11 +8,11 @@ namespace Field {
     export type WithProject = (object: LObject) => Field;
   }
 
-  export type SerializedData = {
-    type: string,
-    key: string,
-    value: string
-  };
+  export interface SerializedData {
+    type: string;
+    key: string;
+    value: string;
+  }
 
   export interface Deserializer extends Function {
     deserialize(data: Field.SerializedData): Field.Factory;

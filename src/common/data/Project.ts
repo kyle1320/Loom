@@ -1,8 +1,8 @@
 import SerializationError from '../errors/SerializationError';
-import LObject from "./LObject";
-import Field from "./Field";
+import LObject from './LObject';
+import Field from './Field';
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
-import Extension from "../extensions/Extension";
+import Extension from '../extensions/Extension';
 import BasicFields from '../extensions/BasicFields';
 import ObjectReferenceError from '../errors/ObjectReferenceError';
 import Components from '../extensions/Components';
@@ -16,10 +16,10 @@ class Project {
   private objects: Map<string, LObject>;
 
   private readonly fieldTypes: {
-    [key: string]: Field.Deserializer
+    [key: string]: Field.Deserializer;
   } = {};
   private readonly defaultFields: {
-    [type: string]: Field.Factory[]
+    [type: string]: Field.Factory[];
   } = {};
 
   public constructor() {
@@ -36,8 +36,8 @@ class Project {
       parent = this.objects.get(parent) || null;
     }
 
-    var obj = new LObject(type, parent);
-    var defaultFields = this.defaultFields[type] || [];
+    const obj = new LObject(type, parent);
+    const defaultFields = this.defaultFields[type] || [];
 
     defaultFields.forEach(factory => obj.addOwnField(factory(this)));
 
@@ -51,7 +51,7 @@ class Project {
   }
 
   public getField(objId: string, key: string): Field | undefined {
-    var obj = this.getObject(objId);
+    const obj = this.getObject(objId);
 
     if (!obj) {
       throw new ObjectReferenceError();
@@ -61,7 +61,7 @@ class Project {
   }
 
   public getFieldValue(objId: string, key: string): string {
-    var obj = this.getObject(objId);
+    const obj = this.getObject(objId);
 
     if (!obj) {
       throw new ObjectReferenceError();
@@ -70,25 +70,25 @@ class Project {
     return obj.getFieldValue(key);
   }
 
-  public addFieldType(type: Field.Deserializer) {
+  public addFieldType(type: Field.Deserializer): void {
     this.fieldTypes[type.name] = type;
   }
 
-  public addDefaultFields(type: string, ...fields: Field.Factory[]) {
-    var arr = this.defaultFields[type] || [];
+  public addDefaultFields(type: string, ...fields: Field.Factory[]): void {
+    const arr = this.defaultFields[type] || [];
     this.defaultFields[type] = arr.concat(fields);
   }
 
-  public addExtension(ext: Extension) {
+  public addExtension(ext: Extension): void {
     ext.init(this);
   }
 
-  public *allObjects() {
+  public *allObjects(): IterableIterator<LObject> {
     yield* this.objects.values();
   }
 
-  private *objectsInDependencyOrder() {
-    var seen = new Set();
+  private *objectsInDependencyOrder(): IterableIterator<LObject> {
+    const seen = new Set();
 
     function* visit(obj: LObject): IterableIterator<LObject> {
       if (seen.has(obj)) return;
@@ -100,7 +100,7 @@ class Project {
       yield obj;
     }
 
-    for (var obj of this.allObjects()) {
+    for (const obj of this.allObjects()) {
       yield* visit(obj);
     }
   }
@@ -117,7 +117,7 @@ class Project {
   public deserializeField(
     data: Field.SerializedData
   ): Field.Factory.WithProject {
-    var cls = this.fieldTypes[data.type];
+    const cls = this.fieldTypes[data.type];
 
     if (!cls) {
       throw new MissingFieldTypeError();
@@ -132,10 +132,10 @@ class Project {
       throw new SerializationError();
     }
 
-    var proj = new Project();
+    const proj = new Project();
 
     data.objects.forEach(o => {
-      var obj = LObject.deserialize(proj, o);
+      const obj = LObject.deserialize(proj, o);
       proj.objects.set(obj.id, obj);
     });
 
@@ -146,10 +146,10 @@ class Project {
 namespace Project {
   export const serializationVersion = 1;
 
-  export type SerializedData = {
-    serializationVersion: number,
-    objects: LObject.SerializedData[]
-  };
+  export interface SerializedData {
+    serializationVersion: number;
+    objects: LObject.SerializedData[];
+  }
 }
 
 export default Project;

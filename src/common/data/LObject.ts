@@ -4,21 +4,21 @@ import FieldReferenceError from '../errors/FieldReferenceError';
 import EventEmitter from '../util/EventEmitter';
 
 namespace LObject {
-  export type SerializedData = {
-    type: string,
-    id: string,
-    parentId: string | null,
+  export interface SerializedData {
+    type: string;
+    id: string;
+    parentId: string | null;
     ownFields: Field.SerializedData[];
-  };
+  }
 
-  export type Initializer = (obj: LObject) => any;
+  export type Initializer = (obj: LObject) => void;
 }
 
-var counter = 0;
+let counter = 0;
 
 class LObject extends EventEmitter<{
-  addField: Field,
-  removeField: Field
+  addField: Field;
+  removeField: Field;
 }> {
   private fields: { [id: string]: Field };
 
@@ -40,19 +40,19 @@ class LObject extends EventEmitter<{
   public *getFieldNames(path: string = ''): IterableIterator<string> {
     if (path) path += '.';
 
-    for (var key in this.fields) {
+    for (const key in this.fields) {
       if (key.startsWith(path)) yield key;
     }
   }
 
   public *getOwnFields(): IterableIterator<Field> {
-    for (var key of this.getOwnFieldNames()) {
+    for (const key of this.getOwnFieldNames()) {
       yield this.getField(key)!;
     }
   }
 
   public *getFields(path: string = ''): IterableIterator<Field> {
-    for (var key of this.getFieldNames(path)) {
+    for (const key of this.getFieldNames(path)) {
       yield this.getField(key)!;
     }
   }
@@ -62,7 +62,7 @@ class LObject extends EventEmitter<{
   }
 
   public getFieldValue(key: string): string {
-    var field = this.getField(key);
+    const field = this.getField(key);
 
     if (!field) {
       throw new FieldReferenceError();
@@ -71,8 +71,8 @@ class LObject extends EventEmitter<{
     return field.get();
   }
 
-  public addOwnField(factory: Field.Factory.WithProject) {
-    var field = factory(this);
+  public addOwnField(factory: Field.Factory.WithProject): void {
+    const field = factory(this);
     this.fields[field.key] = field;
     this.emit('addField', field);
   }
@@ -82,7 +82,7 @@ class LObject extends EventEmitter<{
       type: this.type,
       id: this.id,
       parentId: this.parent && this.parent.id,
-      ownFields: [...this.getOwnFields()].map(attr => attr.serialize())
+      ownFields: [...this.getOwnFields()].map(field => field.serialize())
     };
   }
 
@@ -90,7 +90,7 @@ class LObject extends EventEmitter<{
     project: Project,
     data: LObject.SerializedData
   ): LObject {
-    var obj = new LObject(
+    const obj = new LObject(
       data.type,
       data.parentId && project.getObject(data.parentId) || null,
       data.id

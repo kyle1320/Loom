@@ -22,7 +22,10 @@ export default class FieldEditor {
 
     this.element = <div className='field-editor'>
       {key}: {
-        this.value = <div className='field' contentEditable={(field instanceof BasicField).toString()} onclick={() => {}}>
+        this.value = <div
+          className='field'
+          contentEditable={(field instanceof BasicField).toString()}
+          onclick={() => {}}>
           {obj.getFieldValue(key)}
         </div>
       }
@@ -37,7 +40,7 @@ export default class FieldEditor {
     field.on('update', () => this.update());
   }
 
-  private update() {
+  private update(): void {
     this.value.textContent = this.obj.getFieldValue(this.key);
   }
 }

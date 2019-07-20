@@ -1,24 +1,24 @@
-export type FieldInfo = {
-  key: string,
-  friendlyName: string,
-  category: string,
-  editors: any[],
+export interface FieldInfo {
+  key: string;
+  friendlyName: string;
+  category: string;
+  editors: unknown[];
 }
 
 export default class FieldRegistry {
   public static readonly global = new FieldRegistry();
 
-  private attrs: Map<string, FieldInfo>;
+  private fields: Map<string, FieldInfo>;
 
   public constructor() {
-    this.attrs = new Map();
+    this.fields = new Map();
   }
 
-  public registerField(info: FieldInfo) {
-    this.attrs.set(info.key, info);
+  public registerField(info: FieldInfo): void {
+    this.fields.set(info.key, info);
   }
 
   public get(key: string): FieldInfo | undefined {
-    return this.attrs.get(key);
+    return this.fields.get(key);
   }
 }

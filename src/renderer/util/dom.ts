@@ -6,9 +6,9 @@ export function makeElement<T extends keyof JSX.IntrinsicElements>(
   props?: JSX.IntrinsicElements[T],
   ...children: ElementContent[]
 ): HTMLElementTagNameMap[T] {
-  var el = document.createElement(tag);
+  const el = document.createElement(tag);
 
-  for (var key in props) {
+  for (const key in props) {
     if (key === 'style') {
       Object.assign(el.style, props.style);
     } else if (
@@ -19,6 +19,7 @@ export function makeElement<T extends keyof JSX.IntrinsicElements>(
         (props[key] as unknown) as EventListenerOrEventListenerObject
       );
     } else {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       (el as any)[key] = props[key];
     }
   }
@@ -40,8 +41,8 @@ export function toggleClass(
   el: HTMLElement,
   className: string,
   enabled?: boolean
-) {
-  var regexp = new RegExp('\\s*' + className, 'g');
+): void {
+  const regexp = new RegExp('\\s*' + className, 'g');
 
   if (typeof enabled === 'undefined') {
     enabled = !regexp.test(el.className);

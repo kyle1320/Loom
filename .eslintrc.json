@@ -88,7 +88,10 @@
                 "allowTypedFunctionExpressions": true,
                 "allowHigherOrderFunctions": true
             }
-        ]
+        ],
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-parameter-properties": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
     },
     "overrides": [
         {

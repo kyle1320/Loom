@@ -6,7 +6,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 let win: BrowserWindow | null;
 
-function createWindow() {
+function createWindow(): void {
   win = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true

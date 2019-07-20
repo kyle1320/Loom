@@ -1,8 +1,8 @@
-import LObject from "../../../common/data/LObject";
+import LObject from '../../../common/data/LObject';
 import { makeElement } from '../../util/dom';
-import FieldReferenceError from "../../../common/errors/FieldReferenceError";
+import FieldReferenceError from '../../../common/errors/FieldReferenceError';
 
-import "./ComponentPreview.scss";
+import './ComponentPreview.scss';
 
 export default class ComponentPreview {
   public readonly element: HTMLElement;
@@ -25,7 +25,7 @@ export default class ComponentPreview {
     this.update();
   }
 
-  private update() {
+  private update(): void {
     this.content.innerHTML = this.object.getFieldValue('html.outerContent');
   }
 }
