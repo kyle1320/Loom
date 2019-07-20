@@ -86,7 +86,7 @@
             {
                 "allowExpressions": true,
                 "allowTypedFunctionExpressions": true,
-                "allowHigherOrderFunctions": true,
+                "allowHigherOrderFunctions": true
             }
         ]
     },
