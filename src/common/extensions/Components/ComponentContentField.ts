@@ -76,11 +76,11 @@ export default class ComponentContentField extends Field {
 
   public static deserialize(
     data: Field.SerializedData
-  ): Field.Factory.ProjectStep {
+  ): Field.Factory {
     return ComponentContentField.factory(data.key);
   }
 
-  public static factory(key: string): Field.Factory.ProjectStep {
+  public static factory(key: string): Field.Factory {
     return () => (object) => new ComponentContentField(object, key);
   }
 }

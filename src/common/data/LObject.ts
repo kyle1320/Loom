@@ -71,7 +71,7 @@ class LObject extends EventEmitter<{
     return field.get();
   }
 
-  public addOwnField(factory: Field.Factory.ObjectStep) {
+  public addOwnField(factory: Field.Factory.WithProject) {
     var field = factory(this);
     this.fields[field.key] = field;
     this.emit('addField', field);

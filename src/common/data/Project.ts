@@ -19,7 +19,7 @@ class Project {
     [key: string]: Field.Deserializer
   } = {};
   private readonly defaultFields: {
-    [type: string]: Field.Factory.ProjectStep[]
+    [type: string]: Field.Factory[]
   } = {};
 
   public constructor() {
@@ -74,7 +74,7 @@ class Project {
     this.fieldTypes[type.name] = type;
   }
 
-  public addDefaultFields(type: string, ...fields: Field.Factory.ProjectStep[]) {
+  public addDefaultFields(type: string, ...fields: Field.Factory[]) {
     var arr = this.defaultFields[type] || [];
     this.defaultFields[type] = arr.concat(fields);
   }
@@ -116,7 +116,7 @@ class Project {
 
   public deserializeField(
     data: Field.SerializedData
-  ): Field.Factory.ObjectStep {
+  ): Field.Factory.WithProject {
     var cls = this.fieldTypes[data.type];
 
     if (!cls) {

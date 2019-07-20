@@ -86,11 +86,11 @@ export default class BasicField extends Field {
 
   public static deserialize(
     data: Field.SerializedData
-  ): Field.Factory.ProjectStep {
+  ): Field.Factory {
     return BasicField.factory(data.key, data.value);
   }
 
-  public static factory(key: string, value: string): Field.Factory.ProjectStep {
+  public static factory(key: string, value: string): Field.Factory {
     return project => () => new BasicField(project, key, value);
   }
 }

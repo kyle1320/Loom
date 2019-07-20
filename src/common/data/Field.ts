@@ -3,9 +3,9 @@ import Project from './Project';
 import LObject from './LObject';
 
 namespace Field {
+  export type Factory = (project: Project) => Field.Factory.WithProject;
   export namespace Factory {
-    export type ProjectStep = (project: Project) => Field.Factory.ObjectStep;
-    export type ObjectStep = (object: LObject) => Field;
+    export type WithProject = (object: LObject) => Field;
   }
 
   export type SerializedData = {
@@ -15,7 +15,7 @@ namespace Field {
   };
 
   export interface Deserializer extends Function {
-    deserialize(data: Field.SerializedData): Field.Factory.ProjectStep;
+    deserialize(data: Field.SerializedData): Field.Factory;
   }
 }
 
