@@ -20,7 +20,12 @@ export default class BasicField extends Field {
   public get(context: LObject): string {
     return this.value.replace(/\{([^}]+)\}/g, (_, l) => {
       const split = l.split('|');
-      return context.project.getFieldValue(split[0], split[1]);
+
+      try {
+        return context.project.getFieldValue(split[0], split[1]);
+      } catch {
+        return _;
+      }
     });
   }
 
