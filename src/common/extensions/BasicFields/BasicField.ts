@@ -15,6 +15,9 @@ function diff<T>(
     } else if (j >= newSorted.length || oldSorted[i] < newSorted[j]) {
       onRemove(oldSorted[i]);
       i++;
+    } else {
+      i++;
+      j++;
     }
   }
 }
