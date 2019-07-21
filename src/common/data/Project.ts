@@ -19,7 +19,7 @@ class Project {
     [key: string]: Field.Deserializer;
   } = {};
   private readonly defaultFields: {
-    [type: string]: Field.Factory[];
+    [type: string]: [string, Field][];
   } = {};
 
   public constructor() {
@@ -36,10 +36,12 @@ class Project {
       parent = this.objects.get(parent) || null;
     }
 
-    const obj = new LObject(type, parent);
-    const defaultFields = this.defaultFields[type] || [];
+    const obj = new LObject(this, type, parent);
 
-    defaultFields.forEach(factory => obj.addOwnField(factory(this)));
+    const defaultFields = this.defaultFields[type] || [];
+    defaultFields.forEach(
+      ([key, field]) => obj.addOwnField(key, field.clone())
+    );
 
     this.objects.set(obj.id, obj);
 
@@ -74,7 +76,7 @@ class Project {
     this.fieldTypes[type.name] = type;
   }
 
-  public addDefaultFields(type: string, ...fields: Field.Factory[]): void {
+  public addDefaultFields(type: string, ...fields: [string, Field][]): void {
     const arr = this.defaultFields[type] || [];
     this.defaultFields[type] = arr.concat(fields);
   }
@@ -116,14 +118,14 @@ class Project {
 
   public deserializeField(
     data: Field.SerializedData
-  ): Field.Factory.WithProject {
+  ): Field {
     const cls = this.fieldTypes[data.type];
 
     if (!cls) {
       throw new MissingFieldTypeError();
     }
 
-    return cls.deserialize(data)(this);
+    return cls.deserialize(data);
   }
 
   public static deserialize(data: Project.SerializedData): Project {

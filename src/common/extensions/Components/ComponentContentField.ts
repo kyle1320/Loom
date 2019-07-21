@@ -2,85 +2,37 @@ import Field from '../../data/Field';
 import LObject from '../../data/LObject';
 
 export default class ComponentContentField extends Field {
-  private value: string = '';
-  private invalid: boolean = true;
+  public get(context: LObject): string {
+    const tag = context.getFieldValueOrDefault('html.tag', 'div');
+    const attrs = [...context.getFieldNames('html.attr.*')]
+      .map(f => ` ${f.substr(10)}="${context.getFieldValue(f)}"`)
+      .join('');
+    const content = context.getFieldValueOrDefault('html.innerContent', '');
 
-  private constructor(
-    private object: LObject,
-    key: string
-  ) {
-    super(key);
-
-    this.update = this.update.bind(this);
-
-    this.addFieldListener(object.getField('html.tag'));
-    this.addFieldListener(object.getField('html.innerContent'));
-    for (const attrField of object.getFields('html.attr')) {
-      this.addFieldListener(attrField);
-    }
-
-    object.on('addField', f => {
-      if (f.key === 'html.tag' ||
-          f.key.startsWith('html.attr') ||
-          f.key === 'html.innerContent') {
-        this.update();
-        this.addFieldListener(f);
-      }
-    });
-
-    object.on('removeField', f => {
-      if (f.key === 'html.tag' ||
-          f.key.startsWith('html.attr') ||
-          f.key === 'html.innerContent') {
-        this.removeFieldListener(f);
-      }
-    });
+    // TODO: handle self-closing tags
+    return  `<${tag}${attrs}>${content}</${tag}>`;
   }
 
-  public get(): string {
-    if (this.invalid) {
-      const tag = this.object.getFieldValue('html.tag');
-      const attrs = [...this.object.getFields('html.attr')]
-        .map(f => ` ${f.key.substr(10)}="${f.get()}"`)
-        .join('');
-      const content = this.object.getFieldValue('html.innerContent');
-
-      // TODO: handle self-closing tags
-      this.value = `<${tag}${attrs}>${content}</${tag}>`;
-      this.invalid = false;
-    }
-
-    return this.value;
+  public dependencies(context: LObject): string[] {
+    return [
+      `${context.id}|html.tag`,
+      `${context.id}|html.attr.*`,
+      `${context.id}|html.innerContent`
+    ];
   }
 
-  private update(): void {
-    this.invalid = true;
-    this.emit('update');
-  }
-
-  private addFieldListener(field: Field | undefined): void {
-    if (field) field.on('update', this.update);
-  }
-
-  private removeFieldListener(field: Field | undefined): void {
-    if (field) field.removeListener('update', this.update);
+  public clone(): Field {
+    return new ComponentContentField();
   }
 
   public serialize(): Field.SerializedData {
     return {
       type: ComponentContentField.name,
-      key: this.key,
       value: ''
     };
   }
 
-  public static deserialize(
-    data: Field.SerializedData
-  ): Field.Factory {
-    return ComponentContentField.factory(data.key);
-  }
-
-  public static factory(key: string): Field.Factory {
-    return () => (object) => new ComponentContentField(object, key);
+  public static deserialize(): Field {
+    return new ComponentContentField();
   }
 }

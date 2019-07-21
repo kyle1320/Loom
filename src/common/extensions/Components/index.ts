@@ -1,15 +1,15 @@
 import Project from '../../data/Project';
 import ComponentContentField from './ComponentContentField';
-import BasicField from '../BasicFields/BasicField';
+// import BasicField from '../BasicFields/BasicField';
 
 export default {
   init(project: Project) {
     project.addFieldType(ComponentContentField);
     project.addDefaultFields(
       'component',
-      BasicField.factory('html.tag', 'div'),
-      BasicField.factory('html.innerContent', ''),
-      ComponentContentField.factory('html.outerContent')
+      // ['html.tag', new BasicField('div')],
+      // ['html.innerContent', new BasicField('')],
+      ['html.outerContent', new ComponentContentField()]
     );
   }
 };
