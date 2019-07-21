@@ -9,11 +9,24 @@ export default class ObjectEditor {
   public readonly element: HTMLElement;
 
   public constructor(object: LObject) {
+    const fieldMap = new Map<string, FieldEditor>();
+
+    for (const key of [...object.getFieldNames()].sort()) {
+      fieldMap.set(key, new FieldEditor(object, key));
+    }
+
+    object.addFieldListener('*', key => {
+      // TODO: handle adding / removing fields
+      if (fieldMap.has(key)) {
+        fieldMap.get(key)!.update();
+      }
+    });
+
     this.element = <div className="object-editor">
       <div className="object-id">Id: {object.id}</div>
       {object.parent &&
-        <div className="object-id">Parent: {object.parent.id}</div>}
-      {[...object.getFieldNames()].map(n => new FieldEditor(object, n).element)}
+        <div className="parent-id">Parent Id: {object.parent.id}</div>}
+      {[...fieldMap.values()].map(f => f.element)}
       {object.type === 'component' && new ComponentPreview(object).element}
     </div>;
   }

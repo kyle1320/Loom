@@ -20,11 +20,17 @@ export default class FieldEditor {
       throw new FieldReferenceError();
     }
 
+    const inherited = !obj.hasOwnField(key);
+
     this.element = <div className='field-editor'>
-      {key}: {
+      <div className={`field-editor__key${inherited ? ' inherited' : ''}`}>
+        {key}{inherited && ' (inherited)'}:
+      </div> {
         this.value = <div
           className='field'
-          contentEditable={(field instanceof BasicField).toString()}
+          contentEditable={
+            (field instanceof BasicField && !inherited).toString()
+          }
           onclick={() => {}}>
           {obj.getFieldValue(key)}
         </div>
@@ -36,11 +42,9 @@ export default class FieldEditor {
         field.set(this.value.textContent || '');
       });
     }
-
-    field.on('update', () => this.update());
   }
 
-  private update(): void {
+  public update(): void {
     this.value.textContent = this.obj.getFieldValue(this.key);
   }
 }

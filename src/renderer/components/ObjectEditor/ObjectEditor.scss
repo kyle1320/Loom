@@ -4,8 +4,12 @@
   margin: 5px;
 }
 
-.object-id {
+.object-id, .parent-id {
   border-bottom: 1px solid #ccc;
   padding-bottom: 5px;
   margin-bottom: 5px;
+}
+
+.parent-id {
+  font-weight: bold;
 }
