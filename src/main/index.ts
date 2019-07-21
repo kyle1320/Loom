@@ -8,6 +8,7 @@ let win: BrowserWindow | null;
 
 function createWindow(): void {
   win = new BrowserWindow({
+    title: 'Loom',
     webPreferences: {
       nodeIntegration: true
     }
