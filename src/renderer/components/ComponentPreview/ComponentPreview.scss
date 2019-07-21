@@ -3,9 +3,9 @@
   padding-top: 5px;
   border-top: 1px solid #ccc;
 
-  &__content {
-    margin-top: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+  &__invalid::before {
+    color: red;
+    font-style: italic;
+    content: "Error: invalid content";
   }
 }

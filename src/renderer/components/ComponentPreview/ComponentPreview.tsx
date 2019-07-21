@@ -6,11 +6,14 @@ import './ComponentPreview.scss';
 
 export default class ComponentPreview {
   public readonly element: HTMLElement;
-  public readonly content: HTMLElement;
+
+  private readonly invalidNode = <span className="preview__invalid"/>;
+  private content: ChildNode;
+  private range: Range = document.createRange();
 
   public constructor(private object: LObject) {
     this.element = <div className="preview">
-      Preview: {this.content = <div className="preview__content"></div>}
+      Preview: {this.content = this.invalidNode}
     </div>;
 
     const field = object.getField('html.outerContent');
@@ -26,6 +29,11 @@ export default class ComponentPreview {
   }
 
   private update(): void {
-    this.content.innerHTML = this.object.getFieldValue('html.outerContent');
+    const html = this.object.getFieldValue('html.outerContent');
+    const node = this.range.createContextualFragment(html)
+      .firstChild || this.invalidNode;
+
+    this.content.replaceWith(node);
+    this.content = node;
   }
 }
