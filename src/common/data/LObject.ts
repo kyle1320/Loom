@@ -44,25 +44,29 @@ class LObject {
     this.fields = Object.create(parent && parent.fields);
   }
 
-  public *getOwnFieldNames(): IterableIterator<string> {
-    yield* Object.getOwnPropertyNames(this.fields);
+  public *getOwnFieldNames(path: string = '*'): IterableIterator<string> {
+    const regex = getPathRegex(path);
+
+    for (const key in Object.getOwnPropertyNames(this.fields)) {
+      if (regex.test(key)) yield key;
+    }
   }
 
   public *getFieldNames(path: string = '*'): IterableIterator<string> {
     const regex = getPathRegex(path);
 
     for (const key in this.fields) {
-      if (!regex || regex.test(key)) yield key;
+      if (regex.test(key)) yield key;
     }
   }
 
-  public *getOwnFields(): IterableIterator<Field> {
-    for (const key of this.getOwnFieldNames()) {
+  public *getOwnFields(path: string = '*'): IterableIterator<Field> {
+    for (const key of this.getOwnFieldNames(path)) {
       yield this.getField(key)!;
     }
   }
 
-  public *getFields(path: string = ''): IterableIterator<Field> {
+  public *getFields(path: string = '*'): IterableIterator<Field> {
     for (const key of this.getFieldNames(path)) {
       yield this.getField(key)!;
     }
