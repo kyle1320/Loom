@@ -1,6 +1,7 @@
 import Field from './Field';
 import Project from './Project';
 import FieldReferenceError from '../errors/FieldReferenceError';
+import IllegalFieldKeyError from '../errors/IllegalFieldKeyError';
 
 namespace LObject {
   export interface SerializedData {
@@ -14,6 +15,8 @@ namespace LObject {
 }
 
 let counter = 0;
+
+const validFieldNameRegex = /^[a-z0-9_.-]+$/;
 
 /**
  * Returns a regular expression to match the given path.
@@ -64,11 +67,11 @@ class LObject {
   }
 
   public getField(key: string): Field | undefined {
-    return this.fields[key];
+    return this.fields[key.toLowerCase()];
   }
 
   public getFieldValue(key: string): string {
-    const field = this.getField(key);
+    const field = this.getField(key.toLowerCase());
 
     if (!field) {
       throw new FieldReferenceError();
@@ -78,7 +81,7 @@ class LObject {
   }
 
   public getFieldValueOrDefault(key: string, def: string): string {
-    const field = this.getField(key);
+    const field = this.getField(key.toLowerCase());
 
     if (!field) {
       return def;
@@ -88,10 +91,16 @@ class LObject {
   }
 
   public hasOwnField(key: string): boolean {
-    return Object.prototype.hasOwnProperty.call(this.fields, key);
+    return Object.prototype.hasOwnProperty.call(this.fields, key.toLowerCase());
   }
 
   public addOwnField(key: string, field: Field): void {
+    key = key.toLowerCase();
+
+    if (!validFieldNameRegex.test(key)) {
+      throw new IllegalFieldKeyError();
+    }
+
     this.fields[key] = field;
 
     for (const [path, listeners] of this.listeners) {
@@ -106,6 +115,8 @@ class LObject {
   }
 
   public removeOwnField(key: string): void {
+    key = key.toLowerCase();
+
     const field = this.fields[key];
 
     if (!field) return;
