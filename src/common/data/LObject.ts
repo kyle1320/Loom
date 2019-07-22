@@ -47,7 +47,7 @@ class LObject {
   public *getOwnFieldNames(path: string = '*'): IterableIterator<string> {
     const regex = getPathRegex(path);
 
-    for (const key in Object.getOwnPropertyNames(this.fields)) {
+    for (const key of Object.getOwnPropertyNames(this.fields)) {
       if (regex.test(key)) yield key;
     }
   }
