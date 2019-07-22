@@ -26,7 +26,18 @@ export default class ObjectEditor {
       <div className="object-id">Id: {object.id}</div>
       {object.parent &&
         <div className="parent-id">Parent Id: {object.parent.id}</div>}
-      {[...fieldMap.values()].map(f => f.element)}
+      <table>
+        {[...fieldMap].map(([key, f]) => {
+          const inherited = !object.hasOwnField(key);
+          return <tr>
+            <td><div
+              className={`object-editor__key${inherited ? ' inherited' : ''}`}>
+              {key}{inherited && ' (inherited)'}:
+            </div></td>
+            <td>{f.element}</td>
+          </tr>;
+        })}
+      </table>
       {object.type === 'component' && new ComponentPreview(object).element}
     </div>;
   }

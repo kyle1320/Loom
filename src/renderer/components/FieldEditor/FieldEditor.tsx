@@ -23,9 +23,7 @@ export default class FieldEditor {
     const inherited = !obj.hasOwnField(key);
 
     this.element = <div className='field-editor'>
-      <div className={`field-editor__key${inherited ? ' inherited' : ''}`}>
-        {key}{inherited && ' (inherited)'}:
-      </div> {
+      {
         this.value = <div
           className='field'
           contentEditable={
