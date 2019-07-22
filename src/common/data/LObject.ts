@@ -25,7 +25,9 @@ const validFieldNameRegex = /^[a-z0-9_.-]+$/;
  */
 function getPathRegex(path: string): RegExp {
   return new RegExp(
-    `^${path.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace('*', '.*')}$`
+    `^${path.toLowerCase()
+      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replace('*', '.*')}$`
   );
 }
 
