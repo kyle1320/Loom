@@ -24,7 +24,7 @@ export default class ComponentPreview {
 
     this.update = this.update.bind(this);
 
-    object.addFieldListener('html.outerContent', this.update);
+    object.addPathListener('html.outerContent', this.update);
     this.update();
   }
 

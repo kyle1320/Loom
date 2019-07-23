@@ -15,7 +15,7 @@ export default class ObjectEditor {
       fieldMap.set(key, new FieldEditor(object, key));
     }
 
-    object.addFieldListener('*', key => {
+    object.addPathListener('*', key => {
       // TODO: handle adding / removing fields
       if (fieldMap.has(key)) {
         fieldMap.get(key)!.update();

@@ -31,9 +31,42 @@ function getPathRegex(path: string): RegExp {
   );
 }
 
+function diff<T>(
+  oldSorted: T[],
+  newSorted: T[],
+  onChange: (el: T, isAdd: boolean) => void
+): void {
+  let i = 0, j = 0;
+  while (i < oldSorted.length || j < newSorted.length) {
+    if (i >= oldSorted.length || oldSorted[i] > newSorted[j]) {
+      onChange(newSorted[j], true);
+      j++;
+    } else if (j >= newSorted.length || oldSorted[i] < newSorted[j]) {
+      onChange(oldSorted[i], false);
+      i++;
+    } else {
+      i++;
+      j++;
+    }
+  }
+}
+
+interface PathListenerInfo {
+  primaryListener: LObject.FieldListener;
+  parentListener?: LObject.FieldListener;
+}
+
+interface FieldListenerInfo {
+  onRemove: () => void;
+  updateListener: () => void;
+  dependencies: string[];
+  pathListeners: PathListenerInfo[];
+}
+
 class LObject {
   private fields: { [id: string]: Field };
-  private listeners = new Map<string, Set<LObject.FieldListener>>();
+  private pathListeners = new Map<string, PathListenerInfo[]>();
+  private fieldListeners = new Map<string, FieldListenerInfo>();
 
   public constructor(
     public readonly project: Project,
@@ -109,12 +142,13 @@ class LObject {
 
     this.fields[key] = field;
 
-    for (const [path, listeners] of this.listeners) {
+    for (const [path, listeners] of this.pathListeners) {
       if (getPathRegex(path).test(key)) {
-        for (const listener of listeners) {
+        for (const info of listeners) {
+          this._addFieldListener(key, info);
 
           // TODO: call add-specific function?
-          listener(key);
+          info.primaryListener(key);
         }
       }
     }
@@ -129,75 +163,149 @@ class LObject {
 
     delete this.fields[key];
 
-    for (const [path, listeners] of this.listeners) {
+    for (const [path, listeners] of this.pathListeners) {
       if (getPathRegex(path).test(key)) {
-        for (const listener of listeners) {
+        for (const info of listeners) {
+          this._removeFieldListener(key, info);
 
           // TODO: call remove-specific function?
-          listener(key);
+          info.primaryListener(key);
         }
       }
     }
   }
 
-  public addFieldListener(
+  // Listeners are split into two 'parts': path listeners and field listeners.
+  // Path listeners are per-path, are are the 'normal' way of viewing listeners.
+  //   They consist of a path, a callback, and a 'parent' callback.
+  // Field listeners are used internally to implement path listeners.
+  //   They keep track of which path listeners are associated with which fields.
+  //     This way we can just associate a single listener with each field.
+  //   Paths are added to field listeners when a path listener is registered,
+  //     and when fields are added or removed.
+  //   When a field updates, it calls its path listeners with its key,
+  //     and also checks for updated dependencies.
+  //     If its dependencies change, path listeners are added / removed
+  //       to / from the appropriate objects.
+  //     When a field in the path on those objects changes, each path listener
+  //       is called with the key of the local (dependent) field.
+  public addPathListener(
     path: string,
     listener: LObject.FieldListener
   ): void {
-    // TODO: register listener so that when any field on the given path changes,
-    //       the listener is notified (passing the relevant key).
-    // NOTE: be careful to properly handle inherited fields.
-    //       for example, a -> b -> c, watching for a field via c, if a contains
-    //       the watched field and the field gets added to b, we should stop
-    //       watching the field on c and watch it on b instead.
-    // This should listen for 'update' events on each field, as well as
-    // recursively add field listeners to the dependencies of the fields.
-    const listeners = this.listeners.get(path) || new Set();
+    const listeners = this.pathListeners.get(path) || [];
 
-    if (listeners.has(listener)) return;
+    if (listeners.some(i => i.primaryListener === listener)) return;
 
-    listeners.add(listener);
-    this.listeners.set(path, listeners);
+    const info: PathListenerInfo = {
+      primaryListener: listener
+    };
+    listeners.push(info);
+    this.pathListeners.set(path, listeners);
 
-    for (const key of this.getFieldNames(path)) {
-      const field = this.getField(key)!;
-
-      // TODO: register this in a map so it can be removed
-      const callback = (): void => listener(key);
-
-      // TODO: take diff
-      const updateDependencies = (): void => {
-        field.dependencies(this).forEach(d => {
-          const [objId, path] = d.split('|');
-          const obj = this.project.getObject(objId);
-          if (obj) {
-            // TODO: register this in a map so it can be removed
-            obj.addFieldListener(path, callback);
-          }
-        });
+    if (this.parent) {
+      const parentListener = (key: string): void => {
+        if (!this.hasOwnField(key)) listener(key);
       };
 
-      field.on('update', () => {
-        updateDependencies();
-        callback();
-      });
+      info.parentListener = parentListener;
 
-      updateDependencies();
+      this.parent.addPathListener(path, parentListener);
+    }
+
+    for (const key of this.getOwnFieldNames(path)) {
+      this._addFieldListener(key, info);
     }
   }
 
-  public removeFieldListener(
+  private _addFieldListener(key: string, pathInfo: PathListenerInfo): void {
+    const field = this.getField(key)!;
+    let fieldInfo = this.fieldListeners.get(key);
+
+    if (!fieldInfo) {
+      const updatedField = (): void =>
+        fieldInfo!.pathListeners.forEach(i => i.primaryListener(key));
+      const updateDependencies = (newDeps: string[]): void => {
+        diff(
+          fieldInfo!.dependencies,
+          newDeps,
+          (dep: string, isAdd: boolean) => {
+            const [objId, path] = dep.split('|');
+            const obj = this.project.getObject(objId);
+            if (obj) {
+              if (isAdd) {
+                obj.addPathListener(path, updatedField);
+              } else {
+                obj.removePathListener(path, updatedField);
+              }
+            }
+          }
+        );
+
+        fieldInfo!.dependencies = newDeps;
+      };
+
+      fieldInfo = {
+        onRemove: () => {
+          updateDependencies([]);
+          field.removeListener('update', fieldInfo!.updateListener);
+        },
+        updateListener: () => {
+          updateDependencies(field.dependencies(this).sort());
+          updatedField();
+        },
+        dependencies: [],
+        pathListeners: []
+      };
+      this.fieldListeners.set(key, fieldInfo);
+
+      updateDependencies(field.dependencies(this).sort());
+      field.on('update', fieldInfo.updateListener);
+    }
+
+    fieldInfo.pathListeners.push(pathInfo);
+  }
+
+  public removePathListener(
     path: string,
     listener: LObject.FieldListener
   ): void {
-    const listeners = this.listeners.get(path);
+    const listeners = this.pathListeners.get(path);
 
-    // TODO: do more in-depth removal of listeners
     if (listeners) {
-      listeners.delete(listener);
+      const index = listeners.findIndex(i => i.primaryListener === listener);
 
-      if (listeners.size === 0) {
-        this.listeners.delete(path);
+      if (index < 0) return;
+
+      const info = listeners.splice(index, 1)[0];
+
+      if (info.parentListener && this.parent) {
+        this.parent.removePathListener(path, info.parentListener);
+      }
+
+      for (const key of this.getOwnFieldNames(path)) {
+        this._removeFieldListener(key, info);
+      }
+
+      if (listeners.length === 0) {
+        this.pathListeners.delete(path);
+      }
+    }
+  }
+
+  private _removeFieldListener(key: string, pathInfo: PathListenerInfo): void {
+    const fieldInfo = this.fieldListeners.get(key);
+
+    if (fieldInfo) {
+      const index = fieldInfo.pathListeners.indexOf(pathInfo);
+
+      if (index < 0) return;
+
+      fieldInfo.pathListeners.splice(index, 1)[0];
+
+      if (fieldInfo.pathListeners.length === 0) {
+        fieldInfo.onRemove();
+        this.fieldListeners.delete(key);
       }
     }
   }
