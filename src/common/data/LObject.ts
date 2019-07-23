@@ -18,17 +18,12 @@ let counter = 0;
 
 const validFieldNameRegex = /^[a-z0-9_.-]+$/;
 
-/**
- * Returns a regular expression to match the given path.
- * Paths can contain wildcards using '*'.
- * @param path
- */
-function getPathRegex(path: string): RegExp {
-  return new RegExp(
-    `^${path.toLowerCase()
-      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-      .replace('*', '.*')}$`
-  );
+function keyMatchesPath(key: string, path: string): boolean {
+  path = path.toLowerCase();
+
+  return path.endsWith('*')
+    ? key.startsWith(path.substring(0, path.length - 1))
+    : key === path;
 }
 
 function diff<T>(
@@ -78,18 +73,28 @@ class LObject {
   }
 
   public *getOwnFieldNames(path: string = '*'): IterableIterator<string> {
-    const regex = getPathRegex(path);
+    path = path.toLowerCase();
 
-    for (const key of Object.getOwnPropertyNames(this.fields)) {
-      if (regex.test(key)) yield key;
+    if (path.endsWith('*')) {
+      path = path.substring(0, path.length - 1);
+      for (const key of Object.getOwnPropertyNames(this.fields)) {
+        if (key.startsWith(path)) yield key;
+      }
+    } else if (Object.prototype.hasOwnProperty.call(this.fields, path)) {
+      yield path;
     }
   }
 
   public *getFieldNames(path: string = '*'): IterableIterator<string> {
-    const regex = getPathRegex(path);
+    path = path.toLowerCase();
 
-    for (const key in this.fields) {
-      if (regex.test(key)) yield key;
+    if (path.endsWith('*')) {
+      path = path.substring(0, path.length - 1);
+      for (const key in this.fields) {
+        if (key.startsWith(path)) yield key;
+      }
+    } else if (path in this.fields) {
+      yield path;
     }
   }
 
@@ -143,7 +148,7 @@ class LObject {
     this.fields[key] = field;
 
     for (const [path, listeners] of this.pathListeners) {
-      if (getPathRegex(path).test(key)) {
+      if (keyMatchesPath(key, path)) {
         for (const info of listeners) {
           this._addFieldListener(key, info);
 
@@ -164,7 +169,7 @@ class LObject {
     delete this.fields[key];
 
     for (const [path, listeners] of this.pathListeners) {
-      if (getPathRegex(path).test(key)) {
+      if (keyMatchesPath(key, path)) {
         for (const info of listeners) {
           this._removeFieldListener(key, info);
 
