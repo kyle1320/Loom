@@ -2,13 +2,8 @@ import EventEmitter from '../util/EventEmitter';
 import LObject from './LObject';
 
 namespace Field {
-  export interface SerializedData {
-    type: string;
-    value: string;
-  }
-
   export interface Deserializer extends Function {
-    deserialize(data: Field.SerializedData): Field;
+    deserialize(data: string): Field;
   }
 }
 
@@ -20,7 +15,7 @@ abstract class Field extends EventEmitter<{ update: void }> {
   public abstract dependencies(context: LObject): string[];
 
   public abstract clone(): Field;
-  public abstract serialize(): Field.SerializedData;
+  public abstract serialize(): string;
 }
 
 export default Field;

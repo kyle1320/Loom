@@ -51,16 +51,11 @@ export default class BasicField extends Field {
     return new BasicField(this.value);
   }
 
-  public serialize(): Field.SerializedData {
-    return {
-      type: BasicField.name,
-      value: this.value
-    };
+  public serialize(): string {
+    return this.value;
   }
 
-  public static deserialize(
-    data: Field.SerializedData
-  ): Field {
-    return new BasicField(data.value);
+  public static deserialize(data: string): Field {
+    return new BasicField(data);
   }
 }

@@ -9,7 +9,7 @@ namespace LObject {
     type: string;
     id: string;
     parentId: string | null;
-    ownFields: { [key: string]: Field.SerializedData };
+    ownFields: { [key: string]: string };
   }
 
   export type FieldListener = (key: string) => void;
@@ -340,7 +340,7 @@ class LObject extends EventEmitter<{
     };
 
     for (const key of this.getOwnFieldNames()) {
-      data.ownFields[key] = this.fields[key].serialize();
+      data.ownFields[key] = this.project.serializeField(this.fields[key]);
     }
 
     return data;

@@ -116,16 +116,19 @@ class Project {
     };
   }
 
-  public deserializeField(
-    data: Field.SerializedData
-  ): Field {
-    const cls = this.fieldTypes[data.type];
+  public serializeField(field: Field): string {
+    return `${field.constructor.name}|${field.serialize()}`;
+  }
+
+  public deserializeField(data: string): Field {
+    const [type, val] = data.split('|');
+    const cls = this.fieldTypes[type];
 
     if (!cls) {
       throw new MissingFieldTypeError();
     }
 
-    return cls.deserialize(data);
+    return cls.deserialize(val);
   }
 
   public static deserialize(data: Project.SerializedData): Project {

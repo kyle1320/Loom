@@ -25,11 +25,8 @@ export default class ComponentContentField extends Field {
     return new ComponentContentField();
   }
 
-  public serialize(): Field.SerializedData {
-    return {
-      type: ComponentContentField.name,
-      value: ''
-    };
+  public serialize(): string {
+    return '';
   }
 
   public static deserialize(): Field {

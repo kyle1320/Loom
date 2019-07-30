@@ -337,8 +337,8 @@ describe('can listen for field changes', () => {
       public clone(): Field {
         return this;
       }
-      public serialize(): Field.SerializedData {
-        return {type:'', value:''};
+      public serialize(): string {
+        return '';
       }
     }
 
