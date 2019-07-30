@@ -1,6 +1,7 @@
 import LObject from '../data/LObject';
 import Project from '../data/Project';
 import BasicField from '../extensions/BasicFields/BasicField';
+import Field from '../data/Field';
 
 const project = new Project();
 
@@ -105,6 +106,41 @@ describe('has methods to fetch fields', () => {
 
     const all2 = obj.getFieldNames('test.parent.*');
     expect([...all2]).toHaveLength(2);
+  });
+});
+
+describe('can listen for field addition / removal', () => {
+  test('on an object with no parent', () => {
+    const obj = project.makeObject('test');
+    const add = jest.fn();
+    const remove = jest.fn();
+
+    obj.on('fieldAdded', add);
+    obj.on('fieldRemoved', remove);
+
+    obj.addOwnField('test', new BasicField(''));
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledTimes(0);
+
+    obj.addOwnField('test', new BasicField('value'));
+    expect(add).toHaveBeenCalledTimes(2);
+    expect(remove).toHaveBeenCalledTimes(1);
+
+    obj.addOwnField('test2', new BasicField('value'));
+    expect(add).toHaveBeenCalledTimes(3);
+    expect(remove).toHaveBeenCalledTimes(1);
+
+    obj.removeOwnField('test');
+    expect(add).toHaveBeenCalledTimes(3);
+    expect(remove).toHaveBeenCalledTimes(2);
+
+    obj.removeOwnField('test1');
+    expect(add).toHaveBeenCalledTimes(3);
+    expect(remove).toHaveBeenCalledTimes(2);
+
+    obj.removeOwnField('test2');
+    expect(add).toHaveBeenCalledTimes(3);
+    expect(remove).toHaveBeenCalledTimes(3);
   });
 });
 
@@ -214,8 +250,9 @@ describe('can listen for field changes', () => {
     parent.removeOwnField('test.1');
     expect(mock).toHaveBeenCalledTimes(5);
 
+    // update only triggered on add, not remove
     parent.removeOwnField('test.3');
-    expect(mock).toHaveBeenCalledTimes(6);
+    expect(mock).toHaveBeenCalledTimes(5);
   });
 
   test('handles removing listeners', () => {
@@ -287,6 +324,40 @@ describe('can listen for field changes', () => {
     (obj.getField('test.nested.1') as BasicField).set('2');
     expect(mock1).toHaveBeenCalledTimes(7);
     expect(mock2).toHaveBeenCalledTimes(2);
+  });
+
+  test('handles inherited field dependencies', () => {
+    class TestField extends Field {
+      public get(): string {
+        return '';
+      }
+      public dependencies(context: LObject): string[] {
+        return [`{${context.id}|dep}`];
+      }
+      public clone(): Field {
+        return this;
+      }
+      public serialize(): Field.SerializedData {
+        return {type:'', value:''};
+      }
+    }
+
+    const parent = project.makeObject('test');
+    const obj = project.makeObject('test', parent);
+
+    parent.addOwnField('test', new TestField());
+    parent.addOwnField('dep', new BasicField(''));
+
+    obj.addOwnField('dep', new BasicField(''));
+
+    const mock = jest.fn();
+
+    obj.addPathListener('dep', mock);
+    (parent.getField('dep') as BasicField).set('test');
+    expect(mock).toHaveBeenCalledTimes(0);
+
+    (obj.getField('dep') as BasicField).set('test');
+    expect(mock).toHaveBeenCalledTimes(1);
   });
 });
 
