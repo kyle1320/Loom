@@ -33,9 +33,9 @@ export default class EventEmitter<T extends {[name: string]: any}> {
     registered!.push(callback);
   }
 
-  public emit<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
-  public emit<K extends VoidTypes<T>>(type: K): void;
-  public emit<K extends keyof T>(type: K, arg?: T[K]): void {
+  protected emit<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
+  protected emit<K extends VoidTypes<T>>(type: K): void;
+  protected emit<K extends keyof T>(type: K, arg?: T[K]): void {
     const registered = this._listeners[type];
 
     if (registered) {
@@ -43,9 +43,9 @@ export default class EventEmitter<T extends {[name: string]: any}> {
     }
   }
 
-  public emitOnceAsync<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
-  public emitOnceAsync<K extends VoidTypes<T>>(type: K): void;
-  public emitOnceAsync<K extends keyof T>(type: K, arg?: T[K]): void {
+  protected emitOnceAsync<K extends NonVoidTypes<T>>(type: K, arg: T[K]): void;
+  protected emitOnceAsync<K extends VoidTypes<T>>(type: K): void;
+  protected emitOnceAsync<K extends keyof T>(type: K, arg?: T[K]): void {
     this._queued[type] = arg!;
 
     if (!this._timeout) {
