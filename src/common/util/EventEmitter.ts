@@ -1,7 +1,7 @@
 type Callback<T> = T extends void ? () => void : (arg: T) => void;
 
 type VoidTypes<T, K extends keyof T = keyof T> =
-  T[K] extends void ? K : never;
+  K extends (T[K] extends void ? K : never) ? K : never;
 type NonVoidTypes<T, K extends keyof T = keyof T> =
   T[K] extends void ? never : K;
 type Listeners<T> = {[K in keyof T]?: ((arg: T) => void)[]};
