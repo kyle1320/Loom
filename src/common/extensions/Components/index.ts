@@ -1,15 +1,15 @@
 import Project from '../../data/Project';
 import ComponentContentField from './ComponentContentField';
-// import BasicField from '../BasicFields/BasicField';
+import DataExtension from '../DataExtension';
 
-export default {
-  init(project: Project) {
+const ext: DataExtension = {
+  initProject(project: Project) {
     project.addFieldType(ComponentContentField);
     project.addDefaultFields(
       'component',
-      // ['html.tag', new BasicField('div')],
-      // ['html.innerContent', new BasicField('')],
       ['html.outerContent', new ComponentContentField()]
     );
   }
 };
+
+export default ext;

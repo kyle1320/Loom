@@ -2,18 +2,20 @@ import SerializationError from '../errors/SerializationError';
 import LObject from './LObject';
 import Field from './Field';
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
-import Extension from '../extensions/Extension';
+import DataExtension from '../extensions/DataExtension';
 import BasicFields from '../extensions/BasicFields';
 import ObjectReferenceError from '../errors/ObjectReferenceError';
 import Components from '../extensions/Components';
 
 class Project {
-  public static readonly defaultExtensions: Extension[] = [
+  public static readonly defaultExtensions: DataExtension[] = [
     BasicFields,
     Components
   ];
 
   private objects: Map<string, LObject>;
+
+  private extensions: DataExtension[] = [];
 
   private readonly fieldTypes: {
     [key: string]: Field.Deserializer;
@@ -81,8 +83,9 @@ class Project {
     this.defaultFields[type] = arr.concat(fields);
   }
 
-  public addExtension(ext: Extension): void {
-    ext.init(this);
+  public addExtension(ext: DataExtension): void {
+    this.extensions.push(ext);
+    ext.initProject(this);
   }
 
   public *allObjects(): IterableIterator<LObject> {
