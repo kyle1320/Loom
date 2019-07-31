@@ -19,10 +19,14 @@ export default class BasicField extends Field {
 
   public get(context: LObject): string {
     return this.value.replace(/\{([^}]+)\}/g, (_, l) => {
-      const split = l.split('|');
+      const [objId, key] = l.split('|');
 
       try {
-        return context.project.getFieldValue(split[0], split[1]);
+        if (objId) {
+          return context.project.getFieldValue(objId, key);
+        } else {
+          return context.getFieldValue(key);
+        }
       } catch {
         return _;
       }
@@ -33,12 +37,16 @@ export default class BasicField extends Field {
     return this.value;
   }
 
-  public dependencies(): string[] {
+  public dependencies(context: LObject): string[] {
     const re = /\{([^}]+)\}/g;
     const links = [];
 
     let matches = re.exec(this.value);
     while (matches) {
+      if (matches[1].startsWith('|')) {
+        matches[1] = `${context.id}${matches[1]}`;
+      }
+
       links.push(matches[1]);
 
       matches = re.exec(this.value);
