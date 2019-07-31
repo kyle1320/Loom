@@ -6,6 +6,7 @@ import DataExtension from '../extensions/DataExtension';
 import BasicFields from '../extensions/BasicFields';
 import ObjectReferenceError from '../errors/ObjectReferenceError';
 import Components from '../extensions/Components';
+import Builder from '../build/Builder';
 
 class Project {
   public static readonly defaultExtensions: DataExtension[] = [
@@ -86,6 +87,18 @@ class Project {
   public addExtension(ext: DataExtension): void {
     this.extensions.push(ext);
     ext.initProject(this);
+  }
+
+  public getBuilder(): Builder {
+
+    // TODO: only instantiate once?
+    const builder = new Builder(this);
+
+    for (const ext of this.extensions) {
+      ext.initBuilder(builder);
+    }
+
+    return builder;
   }
 
   public *allObjects(): IterableIterator<LObject> {

@@ -9,7 +9,8 @@ const ext: DataExtension = {
       'component',
       ['html.outerContent', new ComponentContentField()]
     );
-  }
+  },
+  initBuilder() {}
 };
 
 export default ext;
