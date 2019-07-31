@@ -2,6 +2,7 @@ import Field from './Field';
 import Project from './Project';
 import FieldReferenceError from '../errors/FieldReferenceError';
 import IllegalFieldKeyError from '../errors/IllegalFieldKeyError';
+import IllegalPathError from '../errors/IllegalPathError';
 import EventEmitter from '../util/EventEmitter';
 
 namespace LObject {
@@ -18,6 +19,7 @@ namespace LObject {
 let counter = 0;
 
 const validFieldNameRegex = /^[a-z0-9_.-]+$/;
+const validPathRegex = /^[a-zA-Z0-9/_.-]+$/;
 
 function keyMatchesPath(key: string, path: string): boolean {
   path = path.toLowerCase();
@@ -57,18 +59,27 @@ interface FieldListenerInfo {
 class LObject extends EventEmitter<{
   fieldAdded: string;
   fieldRemoved: string;
+  pathChanged: void;
 }> {
   private fields: { [id: string]: Field };
   private pathListeners = new Map<string, LObject.FieldListener[]>();
   private fieldListeners = new Map<string, FieldListenerInfo>();
 
+  private path: string;
+
   public constructor(
     public readonly project: Project,
     public readonly type: string,
     public readonly parent: LObject | null = null,
+    path?: string,
     public readonly id = String(counter++)
   ) {
     super();
+
+    if (!path) path = id;
+    if (!validPathRegex.test(path)) throw new IllegalPathError(path);
+
+    this.path = path;
 
     this.fields = Object.create(parent && parent.fields);
 
@@ -329,6 +340,17 @@ class LObject extends EventEmitter<{
         this.fieldListeners.delete(key);
       }
     }
+  }
+
+  public getPath(): string {
+    return this.path;
+  }
+
+  public setPath(path: string): void {
+    if (!validPathRegex.test(path)) throw new IllegalPathError(path);
+
+    this.path = path;
+    this.emit('pathChanged');
   }
 
   public serialize(): LObject.SerializedData {
