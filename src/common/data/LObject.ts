@@ -29,17 +29,19 @@ function keyMatchesPath(key: string, path: string): boolean {
     : key === path;
 }
 
-function diff<T>(
-  oldSorted: T[],
-  newSorted: T[],
-  onChange: (el: T, isAdd: boolean) => void
+function diff(
+  oldSorted: Field.Dependency[],
+  newSorted: Field.Dependency[],
+  onChange: (el: Field.Dependency, isAdd: boolean) => void
 ): void {
   let i = 0, j = 0;
   while (i < oldSorted.length || j < newSorted.length) {
-    if (i >= oldSorted.length || oldSorted[i] > newSorted[j]) {
+    if (i >= oldSorted.length ||
+        Field.Dependency.Compare(oldSorted[i], newSorted[j]) > 0) {
       onChange(newSorted[j], true);
       j++;
-    } else if (j >= newSorted.length || oldSorted[i] < newSorted[j]) {
+    } else if (j >= newSorted.length ||
+        Field.Dependency.Compare(oldSorted[i], newSorted[j]) < 0) {
       onChange(oldSorted[i], false);
       i++;
     } else {
@@ -52,7 +54,7 @@ function diff<T>(
 interface FieldListenerInfo {
   onRemove: () => void;
   updateListener: () => void;
-  dependencies: string[];
+  dependencies: Field.Dependency[];
   pathListeners: LObject.FieldListener[];
 }
 
@@ -171,14 +173,12 @@ class LObject extends EventEmitter<{
     return field.get(this);
   }
 
-  public getFieldValueOrDefault(key: string, def: string): string {
-    const field = this.getField(key.toLowerCase());
-
-    if (!field) {
-      return def;
-    }
-
-    return field.get(this);
+  public getFieldLink(key: string, def: string): Field.Link {
+    return {
+      objectId: this.id,
+      fieldKey: key,
+      default: def
+    };
   }
 
   public hasOwnField(key: string): boolean {
@@ -258,18 +258,17 @@ class LObject extends EventEmitter<{
     if (!fieldInfo) {
       const updatedField = (): void =>
         fieldInfo!.pathListeners.forEach(l => l(key));
-      const updateDependencies = (newDeps: string[]): void => {
+      const updateDependencies = (newDeps: Field.Dependency[]): void => {
         diff(
           fieldInfo!.dependencies,
           newDeps,
-          (dep: string, isAdd: boolean) => {
-            const [objId, path] = dep.split('|');
-            const obj = this.project.getObject(objId);
+          (dep: Field.Dependency, isAdd: boolean) => {
+            const obj = this.project.getObject(dep.objectId);
             if (obj) {
               if (isAdd) {
-                obj.addPathListener(path, updatedField);
+                obj.addPathListener(dep.path, updatedField);
               } else {
-                obj.removePathListener(path, updatedField);
+                obj.removePathListener(dep.path, updatedField);
               }
             }
           }
@@ -284,7 +283,9 @@ class LObject extends EventEmitter<{
           field.removeListener('update', fieldInfo!.updateListener);
         },
         updateListener: () => {
-          updateDependencies(field.dependencies(this).sort());
+          updateDependencies(
+            field.dependencies(this).sort(Field.Dependency.Compare)
+          );
           updatedField();
         },
         dependencies: [],
@@ -292,7 +293,9 @@ class LObject extends EventEmitter<{
       };
       this.fieldListeners.set(key, fieldInfo);
 
-      updateDependencies(field.dependencies(this).sort());
+      updateDependencies(
+        field.dependencies(this).sort(Field.Dependency.Compare)
+      );
       field.on('update', fieldInfo.updateListener);
     }
 

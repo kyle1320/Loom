@@ -4,7 +4,6 @@ import Field from './Field';
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
 import DataExtension from '../extensions/DataExtension';
 import BasicFields from '../extensions/BasicFields';
-import ObjectReferenceError from '../errors/ObjectReferenceError';
 import Components from '../extensions/Components';
 import Builder from '../build/Builder';
 
@@ -55,24 +54,18 @@ class Project {
     return this.objects.get(id);
   }
 
-  public getField(objId: string, key: string): Field | undefined {
+  public getFieldValueOrDefault(
+    objId: string,
+    key: string,
+    def: string
+  ): string {
     const obj = this.getObject(objId);
+    if (!obj) return def;
 
-    if (!obj) {
-      throw new ObjectReferenceError();
-    }
+    const field = obj.getField(key.toLowerCase());
+    if (!field) return def;
 
-    return obj.getField(key);
-  }
-
-  public getFieldValue(objId: string, key: string): string {
-    const obj = this.getObject(objId);
-
-    if (!obj) {
-      throw new ObjectReferenceError();
-    }
-
-    return obj.getFieldValue(key);
+    return field.get(obj);
   }
 
   public addFieldType(type: Field.Deserializer): void {

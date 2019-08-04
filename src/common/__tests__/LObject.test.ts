@@ -328,11 +328,11 @@ describe('can listen for field changes', () => {
 
   test('handles inherited field dependencies', () => {
     class TestField extends Field {
-      public get(): string {
-        return '';
+      public raw(): Field.Raw {
+        return [];
       }
-      public dependencies(context: LObject): string[] {
-        return [`{${context.id}|dep}`];
+      public dependencies(context: LObject): Field.Dependency[] {
+        return [{ objectId: context.id, path: 'dep' }];
       }
       public clone(): Field {
         return this;
