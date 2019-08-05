@@ -173,12 +173,14 @@ class LObject extends EventEmitter<{
     return field.get(this);
   }
 
-  public getFieldLink(key: string, def: string): Field.Link {
-    return {
-      objectId: this.id,
-      fieldKey: key,
-      default: def
-    };
+  public getFieldValueOrDefault(key: string, def: string): string {
+    const field = this.getField(key.toLowerCase());
+
+    if (!field) {
+      return def;
+    }
+
+    return field.get(this);
   }
 
   public hasOwnField(key: string): boolean {

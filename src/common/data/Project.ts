@@ -62,10 +62,7 @@ class Project {
     const obj = this.getObject(objId);
     if (!obj) return def;
 
-    const field = obj.getField(key.toLowerCase());
-    if (!field) return def;
-
-    return field.get(obj);
+    return obj.getFieldValueOrDefault(key, def);
   }
 
   public addFieldType(type: Field.Deserializer): void {

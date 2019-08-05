@@ -163,8 +163,8 @@ describe('can listen for field changes', () => {
 
     obj.addPathListener('test', mock);
 
-    (obj.getField('test') as BasicField).set('new value');
-    (obj.getField('test.scope.1') as BasicField).set('new value');
+    (obj.getField('test') as BasicField).setFromString('new value');
+    (obj.getField('test.scope.1') as BasicField).setFromString('new value');
 
     expect(mock).toHaveBeenCalledTimes(1);
   });
@@ -174,9 +174,9 @@ describe('can listen for field changes', () => {
 
     obj.addPathListener('test.*', mock);
 
-    (obj.getField('test') as BasicField).set('new value 2');
-    (obj.getField('test.scope.1') as BasicField).set('new value 2');
-    (obj.getField('test.scope.2') as BasicField).set('new value 2');
+    (obj.getField('test') as BasicField).setFromString('new value 2');
+    (obj.getField('test.scope.1') as BasicField).setFromString('new value 2');
+    (obj.getField('test.scope.2') as BasicField).setFromString('new value 2');
 
     expect(mock).toHaveBeenCalledTimes(2);
   });
@@ -187,11 +187,11 @@ describe('can listen for field changes', () => {
     obj2.addPathListener('test', mock);
 
     (obj2.getField('test') as BasicField)
-      .set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
+      .setFromString(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
     (obj.getField('test') as BasicField)
-      .set('new value 3');
+      .setFromString('new value 3');
     (parent.getField('test.parent.2') as BasicField)
-      .set('new value 3');
+      .setFromString('new value 3');
 
     expect(mock).toHaveBeenCalledTimes(3);
   });
@@ -202,19 +202,19 @@ describe('can listen for field changes', () => {
     obj2.addPathListener('test', mock);
 
     (obj2.getField('test') as BasicField)
-      .set(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
+      .setFromString(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
     expect(mock).toHaveBeenCalledTimes(1);
 
     // new dependencies
-    (obj2.getField('test') as BasicField).set(`{${parent.id}|test}`);
+    (obj2.getField('test') as BasicField).setFromString(`{${parent.id}|test}`);
     expect(mock).toHaveBeenCalledTimes(2);
 
     // new dependency causes update
-    (parent.getField('test') as BasicField).set('new value 4');
+    (parent.getField('test') as BasicField).setFromString('new value 4');
     expect(mock).toHaveBeenCalledTimes(3);
 
     // old dependency does not cause update
-    (obj2.getField('test.parent.2') as BasicField).set('new value 4');
+    (obj2.getField('test.parent.2') as BasicField).setFromString('new value 4');
     expect(mock).toHaveBeenCalledTimes(3);
   });
 
@@ -229,10 +229,10 @@ describe('can listen for field changes', () => {
 
     obj.addPathListener('test.*', mock);
 
-    (parent.getField('test.1') as BasicField).set('value3');
+    (parent.getField('test.1') as BasicField).setFromString('value3');
     expect(mock).not.toHaveBeenCalled();
 
-    (obj.getField('test.1') as BasicField).set('value4');
+    (obj.getField('test.1') as BasicField).setFromString('value4');
     expect(mock).toHaveBeenCalledTimes(1);
 
     obj.removeOwnField('test.1');
@@ -260,17 +260,20 @@ describe('can listen for field changes', () => {
 
     obj.addPathListener('test.*', mock);
 
-    (obj.getField('test.scope.1') as BasicField).set('new value 5');
+    (obj.getField('test.scope.1') as BasicField).setFromString('new value 5');
     expect(mock).toHaveBeenCalledTimes(1);
 
-    (obj.getField('test') as BasicField).set('new value 5');
+    (obj.getField('test') as BasicField).setFromString('new value 5');
     expect(mock).toHaveBeenCalledTimes(1);
 
     obj.removePathListener('test.*', mock);
 
-    (obj.getField('test.scope.1') as BasicField).set('another new value 5');
-    (obj.getField('test.scope.2') as BasicField).set('new value 5');
-    (parent.getField('test.parent.1') as BasicField).set('new value 5');
+    (obj.getField('test.scope.1') as BasicField)
+      .setFromString('another new value 5');
+    (obj.getField('test.scope.2') as BasicField)
+      .setFromString('new value 5');
+    (parent.getField('test.parent.1') as BasicField)
+      .setFromString('new value 5');
     expect(mock).toHaveBeenCalledTimes(1);
   });
 
@@ -293,11 +296,11 @@ describe('can listen for field changes', () => {
     obj.addPathListener('test.*', mock1);
     obj.addPathListener('test.nested.*', mock2);
 
-    (obj.getField('test.1') as BasicField).set('1');
+    (obj.getField('test.1') as BasicField).setFromString('1');
     expect(mock1).toHaveBeenCalledTimes(1);
     expect(mock2).toHaveBeenCalledTimes(0);
 
-    (obj.getField('test.nested.1') as BasicField).set('1');
+    (obj.getField('test.nested.1') as BasicField).setFromString('1');
     expect(mock1).toHaveBeenCalledTimes(2);
     expect(mock2).toHaveBeenCalledTimes(1);
 
@@ -317,19 +320,19 @@ describe('can listen for field changes', () => {
     expect(mock1).toHaveBeenCalledTimes(5);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.2') as BasicField).set('1');
+    (obj.getField('test.nested.2') as BasicField).setFromString('1');
     expect(mock1).toHaveBeenCalledTimes(6);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.1') as BasicField).set('2');
+    (obj.getField('test.nested.1') as BasicField).setFromString('2');
     expect(mock1).toHaveBeenCalledTimes(7);
     expect(mock2).toHaveBeenCalledTimes(2);
   });
 
   test('handles inherited field dependencies', () => {
     class TestField extends Field {
-      public raw(): Field.Raw {
-        return [];
+      public get(): string {
+        return '';
       }
       public dependencies(context: LObject): Field.Dependency[] {
         return [{ objectId: context.id, path: 'dep' }];
@@ -353,10 +356,10 @@ describe('can listen for field changes', () => {
     const mock = jest.fn();
 
     obj.addPathListener('dep', mock);
-    (parent.getField('dep') as BasicField).set('test');
+    (parent.getField('dep') as BasicField).setFromString('test');
     expect(mock).toHaveBeenCalledTimes(0);
 
-    (obj.getField('dep') as BasicField).set('test');
+    (obj.getField('dep') as BasicField).setFromString('test');
     expect(mock).toHaveBeenCalledTimes(1);
   });
 });

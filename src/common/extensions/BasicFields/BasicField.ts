@@ -1,23 +1,25 @@
 import Field from '../../data/Field';
 import LObject from '../../data/LObject';
 
-export default class BasicField extends Field {
-  private rawValue: Field.Raw = [];
+class BasicField extends Field {
+  public readonly rawValue: BasicField.RawValue = [];
 
   public constructor(
-    private value: string
+    value: string | BasicField.RawValue
   ) {
     super();
 
-    this.set(value);
+    if (typeof value === 'string') {
+      this.setFromString(value);
+    } else {
+      this.rawValue = value;
+    }
   }
 
-  public set(value: string): void {
-    this.value = value;
-
+  public setFromString(value: string): void {
     const re = /\{([^}]+)\}/g;
     let index = 0;
-    this.rawValue = [];
+    this.rawValue.length = 0;
 
     let matches = re.exec(value);
     while (matches) {
@@ -39,7 +41,7 @@ export default class BasicField extends Field {
     this.emit('update');
   }
 
-  public raw(context: LObject): Field.Raw {
+  public raw(context: LObject): BasicField.RawValue {
     return this.rawValue.map(part => {
       if (typeof part === 'string') return part;
       if (part.objectId) return part;
@@ -49,6 +51,17 @@ export default class BasicField extends Field {
         default: part.default
       };
     });
+  }
+
+  public get(context: LObject): string {
+    return this.raw(context)
+      .map(part => {
+        if (typeof part === 'string') return part;
+        return context.project.getFieldValueOrDefault(
+          part.objectId, part.fieldKey, part.default
+        );
+      })
+      .join('');
   }
 
   public dependencies(context: LObject): Field.Dependency[] {
@@ -65,14 +78,29 @@ export default class BasicField extends Field {
   }
 
   public clone(): Field {
-    return new BasicField(this.value);
+    return new BasicField(this.rawValue);
   }
 
   public serialize(): string {
-    return this.value;
+    return this.rawValue.map(part => {
+      if (typeof part === 'string') return part;
+      return `{${part.objectId}|${part.fieldKey}}`;
+    }).join('');
   }
 
   public static deserialize(data: string): Field {
     return new BasicField(data);
   }
 }
+
+namespace BasicField {
+  export interface Link {
+    objectId: string;
+    fieldKey: string;
+    default: string;
+  }
+
+  export type RawValue = (string | Link)[];
+}
+
+export default BasicField;
