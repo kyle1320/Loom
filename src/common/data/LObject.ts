@@ -11,6 +11,7 @@ namespace LObject {
     type: string;
     id: string;
     parentId: string | null;
+    path: string;
     ownFields: { [key: string]: string };
   }
 }
@@ -62,7 +63,9 @@ class LObject extends EventEmitter<{
   public *getOwnFieldNames(path: string = '*'): IterableIterator<string> {
     path = path.toLowerCase();
 
-    if (path.endsWith('*')) {
+    if (path == '*') {
+      yield* Object.getOwnPropertyNames(this.fields);
+    } else if (path.endsWith('*')) {
       path = path.substring(0, path.length - 1);
       for (const key of Object.getOwnPropertyNames(this.fields)) {
         if (key.startsWith(path)) yield key;
@@ -75,7 +78,11 @@ class LObject extends EventEmitter<{
   public *getFieldNames(path: string = '*'): IterableIterator<string> {
     path = path.toLowerCase();
 
-    if (path.endsWith('*')) {
+    if (path == '*') {
+      for (const key in this.fields) {
+        yield key;
+      }
+    } else if (path.endsWith('*')) {
       path = path.substring(0, path.length - 1);
       for (const key in this.fields) {
         if (key.startsWith(path)) yield key;
@@ -179,6 +186,7 @@ class LObject extends EventEmitter<{
       type: this.type,
       id: this.id,
       parentId: this.parent && this.parent.id,
+      path: this.path,
       ownFields: {}
     };
 
@@ -197,6 +205,7 @@ class LObject extends EventEmitter<{
       project,
       data.type,
       data.parentId && project.getObject(data.parentId) || null,
+      data.path,
       data.id
     );
 
