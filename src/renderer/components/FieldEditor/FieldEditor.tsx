@@ -37,7 +37,7 @@ export default class FieldEditor {
 
     if (field instanceof BasicField) {
       this.value.addEventListener('input', () => {
-        field.set(this.value.textContent || '');
+        field.setFromString(this.value.textContent || '');
       });
     }
   }

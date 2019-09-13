@@ -1,14 +1,16 @@
-import EventEmitter from '../util/EventEmitter';
 import LObject from './LObject';
-import Link from './Link';
+import FieldObserver from '../events/FieldObserver';
 
-abstract class Field extends EventEmitter<{ update: void }> {
-  public abstract get(context: LObject): string;
+interface Field {
+  get(context: LObject): string;
 
-  public abstract dependencies(context: LObject): Link[];
+  observe(
+    context: LObject,
+    recursive: boolean
+  ): FieldObserver;
 
-  public abstract clone(): Field;
-  public abstract serialize(): string;
+  clone(): Field;
+  serialize(): string;
 }
 
 namespace Field {

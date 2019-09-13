@@ -1,8 +1,9 @@
 import Field from '../../data/Field';
 import LObject from '../../data/LObject';
 import Link from '../../data/Link';
+import ComponentContentFieldObserver from './ComponentContentFieldObserver';
 
-export default class ComponentContentField extends Field {
+export default class ComponentContentField implements Field {
   public get(context: LObject): string {
     const tag = context.getFieldValueOrDefault('html.tag', 'div');
     const attrs = [...context.getFieldNames('html.attr.*')]
@@ -14,12 +15,23 @@ export default class ComponentContentField extends Field {
     return  `<${tag}${attrs}>${content}</${tag}>`;
   }
 
-  public dependencies(context: LObject): Link[] {
-    return [
-      context.getLink('html.tag'),
-      context.getLink('html.attr.*'),
-      context.getLink('html.innerContent')
-    ];
+  public tag(context: LObject): Link {
+    return context.getLink('html.tag');
+  }
+
+  public attrs(context: LObject): Link {
+    return context.getLink('html.attr.*');
+  }
+
+  public content(context: LObject): Link {
+    return context.getLink('html.innerContent');
+  }
+
+  public observe(
+    context: LObject,
+    recursive: boolean
+  ): ComponentContentFieldObserver {
+    return new ComponentContentFieldObserver(this, context, recursive);
   }
 
   public clone(): Field {

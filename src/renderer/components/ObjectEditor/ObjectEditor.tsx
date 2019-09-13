@@ -15,10 +15,10 @@ export default class ObjectEditor {
       fieldMap.set(key, new FieldEditor(object, key));
     }
 
-    object.addPathListener('*', key => {
+    object.getLink('*').observe().content(true).on('update', key => {
       // TODO: handle adding / removing fields
-      if (fieldMap.has(key)) {
-        fieldMap.get(key)!.update();
+      if (fieldMap.has(key.fieldName)) {
+        fieldMap.get(key.fieldName)!.update();
       }
     });
 

@@ -13,8 +13,6 @@ namespace LObject {
     parentId: string | null;
     ownFields: { [key: string]: string };
   }
-
-  export type FieldListener = (key: string) => void;
 }
 
 let counter = 0;
@@ -22,51 +20,13 @@ let counter = 0;
 const validFieldNameRegex = /^[a-z0-9_.-]+$/;
 const validPathRegex = /^[a-zA-Z0-9/_.-]+$/;
 
-function keyMatchesPath(key: string, path: string): boolean {
-  path = path.toLowerCase();
-
-  return path.endsWith('*')
-    ? key.startsWith(path.substring(0, path.length - 1))
-    : key === path;
-}
-
-function diff(
-  oldSorted: Link[],
-  newSorted: Link[],
-  onChange: (el: Link, isAdd: boolean) => void
-): void {
-  let i = 0, j = 0;
-  while (i < oldSorted.length || j < newSorted.length) {
-    if (i >= oldSorted.length ||
-        Link.compare(oldSorted[i], newSorted[j]) > 0) {
-      onChange(newSorted[j], true);
-      j++;
-    } else if (j >= newSorted.length ||
-        Link.compare(oldSorted[i], newSorted[j]) < 0) {
-      onChange(oldSorted[i], false);
-      i++;
-    } else {
-      i++;
-      j++;
-    }
-  }
-}
-
-interface FieldListenerInfo {
-  onRemove: () => void;
-  updateListener: () => void;
-  dependencies: Link[];
-  pathListeners: LObject.FieldListener[];
-}
-
 class LObject extends EventEmitter<{
   fieldAdded: string;
   fieldRemoved: string;
+  fieldChanged: string;
   pathChanged: void;
 }> {
   private fields: { [id: string]: Field };
-  private pathListeners = new Map<string, LObject.FieldListener[]>();
-  private fieldListeners = new Map<string, FieldListenerInfo>();
 
   private path: string;
 
@@ -86,39 +46,16 @@ class LObject extends EventEmitter<{
 
     this.fields = Object.create(parent && parent.fields);
 
-    this.on('fieldAdded', key => {
-      for (const [path, listeners] of this.pathListeners) {
-        if (keyMatchesPath(key, path)) {
-          for (const listener of listeners) {
-            this._addFieldListener(key, listener);
-            listener(key);
-          }
-        }
-      }
-    });
-
-    this.on('fieldRemoved', key => {
-      for (const [path, listeners] of this.pathListeners) {
-        if (keyMatchesPath(key, path)) {
-          for (const listener of listeners) {
-            this._removeFieldListener(key, listener);
-          }
-        }
-      }
-    });
-
     if (parent) {
-      parent.on('fieldAdded', key => {
-        if (!this.hasOwnField(key)) {
-          this.emit('fieldAdded', key);
-        }
-      });
-
-      parent.on('fieldRemoved', key => {
-        if (!this.hasOwnField(key)) {
-          this.emit('fieldRemoved', key);
-        }
-      });
+      for (const evt of [
+        'fieldAdded', 'fieldRemoved', 'fieldChanged'
+      ] as const) {
+        parent.on(evt, key => {
+          if (!this.hasOwnField(key)) {
+            this.emit(evt, key);
+          }
+        });
+      }
     }
   }
 
@@ -204,10 +141,10 @@ class LObject extends EventEmitter<{
     this.fields[key] = field;
 
     if (hadField) {
-      this.emit('fieldRemoved', key);
+      this.emit('fieldChanged', key);
+    } else {
+      this.emit('fieldAdded', key);
     }
-
-    this.emit('fieldAdded', key);
   }
 
   public removeOwnField(key: string): void {
@@ -219,136 +156,10 @@ class LObject extends EventEmitter<{
 
     delete this.fields[key];
 
-    this.emit('fieldRemoved', key);
-
     if (this.fields[key]) {
-      this.emit('fieldAdded', key);
-    }
-  }
-
-  // Listeners are split into two 'parts': path listeners and field listeners.
-  // Path listeners are per-path, are are the 'normal' way of viewing listeners.
-  // Field listeners are used internally to implement path listeners.
-  //   They keep track of which path listeners are associated with which fields.
-  //     This way we can just associate a single listener with each field.
-  //   Paths are added to field listeners when a path listener is registered,
-  //     and when fields are added or removed.
-  //   When a field updates, it calls its path listeners with its key,
-  //     and also checks for updated dependencies.
-  //     If its dependencies change, path listeners are added / removed
-  //       to / from the appropriate objects.
-  //     When a field in the path on those objects changes, each path listener
-  //       is called with the key of the local (dependent) field.
-  public addPathListener(
-    path: string,
-    listener: LObject.FieldListener
-  ): void {
-    const listeners = this.pathListeners.get(path) || [];
-
-    if (listeners.some(l => l === listener)) return;
-
-    listeners.push(listener);
-    this.pathListeners.set(path, listeners);
-
-    for (const key of this.getFieldNames(path)) {
-      this._addFieldListener(key, listener);
-    }
-  }
-
-  private _addFieldListener(
-    key: string,
-    listener: LObject.FieldListener
-  ): void {
-    const field = this.getField(key)!;
-    let fieldInfo = this.fieldListeners.get(key);
-
-    if (!fieldInfo) {
-      const updatedField = (): void =>
-        fieldInfo!.pathListeners.forEach(l => l(key));
-      const updateDependencies = (newDeps: Link[]): void => {
-        diff(
-          fieldInfo!.dependencies,
-          newDeps,
-          (dep: Link, isAdd: boolean) => {
-            const obj = this.project.getObject(dep.objectId);
-            if (obj) {
-              if (isAdd) {
-                obj.addPathListener(dep.fieldName, updatedField);
-              } else {
-                obj.removePathListener(dep.fieldName, updatedField);
-              }
-            }
-          }
-        );
-
-        fieldInfo!.dependencies = newDeps;
-      };
-
-      fieldInfo = {
-        onRemove: () => {
-          updateDependencies([]);
-          field.removeListener('update', fieldInfo!.updateListener);
-        },
-        updateListener: () => {
-          updateDependencies(
-            field.dependencies(this).sort(Link.compare)
-          );
-          updatedField();
-        },
-        dependencies: [],
-        pathListeners: []
-      };
-      this.fieldListeners.set(key, fieldInfo);
-
-      updateDependencies(
-        field.dependencies(this).sort(Link.compare)
-      );
-      field.on('update', fieldInfo.updateListener);
-    }
-
-    fieldInfo.pathListeners.push(listener);
-  }
-
-  public removePathListener(
-    path: string,
-    listener: LObject.FieldListener
-  ): void {
-    const listeners = this.pathListeners.get(path);
-
-    if (listeners) {
-      const index = listeners.findIndex(l => l === listener);
-
-      if (index < 0) return;
-
-      const info = listeners.splice(index, 1)[0];
-
-      for (const key of this.getFieldNames(path)) {
-        this._removeFieldListener(key, info);
-      }
-
-      if (listeners.length === 0) {
-        this.pathListeners.delete(path);
-      }
-    }
-  }
-
-  private _removeFieldListener(
-    key: string,
-    listener: LObject.FieldListener
-  ): void {
-    const fieldInfo = this.fieldListeners.get(key);
-
-    if (fieldInfo) {
-      const index = fieldInfo.pathListeners.indexOf(listener);
-
-      if (index < 0) return;
-
-      fieldInfo.pathListeners.splice(index, 1)[0];
-
-      if (fieldInfo.pathListeners.length === 0) {
-        fieldInfo.onRemove();
-        this.fieldListeners.delete(key);
-      }
+      this.emit('fieldChanged', key);
+    } else {
+      this.emit('fieldRemoved', key);
     }
   }
 

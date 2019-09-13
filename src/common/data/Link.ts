@@ -3,6 +3,7 @@ import Field from './Field';
 import ObjectReferenceError from '../errors/ObjectReferenceError';
 import FieldReferenceError from '../errors/FieldReferenceError';
 import LObject from './LObject';
+import LinkObserver from '../events/LinkObserver';
 
 export default class Link {
   private object: LObject | null = null;
@@ -97,6 +98,10 @@ export default class Link {
     }
 
     return res;
+  }
+
+  public observe(): LinkObserver {
+    return new LinkObserver(this);
   }
 
   public matchesKey(key: string): boolean {

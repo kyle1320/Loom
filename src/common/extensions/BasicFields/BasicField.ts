@@ -1,8 +1,10 @@
 import Field from '../../data/Field';
 import LObject from '../../data/LObject';
 import Link from '../../data/Link';
+import EventEmitter from '../../util/EventEmitter';
+import BasicFieldObserver from './BasicFieldObserver';
 
-class BasicField extends Field {
+class BasicField extends EventEmitter<{ update: void }> implements Field {
   public readonly rawValue: BasicField.RawValue = [];
 
   public constructor(
@@ -62,6 +64,13 @@ class BasicField extends Field {
   public dependencies(context: LObject): Link[] {
     return this.raw(context)
       .filter((part): part is Link => typeof part !== 'string');
+  }
+
+  public observe(
+    context: LObject,
+    recursive: boolean
+  ): BasicFieldObserver {
+    return new BasicFieldObserver(this, context, recursive);
   }
 
   public clone(): Field {
