@@ -54,17 +54,6 @@ class Project {
     return this.objects.get(id);
   }
 
-  public getFieldValueOrDefault(
-    objId: string,
-    key: string,
-    def: string
-  ): string {
-    const obj = this.getObject(objId);
-    if (!obj) return def;
-
-    return obj.getFieldValueOrDefault(key, def);
-  }
-
   public addFieldType(type: Field.Deserializer): void {
     this.fieldTypes[type.name] = type;
   }

@@ -4,6 +4,7 @@ import FieldReferenceError from '../errors/FieldReferenceError';
 import IllegalFieldKeyError from '../errors/IllegalFieldKeyError';
 import IllegalPathError from '../errors/IllegalPathError';
 import EventEmitter from '../util/EventEmitter';
+import Link from './Link';
 
 namespace LObject {
   export interface SerializedData {
@@ -30,18 +31,18 @@ function keyMatchesPath(key: string, path: string): boolean {
 }
 
 function diff(
-  oldSorted: Field.Dependency[],
-  newSorted: Field.Dependency[],
-  onChange: (el: Field.Dependency, isAdd: boolean) => void
+  oldSorted: Link[],
+  newSorted: Link[],
+  onChange: (el: Link, isAdd: boolean) => void
 ): void {
   let i = 0, j = 0;
   while (i < oldSorted.length || j < newSorted.length) {
     if (i >= oldSorted.length ||
-        Field.Dependency.Compare(oldSorted[i], newSorted[j]) > 0) {
+        Link.compare(oldSorted[i], newSorted[j]) > 0) {
       onChange(newSorted[j], true);
       j++;
     } else if (j >= newSorted.length ||
-        Field.Dependency.Compare(oldSorted[i], newSorted[j]) < 0) {
+        Link.compare(oldSorted[i], newSorted[j]) < 0) {
       onChange(oldSorted[i], false);
       i++;
     } else {
@@ -54,7 +55,7 @@ function diff(
 interface FieldListenerInfo {
   onRemove: () => void;
   updateListener: () => void;
-  dependencies: Field.Dependency[];
+  dependencies: Link[];
   pathListeners: LObject.FieldListener[];
 }
 
@@ -183,6 +184,10 @@ class LObject extends EventEmitter<{
     return field.get(this);
   }
 
+  public getLink(path: string): Link {
+    return new Link(this.project, this.id, path);
+  }
+
   public hasOwnField(key: string): boolean {
     return Object.prototype.hasOwnProperty.call(this.fields, key.toLowerCase());
   }
@@ -260,17 +265,17 @@ class LObject extends EventEmitter<{
     if (!fieldInfo) {
       const updatedField = (): void =>
         fieldInfo!.pathListeners.forEach(l => l(key));
-      const updateDependencies = (newDeps: Field.Dependency[]): void => {
+      const updateDependencies = (newDeps: Link[]): void => {
         diff(
           fieldInfo!.dependencies,
           newDeps,
-          (dep: Field.Dependency, isAdd: boolean) => {
+          (dep: Link, isAdd: boolean) => {
             const obj = this.project.getObject(dep.objectId);
             if (obj) {
               if (isAdd) {
-                obj.addPathListener(dep.path, updatedField);
+                obj.addPathListener(dep.fieldName, updatedField);
               } else {
-                obj.removePathListener(dep.path, updatedField);
+                obj.removePathListener(dep.fieldName, updatedField);
               }
             }
           }
@@ -286,7 +291,7 @@ class LObject extends EventEmitter<{
         },
         updateListener: () => {
           updateDependencies(
-            field.dependencies(this).sort(Field.Dependency.Compare)
+            field.dependencies(this).sort(Link.compare)
           );
           updatedField();
         },
@@ -296,7 +301,7 @@ class LObject extends EventEmitter<{
       this.fieldListeners.set(key, fieldInfo);
 
       updateDependencies(
-        field.dependencies(this).sort(Field.Dependency.Compare)
+        field.dependencies(this).sort(Link.compare)
       );
       field.on('update', fieldInfo.updateListener);
     }

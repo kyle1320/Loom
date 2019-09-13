@@ -1,5 +1,6 @@
 import Field from '../../data/Field';
 import LObject from '../../data/LObject';
+import Link from '../../data/Link';
 
 class BasicField extends Field {
   public readonly rawValue: BasicField.RawValue = [];
@@ -17,7 +18,7 @@ class BasicField extends Field {
   }
 
   public setFromString(value: string): void {
-    const re = /\{([^}]+)\}/g;
+    const re = /\{([^}|]+)\|([^}]+)\}/g;
     let index = 0;
     this.rawValue.length = 0;
 
@@ -27,8 +28,8 @@ class BasicField extends Field {
         this.rawValue.push(value.substring(index, matches.index));
       }
 
-      const [objectId, fieldKey] = matches[1].split('|');
-      this.rawValue.push({ objectId, fieldKey, default: matches[0] });
+      // TODO: support empty object id
+      this.rawValue.push(new Link(null!, matches[1], matches[2]));
 
       index = matches.index + matches[0].length;
       matches = re.exec(value);
@@ -42,39 +43,25 @@ class BasicField extends Field {
   }
 
   public raw(context: LObject): BasicField.RawValue {
-    return this.rawValue.map(part => {
-      if (typeof part === 'string') return part;
-      if (part.objectId) return part;
-      return {
-        objectId: context.id,
-        fieldKey: part.fieldKey,
-        default: part.default
-      };
-    });
+    return this.rawValue
+      .map(part => {
+        if (typeof part === 'string') return part;
+        return part.withProject(context.project);
+      });
   }
 
   public get(context: LObject): string {
     return this.raw(context)
       .map(part => {
         if (typeof part === 'string') return part;
-        return context.project.getFieldValueOrDefault(
-          part.objectId, part.fieldKey, part.default
-        );
+        return part.getFieldValue();
       })
       .join('');
   }
 
-  public dependencies(context: LObject): Field.Dependency[] {
-    const deps = [];
-    for (const part of this.raw(context)) {
-      if (typeof part !== 'string') {
-        deps.push({
-          objectId: part.objectId,
-          path: part.fieldKey
-        });
-      }
-    }
-    return deps;
+  public dependencies(context: LObject): Link[] {
+    return this.raw(context)
+      .filter((part): part is Link => typeof part !== 'string');
   }
 
   public clone(): Field {
@@ -82,10 +69,7 @@ class BasicField extends Field {
   }
 
   public serialize(): string {
-    return this.rawValue.map(part => {
-      if (typeof part === 'string') return part;
-      return `{${part.objectId}|${part.fieldKey}}`;
-    }).join('');
+    return this.rawValue.join('');
   }
 
   public static deserialize(data: string): Field {
@@ -94,12 +78,6 @@ class BasicField extends Field {
 }
 
 namespace BasicField {
-  export interface Link {
-    objectId: string;
-    fieldKey: string;
-    default: string;
-  }
-
   export type RawValue = (string | Link)[];
 }
 

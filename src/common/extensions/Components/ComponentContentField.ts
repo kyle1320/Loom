@@ -1,5 +1,6 @@
 import Field from '../../data/Field';
 import LObject from '../../data/LObject';
+import Link from '../../data/Link';
 
 export default class ComponentContentField extends Field {
   public get(context: LObject): string {
@@ -13,11 +14,11 @@ export default class ComponentContentField extends Field {
     return  `<${tag}${attrs}>${content}</${tag}>`;
   }
 
-  public dependencies(context: LObject): Field.Dependency[] {
+  public dependencies(context: LObject): Link[] {
     return [
-      { objectId: context.id, path: 'html.tag' },
-      { objectId: context.id, path: 'html.attr.*' },
-      { objectId: context.id, path: 'html.innerContent' }
+      context.getLink('html.tag'),
+      context.getLink('html.attr.*'),
+      context.getLink('html.innerContent')
     ];
   }
 
