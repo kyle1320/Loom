@@ -24,10 +24,6 @@
             "error",
             "single"
         ],
-        "semi": [
-            "error",
-            "always"
-        ],
         "max-len": [
             "error",
             {
