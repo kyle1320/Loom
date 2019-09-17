@@ -3,18 +3,9 @@ import LObject from './LObject';
 import Field from './Field';
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
 import DataExtension from '../extensions/DataExtension';
-import BasicFields from '../extensions/BasicFields';
-import Components from '../extensions/Components';
-import Builder from '../build/Builder';
 
 class Project {
-  public static readonly defaultExtensions: DataExtension[] = [
-    BasicFields,
-    Components
-  ];
-
   private objects: Map<string, LObject>;
-
   private extensions: DataExtension[] = [];
 
   private readonly fieldTypes: {
@@ -26,8 +17,6 @@ class Project {
 
   public constructor() {
     this.objects = new Map();
-
-    Project.defaultExtensions.forEach(e => this.addExtension(e));
   }
 
   public makeObject(
@@ -66,18 +55,6 @@ class Project {
   public addExtension(ext: DataExtension): void {
     this.extensions.push(ext);
     ext.initProject(this);
-  }
-
-  public getBuilder(): Builder {
-
-    // TODO: only instantiate once?
-    const builder = new Builder(this);
-
-    for (const ext of this.extensions) {
-      ext.initBuilder(builder);
-    }
-
-    return builder;
   }
 
   public *allObjects(): IterableIterator<LObject> {
@@ -126,13 +103,19 @@ class Project {
     return cls.deserialize(val);
   }
 
-  public static deserialize(data: Project.SerializedData): Project {
+  public static deserialize(
+    data: Project.SerializedData,
+    extensions: DataExtension[]
+  ): Project {
     // TODO: handle differing serialization versions
     if (data.serializationVersion !== Project.serializationVersion) {
       throw new SerializationError();
     }
 
     const proj = new Project();
+
+    // TODO: load extenions dynamically from project?
+    extensions.forEach(ex => proj.addExtension(ex));
 
     data.objects.forEach(o => {
       const obj = LObject.deserialize(proj, o);

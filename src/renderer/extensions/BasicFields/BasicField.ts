@@ -1,7 +1,7 @@
-import Field from '../../data/Field';
-import LObject from '../../data/LObject';
-import Link from '../../data/Link';
-import EventEmitter from '../../util/EventEmitter';
+import Field from '../../../common/data/Field';
+import LObject from '../../../common/data/LObject';
+import Link from '../../../common/data/Link';
+import EventEmitter from '../../../common/util/EventEmitter';
 import BasicFieldObserver from './BasicFieldObserver';
 
 class BasicField extends EventEmitter<{ update: void }> implements Field {

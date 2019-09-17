@@ -1,8 +1,11 @@
-import Project from '../data/Project';
+import Project from '../../common/data/Project';
+import Link from '../../common/data/Link';
+
+import BasicFields from '../extensions/BasicFields';
 import BasicField from '../extensions/BasicFields/BasicField';
-import Link from '../data/Link';
 
 const project = new Project();
+project.addExtension(BasicFields);
 
 function mocks(link: Link): [jest.Mock, jest.Mock, jest.Mock] {
   const add = jest.fn();

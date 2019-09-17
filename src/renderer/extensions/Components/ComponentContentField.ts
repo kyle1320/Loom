@@ -1,6 +1,6 @@
-import Field from '../../data/Field';
-import LObject from '../../data/LObject';
-import Link from '../../data/Link';
+import LObject from '../../../common/data/LObject';
+import Field from '../../../common/data/Field';
+import Link from '../../../common/data/Link';
 import ComponentContentFieldObserver from './ComponentContentFieldObserver';
 
 export default class ComponentContentField implements Field {

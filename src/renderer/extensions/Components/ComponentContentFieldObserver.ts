@@ -1,9 +1,8 @@
-import FieldObserver from '../../events/FieldObserver';
-import ComponentContentField
-  from './ComponentContentField';
-import LObject from '../../data/LObject';
-import ContentObserver from '../../events/ContentObserver';
-import LinkObserver from '../../events/LinkObserver';
+import LObject from '../../../common/data/LObject';
+import LinkObserver from '../../../common/events/LinkObserver';
+import FieldObserver from '../../../common/events/FieldObserver';
+import ContentObserver from '../../../common/events/ContentObserver';
+import ComponentContentField from './ComponentContentField';
 
 export default class ComponentContentFieldObserver extends FieldObserver {
   private tagObs: ContentObserver | LinkObserver;

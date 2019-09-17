@@ -1,9 +1,9 @@
-import FieldObserver from '../../events/FieldObserver';
-import ContentObserver from '../../events/ContentObserver';
-import Link from '../../data/Link';
-import BasicField from './BasicField';
-import LObject from '../../data/LObject';
+import Link from '../../../common/data/Link';
+import LObject from '../../../common/data/LObject';
+import FieldObserver from '../../../common/events/FieldObserver';
+import ContentObserver from '../../../common/events/ContentObserver';
 import { diff } from '../../util';
+import BasicField from './BasicField';
 
 export default class BasicFieldObserver extends FieldObserver {
   public destroy: () => void;

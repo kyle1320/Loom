@@ -1,8 +1,8 @@
-import Project from '../../data/Project';
 import ComponentContentField from './ComponentContentField';
-import DataExtension from '../DataExtension';
+import Extension from '../Extension';
+import Project from '../../../common/data/Project';
 
-const ext: DataExtension = {
+const ext: Extension = {
   initProject(project: Project) {
     project.addFieldType(ComponentContentField);
     project.addDefaultFields(
@@ -10,7 +10,7 @@ const ext: DataExtension = {
       ['html.outerContent', new ComponentContentField()]
     );
   },
-  initBuilder() {}
+  initRenderer() {}
 };
 
 export default ext;

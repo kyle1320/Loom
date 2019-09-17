@@ -1,12 +1,12 @@
-import Project from '../../data/Project';
+import Project from '../../../common/data/Project';
 import BasicField from './BasicField';
-import DataExtension from '../DataExtension';
+import Extension from '../Extension'
 
-const ext: DataExtension = {
+const ext: Extension = {
   initProject(project: Project) {
     project.addFieldType(BasicField);
   },
-  initBuilder() {}
+  initRenderer() {}
 };
 
 export default ext;

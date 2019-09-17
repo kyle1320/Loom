@@ -1,6 +1,6 @@
 import ObjectEditor from './components/ObjectEditor/ObjectEditor';
 import Project from '../common/data/Project';
-import BasicField from '../common/extensions/BasicFields/BasicField';
+import BasicField from './extensions/BasicFields/BasicField';
 
 window.addEventListener('load', function () {
   const project = new Project();

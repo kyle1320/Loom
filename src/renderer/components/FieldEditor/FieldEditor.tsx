@@ -1,7 +1,7 @@
 import { makeElement } from '../../util/dom';
 
 import './FieldEditor.scss';
-import BasicField from '../../../common/extensions/BasicFields/BasicField';
+import BasicField from '../../extensions/BasicFields/BasicField';
 import LObject from '../../../common/data/LObject';
 import FieldReferenceError from '../../../common/errors/FieldReferenceError';
 
