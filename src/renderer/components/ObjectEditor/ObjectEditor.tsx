@@ -38,7 +38,9 @@ export default class ObjectEditor {
           </tr>;
         })}
       </table>
-      {object.type === 'component' && new ComponentPreview(object).element}
+      {object.type === 'component' && <div className="preview">
+          Preview: { new ComponentPreview(object.getLink('html.outerContent')).element }
+      </div>}
     </div>;
   }
 }

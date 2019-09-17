@@ -1,40 +1,91 @@
-import LObject from '../../../common/data/LObject';
 import { makeElement } from '../../util/dom';
 import FieldReferenceError from '../../../common/errors/FieldReferenceError';
 
 import './ComponentPreview.scss';
+import ComponentContentField
+  from '../../extensions/Components/ComponentContentField';
+import Link from '../../../common/data/Link';
+import BasicField from '../../extensions/BasicFields/BasicField';
+
+export function addFieldNodesToParent(el: HTMLElement, link: Link): void {
+  const field = link.getField();
+
+  if (field instanceof BasicField) {
+    for (const part of field.raw(link.getObject())) {
+      if (typeof part === 'string') {
+        el.appendChild(document.createTextNode(part));
+      } else {
+        addFieldNodesToParent(el, part);
+      }
+    }
+  } else {
+    // eslint-disable-next-line
+    el.appendChild(new ComponentPreview(link).element);
+  }
+}
 
 export default class ComponentPreview {
-  public readonly element: HTMLElement;
+  public element: HTMLElement;
 
-  private readonly invalidNode = <span className="preview__invalid"/>;
-  private content: ChildNode;
-  private range: Range = document.createRange();
+  private tag: Link;
+  private attrs: Link;
+  private content: Link;
 
-  public constructor(private object: LObject) {
-    this.element = <div className="preview">
-      Preview: {this.content = this.invalidNode}
-    </div>;
+  public constructor(link: Link) {
+    this.element = <div/>;
 
-    const field = object.getField('html.outerContent');
+    const field = link.getField();
 
-    if (!field) {
+    if (!field || !(field instanceof ComponentContentField)) {
       throw new FieldReferenceError();
     }
 
-    this.update = this.update.bind(this);
+    this.updateTag = this.updateTag.bind(this);
+    this.updateAttr = this.updateAttr.bind(this);
+    this.updateContent = this.updateContent.bind(this);
 
-    object.getLink('html.outerContent').observe().content(true)
-      .on('update', this.update);
-    this.update();
+    this.tag = field.tag(link.getObject());
+    this.attrs = field.attrs(link.getObject());
+    this.content = field.content(link.getObject());
+
+    this.tag.observe().content(true)
+      .on('update', this.updateTag);
+    this.attrs.observe().content(true)
+      .on('update', this.updateAttr);
+
+    // TODO: don't be recursive
+    this.content.observe().content(false)
+      .on('update', this.updateContent);
+
+    this.rebuild();
   }
 
-  private update(): void {
-    const html = this.object.getFieldValue('html.outerContent');
-    const node = this.range.createContextualFragment(html)
-      .firstChild || this.invalidNode;
+  private rebuild(): void {
+    const el = document.createElement(this.tag.getFieldValueOrDefault('div'));
+    this.element.replaceWith(el);
+    this.element = el;
 
-    this.content.replaceWith(node);
-    this.content = node;
+    this.updateAttr(this.attrs);
+    this.updateContent(this.content);
+  }
+
+  private updateTag(link: Link): void {
+    // tag cannot easily be changed; rebuild everything
+    this.rebuild();
+  }
+
+  private updateAttr(link: Link): void {
+    const attrs = link!.getFieldValues();
+
+    for (const key in attrs) {
+      // skip 'html.attr.'
+      this.element.setAttribute(key.substr(10), attrs[key]);
+    }
+  }
+
+  private updateContent(link: Link): void {
+    // TODO: do a diff, only update what's necessary
+    this.element.innerHTML = '';
+    addFieldNodesToParent(this.element, link);
   }
 }

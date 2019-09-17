@@ -1,9 +1,10 @@
+import Renderer from './Renderer';
 import ObjectEditor from './components/ObjectEditor/ObjectEditor';
-import Project from '../common/data/Project';
 import BasicField from './extensions/BasicFields/BasicField';
 
 window.addEventListener('load', function () {
-  const project = new Project();
+  const manager = new Renderer();
+  const project = manager.makeProject();
 
   const obj1 = project.makeObject('component');
   obj1.addOwnField('html.tag', new BasicField('button'));
