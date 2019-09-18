@@ -27,6 +27,14 @@ export default class ComponentContentField implements Field {
     return context.getLink('html.innerContent');
   }
 
+  public dependencies(context: LObject): Link[] {
+    return [
+      this.tag(context),
+      this.attrs(context),
+      this.content(context)
+    ];
+  }
+
   public observe(
     context: LObject,
     recursive: boolean

@@ -1,8 +1,11 @@
 import LObject from './LObject';
+import Link from './Link';
 import FieldObserver from '../events/FieldObserver';
 
 interface Field {
   get(context: LObject): string;
+
+  dependencies(context: LObject): Link[];
 
   observe(
     context: LObject,
