@@ -11,7 +11,8 @@ export default class Link {
   public constructor(
     public readonly project: Project,
     public readonly objectId: string,
-    public readonly fieldName: string
+    public readonly fieldName: string,
+    public readonly parent: Link | null = null
   ) {
     this.fieldName = fieldName.toLowerCase();
   }
@@ -85,21 +86,6 @@ export default class Link {
     return res;
   }
 
-  public getFieldValuesOrDefault(
-    defFun: (key: string) => string
-  ): { [key: string]: string } {
-    const object = this.getObject();
-    const res: { [key: string]: string } = {};
-
-    for (const key of object.getFieldNames()) {
-      if (this.matchesKey(key)) {
-        res[key] = object.getFieldValueOrDefault(key, defFun(key));
-      }
-    }
-
-    return res;
-  }
-
   public observe(): LinkObserver {
     return new LinkObserver(this);
   }
@@ -110,33 +96,20 @@ export default class Link {
       : key === this.fieldName;
   }
 
-  public withProject(project: Project): Link {
-    return new Link(project, this.objectId, this.fieldName);
+  public withParent(parent: Link): Link {
+    return new Link(this.project, this.objectId, this.fieldName, parent);
   }
 
-  public withObject(objectId: string): Link {
-    return new Link(this.project, objectId, this.fieldName);
+  public withProject(project: Project): Link {
+    return new Link(project, this.objectId, this.fieldName, this.parent);
   }
 
   public withFieldName(fieldName: string): Link {
-    return new Link(this.project, this.objectId, fieldName);
-  }
-
-  public equals(other: Link): boolean {
-    return this.objectId == other.objectId
-      && this.fieldName == other.fieldName;
+    return new Link(this.project, this.objectId, fieldName, this.parent);
   }
 
   public toString(): string {
     return `{${this.objectId}|${this.fieldName}}`;
-  }
-
-  public static fromString(project: Project, str: string): Link | null {
-    const match = str.match(/\^{([^}|]+)\|([^}]+)\}$/);
-
-    if (!match) return null;
-
-    return new Link(project, match[1], match[2]);
   }
 
   public static compare(a: Link, b: Link): number {
