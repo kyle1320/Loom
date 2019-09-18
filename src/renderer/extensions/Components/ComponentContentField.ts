@@ -1,7 +1,8 @@
 import LObject from '../../../common/data/LObject';
 import Field from '../../../common/data/Field';
 import Link from '../../../common/data/Link';
-import ComponentContentFieldObserver from './ComponentContentFieldObserver';
+import FieldDependencyObserver
+  from '../../../common/events/FieldDependencyObserver';
 
 export default class ComponentContentField implements Field {
   public get(context: LObject): string {
@@ -38,8 +39,8 @@ export default class ComponentContentField implements Field {
   public observe(
     context: LObject,
     recursive: boolean
-  ): ComponentContentFieldObserver {
-    return new ComponentContentFieldObserver(this, context, recursive);
+  ): FieldDependencyObserver {
+    return new FieldDependencyObserver(this, context, recursive);
   }
 
   public clone(): Field {
