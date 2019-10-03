@@ -5,6 +5,7 @@
     },
     "extends": [
         "eslint:recommended",
+        "plugin:react/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
@@ -84,25 +85,5 @@
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-parameter-properties": "off",
         "@typescript-eslint/no-non-null-assertion": "off"
-    },
-    "overrides": [
-        {
-            "files": ["**/*.tsx"],
-            "parserOptions": {
-                "ecmaFeatures": {
-                    "jsx": true
-                }
-            },
-            "rules": {
-                "@typescript-eslint/no-unused-vars": [
-                    "error",
-                    {
-                        "vars": "local",
-                        "args": "none",
-                        "varsIgnorePattern": "^makeElement$"
-                    }
-                ]
-            }
-        }
-    ]
+    }
 }

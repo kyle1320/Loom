@@ -4,7 +4,6 @@
     "alwaysStrict": true,
     "downlevelIteration": true,
     "strict": true,
-    "jsx": "react",
-    "jsxFactory": "makeElement"
+    "jsx": "react"
   }
 }
