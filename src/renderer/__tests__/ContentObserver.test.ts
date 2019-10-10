@@ -25,8 +25,8 @@ describe('can listen for field changes', () => {
 
     obj.getLink('test').observe().content(true).on('update', mock);
 
-    (obj.getField('test') as BasicField).setFromString('new value');
-    (obj.getField('test.scope.1') as BasicField).setFromString('new value');
+    obj.getField('test')!.set('new value');
+    obj.getField('test.scope.1')!.set('new value');
 
     expect(mock).toHaveBeenCalledTimes(1);
   });
@@ -36,9 +36,9 @@ describe('can listen for field changes', () => {
 
     obj.getLink('test.*').observe().content(true).on('update', mock);
 
-    (obj.getField('test') as BasicField).setFromString('new value 2');
-    (obj.getField('test.scope.1') as BasicField).setFromString('new value 2');
-    (obj.getField('test.scope.2') as BasicField).setFromString('new value 2');
+    obj.getField('test')!.set('new value 2');
+    obj.getField('test.scope.1')!.set('new value 2');
+    obj.getField('test.scope.2')!.set('new value 2');
 
     expect(mock).toHaveBeenCalledTimes(2);
   });
@@ -48,12 +48,9 @@ describe('can listen for field changes', () => {
 
     obj2.getLink('test').observe().content(true).on('update', mock);
 
-    (obj2.getField('test') as BasicField)
-      .setFromString(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
-    (obj.getField('test') as BasicField)
-      .setFromString('new value 3');
-    (parent.getField('test.parent.2') as BasicField)
-      .setFromString('new value 3');
+    obj2.getField('test')!.set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
+    obj.getField('test')!.set('new value 3');
+    parent.getField('test.parent.2')!.set('new value 3');
 
     expect(mock).toHaveBeenCalledTimes(3);
   });
@@ -64,12 +61,9 @@ describe('can listen for field changes', () => {
 
       obj2.getLink('test').observe().content(false).on('update', mock);
 
-      (obj2.getField('test') as BasicField)
-        .setFromString(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
-      (obj.getField('test') as BasicField)
-        .setFromString('new value 3');
-      (parent.getField('test.parent.2') as BasicField)
-        .setFromString('new value 3');
+      obj2.getField('test')!.set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
+      obj.getField('test')!.set('new value 3');
+      parent.getField('test.parent.2')!.set('new value 3');
 
       expect(mock).toHaveBeenCalledTimes(1);
     }
@@ -80,8 +74,7 @@ describe('can listen for field changes', () => {
 
     obj2.getLink('test').observe().content(true).on('update', mock);
 
-    (obj2.getField('test') as BasicField)
-      .setFromString(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
+    obj2.getField('test')!.set(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
     expect(mock).toHaveBeenCalledTimes(1);
 
     // dependency field change causes update
@@ -91,15 +84,15 @@ describe('can listen for field changes', () => {
     expect(mock).toHaveBeenCalledTimes(3);
 
     // new dependencies cause update
-    (obj2.getField('test') as BasicField).setFromString(`{${parent.id}|test}`);
+    obj2.getField('test')!.set(`{${parent.id}|test}`);
     expect(mock).toHaveBeenCalledTimes(4);
 
     // new dependency causes update
-    (parent.getField('test') as BasicField).setFromString('new value 5');
+    parent.getField('test')!.set('new value 5');
     expect(mock).toHaveBeenCalledTimes(5);
 
     // old dependency does not cause update
-    (obj2.getField('test.parent.2') as BasicField).setFromString('new value 6');
+    obj2.getField('test.parent.2')!.set('new value 6');
     expect(mock).toHaveBeenCalledTimes(5);
   });
 
@@ -115,10 +108,10 @@ describe('can listen for field changes', () => {
     obj.getLink('test.*')
       .observe().content(true).on('update', mock);
 
-    (parent.getField('test.1') as BasicField).setFromString('value3');
+    parent.getField('test.1')!.set('value3');
     expect(mock).not.toHaveBeenCalled();
 
-    (obj.getField('test.1') as BasicField).setFromString('value4');
+    obj.getField('test.1')!.set('value4');
     expect(mock).toHaveBeenCalledTimes(1);
 
     obj.removeOwnField('test.1');
@@ -147,17 +140,15 @@ describe('can listen for field changes', () => {
       const obs = obj.getLink('test.*').observe().content(true)
         .on('update', mock);
 
-      (obj.getField('test.scope.1') as BasicField).setFromString(
+      obj.getField('test.scope.1')!.set(
         `new value ${obj2.getLink('test')}`
       );
-      (obj2.getField('test') as BasicField)
-        .setFromString('new value 6');
+      obj2.getField('test')!.set('new value 6');
       expect(mock).toHaveBeenCalledTimes(2);
 
       obs.destroy();
 
-      (obj2.getField('test') as BasicField)
-        .setFromString('new value 7');
+      obj2.getField('test')!.set('new value 7');
       expect(mock).toHaveBeenCalledTimes(2);
     });
 
@@ -167,20 +158,17 @@ describe('can listen for field changes', () => {
       const obs = obj.getLink('test.*').observe().content(true)
         .on('update', mock);
 
-      (obj.getField('test.scope.1') as BasicField).setFromString('new value 5');
+      obj.getField('test.scope.1')!.set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
 
-      (obj.getField('test') as BasicField).setFromString('new value 5');
+      obj.getField('test')!.set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
 
       obs.destroy();
 
-      (obj.getField('test.scope.1') as BasicField)
-        .setFromString('another new value 5');
-      (obj.getField('test.scope.2') as BasicField)
-        .setFromString('new value 5');
-      (parent.getField('test.parent.1') as BasicField)
-        .setFromString('new value 5');
+      obj.getField('test.scope.1')!.set('another new value 5');
+      obj.getField('test.scope.2')!.set('new value 5');
+      parent.getField('test.parent.1')!.set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
     });
   });
@@ -206,11 +194,11 @@ describe('can listen for field changes', () => {
     const obs2 = obj.getLink('test.nested.*').observe().content(true)
       .on('update', mock2);
 
-    (obj.getField('test.1') as BasicField).setFromString('1');
+    obj.getField('test.1')!.set('1');
     expect(mock1).toHaveBeenCalledTimes(1);
     expect(mock2).toHaveBeenCalledTimes(0);
 
-    (obj.getField('test.nested.1') as BasicField).setFromString('1');
+    obj.getField('test.nested.1')!.set('1');
     expect(mock1).toHaveBeenCalledTimes(2);
     expect(mock2).toHaveBeenCalledTimes(1);
 
@@ -230,11 +218,11 @@ describe('can listen for field changes', () => {
     expect(mock1).toHaveBeenCalledTimes(5);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.2') as BasicField).setFromString('1');
+    obj.getField('test.nested.2')!.set('1');
     expect(mock1).toHaveBeenCalledTimes(6);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.1') as BasicField).setFromString('2');
+    obj.getField('test.nested.1')!.set('2');
     expect(mock1).toHaveBeenCalledTimes(7);
     expect(mock2).toHaveBeenCalledTimes(2);
   });

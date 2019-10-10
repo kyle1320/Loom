@@ -5,6 +5,7 @@ import EventEmitter from '../../../common/util/EventEmitter';
 import BasicFieldObserver from './BasicFieldObserver';
 
 class BasicField extends EventEmitter<{ update: void }> implements Field {
+  public readonly writable = true;
   public readonly rawValue: BasicField.RawValue = [];
 
   public constructor(
@@ -13,14 +14,14 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
     super();
 
     if (typeof value === 'string') {
-      this.setFromString(value);
+      this.set(value);
     } else {
       this.rawValue = value;
     }
   }
 
-  public setFromString(value: string): void {
-    const re = /\{([^}|]+)\|([^}]+)\}/g;
+  public set(value: string): void {
+    const re = /\{([^{}|]+)\|([^{}]+)\}/g;
     let index = 0;
     this.rawValue.length = 0;
 
@@ -59,6 +60,10 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
         return part.getFieldValue();
       })
       .join('');
+  }
+
+  public getAsRawString(context: LObject): string {
+    return this.raw(context).map(String).join('');
   }
 
   public dependencies(context: LObject): Link[] {

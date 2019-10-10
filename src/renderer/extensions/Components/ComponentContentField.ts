@@ -5,6 +5,8 @@ import FieldDependencyObserver
   from '../../../common/events/FieldDependencyObserver';
 
 export default class ComponentContentField implements Field {
+  public readonly writable = false;
+
   public get(context: LObject): string {
     const tag = context.getFieldValueOrDefault('html.tag', 'div');
     const attrs = [...context.getFieldNames('html.attr.*')]
@@ -14,6 +16,10 @@ export default class ComponentContentField implements Field {
 
     // TODO: handle self-closing tags
     return  `<${tag}${attrs}>${content}</${tag}>`;
+  }
+
+  public set(): never {
+    throw Error('ComponentContentField cannot be set');
   }
 
   public tag(context: LObject): Link {
