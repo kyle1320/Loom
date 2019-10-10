@@ -1,3 +1,5 @@
+import Renderer from '../Renderer';
+
 export default interface RendererExtension {
-  initRenderer(): void;
+  initRenderer(renderer: Renderer): void;
 }

@@ -1,0 +1,10 @@
+.plain-field-editor {
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  padding: 2px 3px;
+
+  &.error {
+    border-color: red;
+    background-color: #FFCCCC;
+  }
+}

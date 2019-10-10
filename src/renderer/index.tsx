@@ -1,10 +1,16 @@
 import Renderer from './Renderer';
-import ObjectEditor from './components/ObjectEditor/ObjectEditor';
 import BasicField from './extensions/BasicFields/BasicField';
 
+import React from 'react';
+import ReactDom from 'react-dom';
+import LoomUI from './LoomUI';
+
 window.addEventListener('load', function () {
-  const manager = new Renderer();
-  const project = manager.makeProject();
+  const renderer = new Renderer();
+
+  renderer.newProject();
+
+  const project = renderer.getProject()!;
 
   const obj1 = project.makeObject('component');
   obj1.addOwnField('html.tag', new BasicField('button'));
@@ -15,6 +21,7 @@ window.addEventListener('load', function () {
   const obj2 = project.makeObject('component', obj1);
   obj2.addOwnField('html.innerContent', new BasicField('Custom Text'));
   obj2.addOwnField('html.attr.onclick', new BasicField('alert(\'Custom\')'));
+  obj2.addOwnField('test', new BasicField('Testing'));
 
   const obj3 = project.makeObject('component');
   obj3.addOwnField(
@@ -22,7 +29,8 @@ window.addEventListener('load', function () {
     new BasicField(`The button is: {${obj2.id}|html.outerContent}`)
   );
 
-  document.body.appendChild(new ObjectEditor(obj1).element);
-  document.body.appendChild(new ObjectEditor(obj2).element);
-  document.body.appendChild(new ObjectEditor(obj3).element);
+  ReactDom.render(
+    <LoomUI renderer={renderer}></LoomUI>,
+    document.getElementById('app')
+  );
 });

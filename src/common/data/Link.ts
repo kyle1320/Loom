@@ -42,8 +42,12 @@ export default class Link {
     yield* this.getObject().getFieldNames(this.fieldName);
   }
 
+  public maybeGetField(): Field | undefined {
+    return this.getObject().getField(this.fieldName);
+  }
+
   public getField(): Field {
-    const field = this.getObject().getField(this.fieldName);
+    const field = this.maybeGetField();
 
     if (!field) {
       throw new FieldReferenceError();

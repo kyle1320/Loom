@@ -1,0 +1,15 @@
+.field-categories {
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+
+  .category {
+    border-bottom: 1px solid #808080;
+    border-right: 1px solid #808080;
+    flex-grow: 1;
+
+    &.active {
+      background-color: #505080;
+    }
+  }
+}
