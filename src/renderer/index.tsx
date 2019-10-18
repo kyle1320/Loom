@@ -16,7 +16,9 @@ window.addEventListener('load', function () {
   obj1.addOwnField('html.tag', new BasicField('button'));
   obj1.addOwnField('html.innerContent', new BasicField('Click Me'));
   obj1.addOwnField('html.attr.onclick', new BasicField('alert(\'Base\')'));
-  obj1.addOwnField('html.attr.style', new BasicField('color: red'));
+  obj1.addOwnField('style.color', new BasicField('red'));
+  obj1.addOwnField('style.font-weight', new BasicField(''));
+  obj1.addOwnField('style.border', new BasicField(''));
 
   const obj2 = project.makeObject('component', obj1);
   obj2.addOwnField('html.innerContent', new BasicField('Custom Text'));

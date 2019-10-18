@@ -5,6 +5,7 @@ import Field from '../common/data/Field';
 import Extension from './extensions/Extension';
 import Components from './extensions/Components';
 import BasicFields from './extensions/BasicFields';
+import Styles from './extensions/Styles';
 
 import React from 'react';
 import {
@@ -30,7 +31,8 @@ const defaultCategory = { key: 'all', name: 'All', paths: ['*'], sections: [] };
 export default class Renderer {
   private static readonly defaultExtensions: Extension[] = [
     BasicFields,
-    Components
+    Components,
+    Styles
   ];
 
   private project: Project | null = null;
