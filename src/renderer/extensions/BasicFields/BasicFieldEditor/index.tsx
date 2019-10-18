@@ -2,10 +2,9 @@ import React, { Component, ReactElement } from 'react';
 import {
   FieldEditor,
   FieldEditorProps } from '../../../registry/FieldEditor';
+import BasicField from '../BasicField';
 
 import './BasicFieldEditor.scss';
-import BasicField from '../BasicField';
-import { useFieldValue } from '../../../LoomUI/util/hooks';
 
 interface Props { value: string; onChange: (val: string) => void }
 
@@ -23,7 +22,7 @@ class BasicFieldEditorInner extends Component<Props> {
     }
   }
 
-  public update = () => {
+  public update = (): void => {
     const el = this.ref.current;
 
     if (!el) return;
@@ -52,12 +51,7 @@ const BasicFieldEditor: FieldEditor = (props: FieldEditorProps) => {
     (value: string) => props.field.set(value),
     [props.field]
   );
-  const value = useFieldValue(
-    props.field,
-    props.context,
-    (field, context) => (field as BasicField).getAsRawString(context),
-    false
-  ) || '';
+  const value = (props.field as BasicField).getAsRawString(props.context);
 
   return <BasicFieldEditorInner value={value} onChange={onChange} />
 }

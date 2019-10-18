@@ -48,6 +48,15 @@ export function useWatchLink(link: Link, recursive?: boolean): Link {
   return link;
 }
 
+export function useWatchPaths(context: LObject, paths: string[]): void {
+  const [, forceUpdate] = useForceUpdate();
+  React.useEffect(() => {
+    const observers
+      = paths.map(p => context.getLink(p).observe().on('update', forceUpdate));
+    return () => observers.forEach(o => o.destroy());
+  }, [context, ...paths]);
+}
+
 export function useLink(object: LObject, name: string): Link {
   return React.useMemo(() => object.getLink(name), [object, name]);
 }

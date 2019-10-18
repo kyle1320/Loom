@@ -22,7 +22,9 @@ export interface RendererProps<F extends Field = Field> {
 export type Renderer<F extends Field = Field>
   = React.ComponentType<RendererProps<F>>;
 
-function manageAttributes(comp: LObject): (node: HTMLElement | null) => void {
+type Manager = (node: HTMLElement | null) => void;
+
+function manageAttributes(comp: LObject): Manager {
   const attrs = comp.getLink('html.attr.*');
 
   let curNode: HTMLElement | null = null;
@@ -48,20 +50,61 @@ function manageAttributes(comp: LObject): (node: HTMLElement | null) => void {
   };
 }
 
+function manageStyles(comp: LObject): Manager {
+  const styles = comp.getLink('style.*');
+
+  let curNode: HTMLElement | null = null;
+  let attrObs: ContentObserver | null = null;
+
+  return (node: HTMLElement | null) => {
+    if (curNode && curNode != node) {
+      attrObs!.destroy();
+    }
+
+    curNode = node;
+
+    if (node) {
+      const styleMap = styles.getFieldValues();
+      for (const key in styleMap) {
+        node.style.setProperty(key.substring(6), styleMap[key]);
+      }
+
+      attrObs = styles.observe().content(true).on('update', (link: Link) => {
+        node.style.setProperty(link.fieldName.substring(6), '');
+        node.style.setProperty(
+          link.fieldName.substring(6),
+          link.getFieldValue()
+        );
+      });
+    }
+  };
+}
+
+function manageMany(...managers: Manager[]): Manager {
+  return (node: HTMLElement | null) => {
+    managers.forEach(m => m(node));
+  };
+}
+
 const ComponentRenderer: ComponentRenderer
   = (props: ComponentRendererProps) => {
     const tagLink = useLink(props.object, 'html.tag');
     useWatchLink(tagLink, true);
     const tag = tagLink.getFieldValueOrDefault('') || 'div';
 
-    const attrManager
-      = React.useMemo(() => manageAttributes(props.object), [props.object]);
+    const manager = React.useMemo(
+      () => manageMany(
+        manageAttributes(props.object),
+        manageStyles(props.object)
+      ),
+      [props.object]
+    );
 
     const icLink = useLink(props.object, 'html.innercontent');
 
     return React.createElement(
       tag,
-      { ref: attrManager },
+      { ref: manager },
       <LinkRenderer link={icLink} />
     );
   }

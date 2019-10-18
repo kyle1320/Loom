@@ -20,7 +20,10 @@ const Properties: React.FC<Props> = (props: Props) => {
       categories={renderer.getCategories()}
       active={cat}
       onSelect={setCat} />
-    <FieldList context={props.context} category={cat} />
+    {props.context
+      ? <FieldList context={props.context} category={cat} />
+      : 'no object is selected'
+    }
   </div>;
 }
 

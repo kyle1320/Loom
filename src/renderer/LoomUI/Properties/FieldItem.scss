@@ -1,17 +1,20 @@
 .property-field {
-  border-bottom: 1px solid #808080;
-  padding: 2px;
+  padding: 2px 4px;
+  font-size: 12px;
+  margin-bottom: 3px;
 
   &.inherited {
     color: gray;
     border-color: gray;
   }
 
-  &__name {
-    margin-bottom: 2px;
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
   }
 
-  &__editor {
-    padding-left: 5px;
+  &__name {
+    margin-bottom: 2px;
+    margin-right: auto;
   }
 }

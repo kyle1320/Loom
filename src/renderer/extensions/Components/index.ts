@@ -16,9 +16,30 @@ const ext: Extension = {
     renderer.registerCategory({
       key: 'component',
       name: 'Component',
-      path: 'html.*'
+      paths: ['html.*'],
+      sections: [
+        {
+          name: 'HTML',
+          paths: [
+            'html.tag',
+            'html.innercontent',
+            'html.outercontent'
+          ]
+        },
+        {
+          name: 'Attributes',
+          paths: ['html.attr.*']
+        }
+      ]
     });
+
     renderer.registerObjectEditor('component', ComponentRenderer);
+
+    renderer.registerFieldName('html.outercontent', 'HTML');
+    renderer.registerFieldName('html.innercontent', 'Contents');
+    renderer.registerFieldName('html.tag', 'HTML Tag');
+    renderer.registerFieldName('html.attr.style', 'Style');
+    renderer.registerFieldName('html.attr.onclick', 'Click Handler');
   }
 };
 

@@ -16,13 +16,16 @@ import {
   ObjectEditorProps,
   PlainObjectEditor } from './registry/ObjectEditor';
 
-export interface Category {
-  key: string;
+export interface CategorySection {
   name: string;
-  path: string;
+  paths: string[];
+}
+export interface Category extends CategorySection {
+  key: string;
+  sections: CategorySection[];
 }
 
-const defaultCategory = { key: 'all', name: 'All', path: '*' };
+const defaultCategory = { key: 'all', name: 'All', paths: ['*'], sections: [] };
 
 export default class Renderer {
   private static readonly defaultExtensions: Extension[] = [
@@ -33,7 +36,10 @@ export default class Renderer {
   private project: Project | null = null;
 
   private rawFieldEditors: Map<string, FieldEditor> = new Map();
+  private fieldEditors: Map<string, FieldEditor> = new Map();
   private fieldCategories: Category[] = [defaultCategory];
+  /** Map from field keys to user-friendly names */
+  private fieldNames: Map<string, string> = new Map();
 
   private objectEditors: Map<string, ObjectEditor> = new Map();
 
@@ -88,7 +94,33 @@ export default class Renderer {
     return React.createElement(Editor, { field, context });
   }
 
+  public registerFieldEditor(name: string, editor: FieldEditor): void {
+    // TODO: allow multiple editors
+    this.fieldEditors.set(name, editor);
+  }
+
+  public getFieldEditor(
+    name: string,
+    field: Field,
+    context: LObject
+  ): React.ReactElement<FieldEditorProps> | null {
+    const Editor = this.fieldEditors.get(name);
+    return Editor ? React.createElement(Editor, { field, context }) : null;
+  }
+
+  public hasFieldEditor(name: string): boolean {
+    return this.fieldEditors.has(name);
+  }
+
   /** EDITORS **/
+
+  public registerFieldName(key: string, name: string): void {
+    this.fieldNames.set(key.toLowerCase(), name);
+  }
+
+  public getFieldName(key: string): string | undefined {
+    return this.fieldNames.get(key.toLowerCase());
+  }
 
   public registerObjectEditor(type: string, editor: ObjectEditor): void {
     this.objectEditors.set(type, editor);
