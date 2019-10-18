@@ -79,7 +79,7 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
   }
 
   public clone(): Field {
-    return new BasicField(this.rawValue);
+    return new BasicField(this.rawValue.slice());
   }
 
   public serialize(): string {
