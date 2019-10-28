@@ -10,11 +10,11 @@ export function useForceUpdate(): [object, () => void] {
   return [value, React.useCallback(() => set({}), [])];
 }
 
-export function useFieldValue<F extends Field, R>(
+export function useFieldGetter<F extends Field, R>(
   field: F,
   context: LObject,
   getter: (field: F, context: LObject) => R,
-  recursive = true
+  recursive: boolean
 ): R | null {
   const [dep, forceUpdate] = useForceUpdate();
   const value = React.useMemo(() => {
@@ -28,6 +28,14 @@ export function useFieldValue<F extends Field, R>(
     return () => observer.destroy();
   }, [field, context]);
   return value;
+}
+
+export function useFieldValue(
+  field: Field,
+  context: LObject,
+  recursive = true
+): string | null {
+  return useFieldGetter(field, context, (f, c) => f.get(c), recursive);
 }
 
 /** Watches the link for updates, ignoring field content */

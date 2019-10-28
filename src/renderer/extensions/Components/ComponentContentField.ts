@@ -1,12 +1,8 @@
 import LObject from '../../../common/data/LObject';
-import Field from '../../../common/data/Field';
 import Link from '../../../common/data/Link';
-import FieldDependencyObserver
-  from '../../../common/events/FieldDependencyObserver';
+import ComputedField from '../../../common/data/ComputedField';
 
-export default class ComponentContentField implements Field {
-  public readonly writable = false;
-
+export default class ComponentContentField extends ComputedField {
   public get(context: LObject): string {
     const tag = context.getFieldValueOrDefault('html.tag', 'div');
     const attrs = [...context.getFieldNames('html.attr.*')]
@@ -16,10 +12,6 @@ export default class ComponentContentField implements Field {
 
     // TODO: handle self-closing tags
     return  `<${tag}${attrs}>${content}</${tag}>`;
-  }
-
-  public set(): never {
-    throw Error('ComponentContentField cannot be set');
   }
 
   public tag(context: LObject): Link {
@@ -42,22 +34,7 @@ export default class ComponentContentField implements Field {
     ];
   }
 
-  public observe(
-    context: LObject,
-    recursive: boolean
-  ): FieldDependencyObserver {
-    return new FieldDependencyObserver(this, context, recursive);
-  }
-
-  public clone(): Field {
-    return new ComponentContentField();
-  }
-
-  public serialize(): string {
-    return '';
-  }
-
-  public static deserialize(): Field {
+  public static deserialize(): ComponentContentField {
     return new ComponentContentField();
   }
 }

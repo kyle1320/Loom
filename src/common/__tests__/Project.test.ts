@@ -1,7 +1,5 @@
-import Project from '../../common/data/Project';
-
-import BasicFields from '../extensions/BasicFields';
-import BasicField from '../extensions/BasicFields/BasicField';
+import Project from '../data/Project';
+import BasicField from '../data/BasicField';
 
 test('can be instantiated', () => {
   new Project();
@@ -28,7 +26,6 @@ test('can create and fetch objects', () => {
 
 test('can fetch fields from objects', () => {
   const proj = new Project();
-  proj.addExtension(BasicFields);
 
   const obj1 = proj.makeObject('user');
   const field1 = new BasicField('value1');
@@ -47,7 +44,6 @@ test('can fetch fields from objects', () => {
 
 test('throws an error when fetching an invalid object', () => {
   const proj = new Project();
-  proj.addExtension(BasicFields);
 
   const obj1 = proj.makeObject('user');
   const field1 = new BasicField('value1');
@@ -60,7 +56,6 @@ test('throws an error when fetching an invalid object', () => {
 
 test('can fetch field values from objects', () => {
   const proj = new Project();
-  proj.addExtension(BasicFields);
 
   const obj1 = proj.makeObject('user');
   obj1.addOwnField('field1', new BasicField('value1'));
@@ -77,7 +72,6 @@ test('can fetch field values from objects', () => {
 
 test('throws an error when fetching an invalid field', () => {
   const proj = new Project();
-  proj.addExtension(BasicFields);
 
   const obj1 = proj.makeObject('user');
   obj1.addOwnField('field1', new BasicField('value1'));
@@ -96,7 +90,6 @@ test('throws an error when fetching an invalid field', () => {
 
 test('can serialize and deserialize objects and fields', () => {
   const proj = new Project();
-  proj.addExtension(BasicFields);
 
   const obj1 = proj.makeObject('user');
   obj1.addOwnField('field1', new BasicField('value1'));
@@ -104,7 +97,7 @@ test('can serialize and deserialize objects and fields', () => {
   const obj2 = proj.makeObject('user');
   obj2.addOwnField('field2', new BasicField('value2'));
 
-  const proj_ = Project.deserialize(proj.serialize(), [BasicFields]);
+  const proj_ = Project.deserialize(proj.serialize(), []);
   const obj1_ = proj_.getObject(obj1.id);
   const obj2_ = proj_.getObject(obj2.id);
   // const value1 = proj_.getFieldValue(obj1.id, 'field1');

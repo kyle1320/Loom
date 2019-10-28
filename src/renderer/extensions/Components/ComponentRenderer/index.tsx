@@ -2,13 +2,14 @@ import React from 'react';
 import parse from 'html-react-parser';
 import Link from '../../../../common/data/Link';
 import LObject from '../../../../common/data/LObject';
-import BasicField from '../../BasicFields/BasicField';
+import BasicField from '../../../../common/data/BasicField';
 import ComponentContentField from '../ComponentContentField';
 import Field from '../../../../common/data/Field';
 import {
   useWatchLink,
   useLink,
-  useFieldValue } from '../../../LoomUI/util/hooks';
+  useFieldValue,
+  useFieldGetter } from '../../../LoomUI/util/hooks';
 import ContentObserver from '../../../../common/events/ContentObserver';
 
 import './ComponentRenderer.scss';
@@ -111,7 +112,7 @@ const ComponentRenderer: ComponentRenderer
 
 const BasicFieldRenderer: Renderer<BasicField>
   = (props: RendererProps<BasicField>) => {
-    const parts = useFieldValue(
+    const parts = useFieldGetter(
       props.field,
       props.object,
       (f: BasicField, o: LObject) => f.raw(o),
@@ -119,20 +120,15 @@ const BasicFieldRenderer: Renderer<BasicField>
     );
 
     return <>{
-      parts && parts.map(p => typeof p === 'string'
+      parts && parts.map((p, i) => typeof p === 'string'
         ? parse(p)
-        : <LinkRenderer link={p} />)
+        : <LinkRenderer key={i} link={p} />)
     }</>
   }
 
 const DefaultFieldRenderer: Renderer =
   (props: RendererProps) => {
-    const content = useFieldValue(
-      props.field,
-      props.object,
-      (f: Field, o: LObject) => f.get(o),
-      false
-    );
+    const content = useFieldValue(props.field, props.object);
     return <>{content && parse(content)}</>
   }
 
@@ -145,7 +141,6 @@ const LinkRenderer: LinkRenderer = (props: LinkRendererProps) => {
   const field = props.link.maybeGetField();
   const object = props.link.getObject();
 
-  // TODO: handle this via plugins
   if (field instanceof ComponentContentField) {
     return <ComponentRenderer object={object} />
   } else if (field instanceof BasicField) {

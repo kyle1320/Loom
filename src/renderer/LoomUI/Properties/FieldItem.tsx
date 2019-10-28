@@ -1,7 +1,8 @@
 import React from 'react';
-import LObject from '../../../common/data/LObject';
-import { useRenderer } from '../RendererContext';
 import Field from '../../../common/data/Field';
+import LObject from '../../../common/data/LObject';
+import BasicField from '../../../common/data/BasicField';
+import { useRenderer } from '../RendererContext';
 
 import './FieldItem.scss';
 
@@ -19,13 +20,19 @@ const FieldItem: React.FC<Props> = (props: Props) => {
   const hoverName = props.name + (inherited ? ' (inherited)' : '');
 
   const className = 'property-field' + (inherited ? ' inherited' : '');
-  const hasEditor = renderer.hasFieldEditor(props.name);
 
-  const [raw, toggleRaw] = React.useReducer(x => !hasEditor || !x, !hasEditor);
+  const isEditable = props.field instanceof BasicField;
+  const hasEditor = isEditable && renderer.hasFieldEditor(props.name);
+  const [raw, toggleRaw] = React.useReducer(
+    x => !hasEditor || !x,
+    !hasEditor,
+  );
 
-  const editor = (raw || !hasEditor)
-    ? renderer.getRawFieldEditor(props.field, props.context)
-    : renderer.getFieldEditor(props.name, props.field, props.context)!;
+  const editor = props.field instanceof BasicField
+    ? (!raw && hasEditor)
+      ? renderer.getFieldEditor(props.name, props.field, props.context)
+      : renderer.getRawFieldEditor(props.field, props.context)
+    : renderer.getFieldDisplay(props.field, props.context);
 
   const clone = React.useCallback(
     () => props.context.addOwnField(props.name, props.field.clone()),
@@ -37,7 +44,7 @@ const FieldItem: React.FC<Props> = (props: Props) => {
   );
 
   return <div className={className}>
-    <div className="property-field__header" title={hoverName}>
+    <div className="property-field__header">
       <div className="property-field__name" title={hoverName}>
         {friendlyName}
       </div>

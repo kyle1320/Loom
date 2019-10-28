@@ -1,9 +1,9 @@
-import Renderer from './Renderer';
-import BasicField from './extensions/BasicFields/BasicField';
-
 import React from 'react';
 import ReactDom from 'react-dom';
+
 import LoomUI from './LoomUI';
+import Renderer from './Renderer';
+import BasicField from '../common/data/BasicField';
 
 window.addEventListener('load', function () {
   const renderer = new Renderer();

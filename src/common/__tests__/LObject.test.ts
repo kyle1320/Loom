@@ -1,10 +1,8 @@
-import LObject from '../../common/data/LObject';
-import Project from '../../common/data/Project';
-import BasicFields from '../extensions/BasicFields';
-import BasicField from '../extensions/BasicFields/BasicField';
+import LObject from '../data/LObject';
+import Project from '../data/Project';
+import BasicField from '../data/BasicField';
 
 const project = new Project();
-project.addExtension(BasicFields);
 
 test('can be instantiated', () => {
   new LObject(project, 'test');

@@ -95,9 +95,7 @@ export default class Link {
   }
 
   public matchesKey(key: string): boolean {
-    return this.fieldName.endsWith('*')
-      ? key.startsWith(this.fieldName.substring(0, this.fieldName.length - 1))
-      : key === this.fieldName;
+    return Link.pathMatches(this.fieldName, key);
   }
 
   public withParent(parent: Link): Link {
@@ -106,6 +104,10 @@ export default class Link {
 
   public withProject(project: Project): Link {
     return new Link(project, this.objectId, this.fieldName, this.parent);
+  }
+
+  public withObject(objectId: string): Link {
+    return new Link(this.project, objectId, this.fieldName, this.parent);
   }
 
   public withFieldName(fieldName: string): Link {
@@ -119,5 +121,11 @@ export default class Link {
   public static compare(a: Link, b: Link): number {
     return a.objectId < b.objectId ? -1 : a.objectId > b.objectId ? 1 :
       a.fieldName < b.fieldName ? -1 : a.fieldName > b.fieldName ? 1 : 0;
+  }
+
+  public static pathMatches(path: string, key: string): boolean {
+    return path.endsWith('*')
+      ? key.startsWith(path.substring(0, path.length - 1))
+      : key === path;
   }
 }

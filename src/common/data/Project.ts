@@ -3,13 +3,14 @@ import LObject from './LObject';
 import Field from './Field';
 import MissingFieldTypeError from '../errors/MissingFieldTypeError';
 import DataExtension from '../extensions/DataExtension';
+import ComputedField from './ComputedField';
 
 class Project {
   private objects: Map<string, LObject>;
   private extensions: DataExtension[] = [];
 
-  private readonly fieldTypes: {
-    [key: string]: Field.Deserializer;
+  private readonly computedFieldTypes: {
+    [key: string]: Field.Deserializer<ComputedField>;
   } = {};
   private readonly defaultFields: {
     [type: string]: [string, Field][];
@@ -43,8 +44,8 @@ class Project {
     return this.objects.get(id);
   }
 
-  public addFieldType(type: Field.Deserializer): void {
-    this.fieldTypes[type.name] = type;
+  public addComputedFieldType(type: Field.Deserializer<ComputedField>): void {
+    this.computedFieldTypes[type.name] = type;
   }
 
   public addDefaultFields(type: string, ...fields: [string, Field][]): void {
@@ -54,7 +55,7 @@ class Project {
 
   public addExtension(ext: DataExtension): void {
     this.extensions.push(ext);
-    ext.initProject(this);
+    ext.initProject && ext.initProject(this);
   }
 
   public *allObjects(): IterableIterator<LObject> {
@@ -94,7 +95,7 @@ class Project {
 
   public deserializeField(data: string): Field {
     const [type, val] = data.split('|');
-    const cls = this.fieldTypes[type];
+    const cls = this.computedFieldTypes[type];
 
     if (!cls) {
       throw new MissingFieldTypeError();

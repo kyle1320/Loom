@@ -60,7 +60,7 @@ class LObject extends EventEmitter<{
     }
   }
 
-  public *getOwnFieldNames(path: string = '*'): IterableIterator<string> {
+  public *getOwnFieldNames(path = '*'): IterableIterator<string> {
     path = path.toLowerCase();
 
     if (path == '*') {
@@ -75,7 +75,7 @@ class LObject extends EventEmitter<{
     }
   }
 
-  public *getFieldNames(path: string = '*'): IterableIterator<string> {
+  public *getFieldNames(path = '*'): IterableIterator<string> {
     path = path.toLowerCase();
 
     if (path == '*') {
@@ -92,13 +92,13 @@ class LObject extends EventEmitter<{
     }
   }
 
-  public *getOwnFields(path: string = '*'): IterableIterator<Field> {
+  public *getOwnFields(path = '*'): IterableIterator<Field> {
     for (const key of this.getOwnFieldNames(path)) {
       yield this.getField(key)!;
     }
   }
 
-  public *getFields(path: string = '*'): IterableIterator<Field> {
+  public *getFields(path = '*'): IterableIterator<Field> {
     for (const key of this.getFieldNames(path)) {
       yield this.getField(key)!;
     }

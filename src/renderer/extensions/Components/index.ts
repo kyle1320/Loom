@@ -6,7 +6,7 @@ import ComponentRenderer from './ComponentRenderer';
 
 const ext: Extension = {
   initProject(project: Project) {
-    project.addFieldType(ComponentContentField);
+    project.addComputedFieldType(ComponentContentField);
     project.addDefaultFields(
       'component',
       ['html.outerContent', new ComponentContentField()]

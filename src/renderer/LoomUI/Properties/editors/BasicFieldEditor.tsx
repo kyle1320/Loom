@@ -1,8 +1,6 @@
 import React, { Component, ReactElement } from 'react';
-import {
-  FieldEditor,
-  FieldEditorProps } from '../../../registry/FieldEditor';
-import BasicField from '../BasicField';
+import FieldEditor from '../../../registry/FieldEditor';
+import BasicField from '../../../../common/data/BasicField';
 
 import './BasicFieldEditor.scss';
 
@@ -35,6 +33,7 @@ class BasicFieldEditorInner extends Component<Props> {
   }
 
   public render(): ReactElement {
+    // TODO: render links specially
     return <div
       ref={this.ref}
       className="basic-field-editor"
@@ -46,12 +45,13 @@ class BasicFieldEditorInner extends Component<Props> {
   }
 }
 
-const BasicFieldEditor: FieldEditor = (props: FieldEditorProps) => {
+const BasicFieldEditor: FieldEditor = (props: FieldEditor.Props) => {
+  const field = (props.field as BasicField);
   const onChange = React.useCallback(
-    (value: string) => props.field.set(value),
+    (value: string) => field.set(value),
     [props.field]
   );
-  const value = (props.field as BasicField).getAsRawString(props.context);
+  const value = field.getAsRawString(props.context);
 
   return <BasicFieldEditorInner value={value} onChange={onChange} />
 }
