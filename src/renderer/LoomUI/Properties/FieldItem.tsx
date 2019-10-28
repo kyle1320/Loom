@@ -1,7 +1,7 @@
 import React from 'react';
 import Field from '../../../common/data/Field';
 import LObject from '../../../common/data/LObject';
-import BasicField from '../../../common/data/BasicField';
+import MutableField from '../../../common/data/MutableField';
 import { useRenderer } from '../RendererContext';
 
 import './FieldItem.scss';
@@ -21,14 +21,14 @@ const FieldItem: React.FC<Props> = (props: Props) => {
 
   const className = 'property-field' + (inherited ? ' inherited' : '');
 
-  const isEditable = props.field instanceof BasicField;
+  const isEditable = props.field instanceof MutableField;
   const hasEditor = isEditable && renderer.hasFieldEditor(props.name);
   const [raw, toggleRaw] = React.useReducer(
     x => !hasEditor || !x,
     !hasEditor,
   );
 
-  const editor = props.field instanceof BasicField
+  const editor = props.field instanceof MutableField
     ? (!raw && hasEditor)
       ? renderer.getFieldEditor(props.name, props.field, props.context)
       : renderer.getRawFieldEditor(props.field, props.context)

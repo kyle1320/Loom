@@ -1,7 +1,7 @@
 import Field from '../common/data/Field';
 import Project from '../common/data/Project';
 import LObject from '../common/data/LObject';
-import BasicField from '../common/data/BasicField';
+import MutableField from '../common/data/MutableField';
 
 import React from 'react';
 
@@ -13,7 +13,7 @@ import FieldEditor from './registry/FieldEditor';
 import ObjectEditor from './registry/ObjectEditor';
 import FieldDisplay from './registry/FieldDisplay';
 
-import BasicFieldEditor from './LoomUI/Properties/editors/BasicFieldEditor';
+import MutableFieldEditor from './LoomUI/Properties/editors/MutableFieldEditor';
 import PlainObjectEditor from './LoomUI/Properties/editors/PlainObjectEditor';
 import PlainFieldDisplay from './LoomUI/Properties/editors/PlainFieldDisplay';
 
@@ -104,15 +104,15 @@ export default class Renderer {
   }
 
   public getRawFieldEditor(
-    field: BasicField,
+    field: MutableField,
     context: LObject
   ): React.ReactElement | null {
-    return React.createElement(BasicFieldEditor, { field, context });
+    return React.createElement(MutableFieldEditor, { field, context });
   }
 
   public getFieldEditor(
     name: string,
-    field: BasicField,
+    field: MutableField,
     context: LObject
   ): React.ReactElement<FieldEditor.Props> | null {
     const Editor = this.fieldEditors.get(name);

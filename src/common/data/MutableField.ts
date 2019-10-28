@@ -2,15 +2,15 @@ import LObject from './LObject';
 import Field from './Field';
 import Link from './Link';
 import EventEmitter from '../util/EventEmitter';
-import FieldObserver from '../../common/events/FieldObserver';
-import ContentObserver from '../../common/events/ContentObserver';
+import FieldObserver from '../events/FieldObserver';
+import ContentObserver from '../events/ContentObserver';
 import { diff } from '../util';
 
-class BasicFieldObserver extends FieldObserver {
+class MutableFieldObserver extends FieldObserver {
   public destroy: () => void;
 
   public constructor (
-    field: BasicField,
+    field: MutableField,
     context: LObject,
     recursive: boolean
   ) {
@@ -62,16 +62,16 @@ class BasicFieldObserver extends FieldObserver {
   }
 }
 
-class BasicField extends EventEmitter<{ update: void }> implements Field {
-  private rawValue: BasicField.RawValue = [];
+class MutableField extends EventEmitter<{ update: void }> implements Field {
+  private rawValue: MutableField.RawValue = [];
 
-  public constructor(value: string | BasicField.RawValue) {
+  public constructor(value: string | MutableField.RawValue) {
     super();
 
     this.set(value);
   }
 
-  public set(value: string | BasicField.RawValue): void {
+  public set(value: string | MutableField.RawValue): void {
     if (typeof value === 'string') {
       const re = /\{([^{}|]+)\|([^{}]+)\}/g;
       let index = 0;
@@ -100,7 +100,7 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
     this.emit('update');
   }
 
-  public raw(context: LObject): BasicField.RawValue {
+  public raw(context: LObject): MutableField.RawValue {
     return this.rawValue
       .map(part => {
         if (typeof part === 'string') return part;
@@ -126,12 +126,12 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
       .filter((part): part is Link => typeof part !== 'string');
   }
 
-  public observe(context: LObject, recursive: boolean): BasicFieldObserver {
-    return new BasicFieldObserver(this, context, recursive);
+  public observe(context: LObject, recursive: boolean): MutableFieldObserver {
+    return new MutableFieldObserver(this, context, recursive);
   }
 
   public clone(): Field {
-    return new BasicField(this.rawValue);
+    return new MutableField(this.rawValue);
   }
 
   public serialize(): string {
@@ -139,12 +139,12 @@ class BasicField extends EventEmitter<{ update: void }> implements Field {
   }
 
   public static deserialize(data: string): Field {
-    return new BasicField(data);
+    return new MutableField(data);
   }
 }
 
-namespace BasicField {
+namespace MutableField {
   export type RawValue = (string | Link)[];
 }
 
-export default BasicField;
+export default MutableField;

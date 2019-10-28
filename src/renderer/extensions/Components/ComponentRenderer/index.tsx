@@ -2,7 +2,7 @@ import React from 'react';
 import parse from 'html-react-parser';
 import Link from '../../../../common/data/Link';
 import LObject from '../../../../common/data/LObject';
-import BasicField from '../../../../common/data/BasicField';
+import MutableField from '../../../../common/data/MutableField';
 import ComponentContentField from '../ComponentContentField';
 import Field from '../../../../common/data/Field';
 import {
@@ -110,12 +110,12 @@ const ComponentRenderer: ComponentRenderer
     );
   }
 
-const BasicFieldRenderer: Renderer<BasicField>
-  = (props: RendererProps<BasicField>) => {
+const MutableFieldRenderer: Renderer<MutableField>
+  = (props: RendererProps<MutableField>) => {
     const parts = useFieldGetter(
       props.field,
       props.object,
-      (f: BasicField, o: LObject) => f.raw(o),
+      (f: MutableField, o: LObject) => f.raw(o),
       false
     );
 
@@ -143,8 +143,8 @@ const LinkRenderer: LinkRenderer = (props: LinkRendererProps) => {
 
   if (field instanceof ComponentContentField) {
     return <ComponentRenderer object={object} />
-  } else if (field instanceof BasicField) {
-    return <BasicFieldRenderer field={field} object={object} />
+  } else if (field instanceof MutableField) {
+    return <MutableFieldRenderer field={field} object={object} />
   } else if (field) {
     return <DefaultFieldRenderer field={field} object={object} />
   } else {

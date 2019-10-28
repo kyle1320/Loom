@@ -1,5 +1,5 @@
 import Project from '../data/Project';
-import BasicField from '../data/BasicField';
+import MutableField from '../data/MutableField';
 
 test('can be instantiated', () => {
   new Project();
@@ -28,11 +28,11 @@ test('can fetch fields from objects', () => {
   const proj = new Project();
 
   const obj1 = proj.makeObject('user');
-  const field1 = new BasicField('value1');
+  const field1 = new MutableField('value1');
   obj1.addOwnField('field1', field1);
 
   const obj2 = proj.makeObject('user');
-  const field2 = new BasicField('value2');
+  const field2 = new MutableField('value2');
   obj2.addOwnField('field2', field2);
 
   // const field1_ = proj.getField(obj1.id, 'field1');
@@ -46,7 +46,7 @@ test('throws an error when fetching an invalid object', () => {
   const proj = new Project();
 
   const obj1 = proj.makeObject('user');
-  const field1 = new BasicField('value1');
+  const field1 = new MutableField('value1');
   obj1.addOwnField('field1', field1);
 
   // expect(() => {
@@ -58,10 +58,10 @@ test('can fetch field values from objects', () => {
   const proj = new Project();
 
   const obj1 = proj.makeObject('user');
-  obj1.addOwnField('field1', new BasicField('value1'));
+  obj1.addOwnField('field1', new MutableField('value1'));
 
   const obj2 = proj.makeObject('user');
-  obj2.addOwnField('field2', new BasicField('value2'));
+  obj2.addOwnField('field2', new MutableField('value2'));
 
   // const value1 = proj.getFieldValue(obj1.id, 'field1');
   // expect(value1).toBe('value1');
@@ -74,10 +74,10 @@ test('throws an error when fetching an invalid field', () => {
   const proj = new Project();
 
   const obj1 = proj.makeObject('user');
-  obj1.addOwnField('field1', new BasicField('value1'));
+  obj1.addOwnField('field1', new MutableField('value1'));
 
   const obj2 = proj.makeObject('user');
-  obj2.addOwnField('field2', new BasicField('value2'));
+  obj2.addOwnField('field2', new MutableField('value2'));
 
   // expect(() => {
   //   proj.getFieldValue(obj1.id, '');
@@ -92,10 +92,10 @@ test('can serialize and deserialize objects and fields', () => {
   const proj = new Project();
 
   const obj1 = proj.makeObject('user');
-  obj1.addOwnField('field1', new BasicField('value1'));
+  obj1.addOwnField('field1', new MutableField('value1'));
 
   const obj2 = proj.makeObject('user');
-  obj2.addOwnField('field2', new BasicField('value2'));
+  obj2.addOwnField('field2', new MutableField('value2'));
 
   const proj_ = Project.deserialize(proj.serialize(), []);
   const obj1_ = proj_.getObject(obj1.id);

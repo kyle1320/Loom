@@ -1,12 +1,12 @@
 import React, { Component, ReactElement } from 'react';
 import FieldEditor from '../../../registry/FieldEditor';
-import BasicField from '../../../../common/data/BasicField';
+import MutableField from '../../../../common/data/MutableField';
 
-import './BasicFieldEditor.scss';
+import './MutableFieldEditor.scss';
 
 interface Props { value: string; onChange: (val: string) => void }
 
-class BasicFieldEditorInner extends Component<Props> {
+class MutableFieldEditorInner extends Component<Props> {
   private ref = React.createRef<HTMLDivElement>();
   private lastText: string | null = null;
 
@@ -45,15 +45,15 @@ class BasicFieldEditorInner extends Component<Props> {
   }
 }
 
-const BasicFieldEditor: FieldEditor = (props: FieldEditor.Props) => {
-  const field = (props.field as BasicField);
+const MutableFieldEditor: FieldEditor = (props: FieldEditor.Props) => {
+  const field = (props.field as MutableField);
   const onChange = React.useCallback(
     (value: string) => field.set(value),
     [props.field]
   );
   const value = field.getAsRawString(props.context);
 
-  return <BasicFieldEditorInner value={value} onChange={onChange} />
+  return <MutableFieldEditorInner value={value} onChange={onChange} />
 }
 
-export default BasicFieldEditor;
+export default MutableFieldEditor;

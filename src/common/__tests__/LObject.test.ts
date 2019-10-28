@@ -1,6 +1,6 @@
 import LObject from '../data/LObject';
 import Project from '../data/Project';
-import BasicField from '../data/BasicField';
+import MutableField from '../data/MutableField';
 
 const project = new Project();
 
@@ -16,8 +16,8 @@ test('can be serialized and deserialized', () => {
 
 test('can have fields', () => {
   const obj = new LObject(project, 'test');
-  obj.addOwnField('test1', new BasicField('value1'));
-  obj.addOwnField('test2', new BasicField('value2'));
+  obj.addOwnField('test1', new MutableField('value1'));
+  obj.addOwnField('test2', new MutableField('value2'));
 
   expect(obj.getFieldValue('test1')).toEqual('value1');
   expect(obj.getFieldValue('test2')).toEqual('value2');
@@ -25,10 +25,10 @@ test('can have fields', () => {
 
 test('can have a parent', () => {
   const parent = new LObject(project, 'test');
-  parent.addOwnField('test1', new BasicField('value1'));
+  parent.addOwnField('test1', new MutableField('value1'));
 
   const obj = new LObject(project, 'test', parent);
-  obj.addOwnField('test2', new BasicField('value2'));
+  obj.addOwnField('test2', new MutableField('value2'));
 
   expect(obj.getFieldValue('test1')).toEqual('value1');
   expect(obj.getFieldValue('test2')).toEqual('value2');
@@ -36,14 +36,14 @@ test('can have a parent', () => {
 
 test('can have a chain of parents', () => {
   const grandparent = new LObject(project, 'test');
-  grandparent.addOwnField('test1', new BasicField('value1'));
-  grandparent.addOwnField('test2', new BasicField('hidden value'));
+  grandparent.addOwnField('test1', new MutableField('value1'));
+  grandparent.addOwnField('test2', new MutableField('hidden value'));
 
   const parent = new LObject(project, 'test', grandparent);
-  parent.addOwnField('test2', new BasicField('value2'));
+  parent.addOwnField('test2', new MutableField('value2'));
 
   const obj = new LObject(project, 'test', parent);
-  obj.addOwnField('test3', new BasicField('value3'));
+  obj.addOwnField('test3', new MutableField('value3'));
 
   expect(obj.getFieldValue('test1')).toEqual('value1');
   expect(obj.getFieldValue('test2')).toEqual('value2');
@@ -52,14 +52,14 @@ test('can have a chain of parents', () => {
 
 describe('has methods to fetch fields', () => {
   const parent = new LObject(project, 'test');
-  parent.addOwnField('test', new BasicField('value1'));
-  parent.addOwnField('test.parent.1', new BasicField('value2'));
-  parent.addOwnField('test.parent.2', new BasicField('value3'));
+  parent.addOwnField('test', new MutableField('value1'));
+  parent.addOwnField('test.parent.1', new MutableField('value2'));
+  parent.addOwnField('test.parent.2', new MutableField('value3'));
 
   const obj = new LObject(project, 'test', parent);
-  obj.addOwnField('test', new BasicField('value4'));
-  obj.addOwnField('test.scope.1', new BasicField('value5'));
-  obj.addOwnField('test.scope.2', new BasicField('value6'));
+  obj.addOwnField('test', new MutableField('value4'));
+  obj.addOwnField('test.scope.1', new MutableField('value5'));
+  obj.addOwnField('test.scope.2', new MutableField('value6'));
 
   test('can fetch own fields', () => {
     const own = obj.getOwnFields();
@@ -119,17 +119,17 @@ describe('can listen for field addition / removal', () => {
     obj.on('fieldRemoved', remove);
     obj.on('fieldChanged', change);
 
-    obj.addOwnField('test', new BasicField(''));
+    obj.addOwnField('test', new MutableField(''));
     expect(add).toHaveBeenCalledTimes(1);
     expect(remove).toHaveBeenCalledTimes(0);
     expect(change).toHaveBeenCalledTimes(0);
 
-    obj.addOwnField('test', new BasicField('value'));
+    obj.addOwnField('test', new MutableField('value'));
     expect(add).toHaveBeenCalledTimes(1);
     expect(remove).toHaveBeenCalledTimes(0);
     expect(change).toHaveBeenCalledTimes(1);
 
-    obj.addOwnField('test2', new BasicField('value'));
+    obj.addOwnField('test2', new MutableField('value'));
     expect(add).toHaveBeenCalledTimes(2);
     expect(remove).toHaveBeenCalledTimes(0);
     expect(change).toHaveBeenCalledTimes(1);

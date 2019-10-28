@@ -1,6 +1,6 @@
 import Project from '../data/Project';
 import Link from '../data/Link';
-import BasicField from '../data/BasicField';
+import MutableField from '../data/MutableField';
 
 const project = new Project();
 
@@ -18,8 +18,8 @@ function mocks(link: Link): [jest.Mock, jest.Mock, jest.Mock] {
 }
 
 let counter = 1;
-function newField(): BasicField {
-  return new BasicField(`field${counter++}`);
+function newField(): MutableField {
+  return new MutableField(`field${counter++}`);
 }
 
 describe('can listen for field changes on a single field', () => {
