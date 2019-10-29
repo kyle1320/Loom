@@ -1,13 +1,14 @@
 import React from 'react';
-import LObject from '../../../common/data/LObject';
+
 import FieldList from './FieldList';
 import CategoryTabs from './CategoryTabs';
 import { useRenderer } from '../RendererContext';
 import { Category } from '../../Renderer';
+import DataObject from '../../../common/data/objects/DataObject';
 
 import './Properties.scss';
 
-interface Props { context: LObject | null }
+interface Props { context: DataObject | null }
 
 const Properties: React.FC<Props> = (props: Props) => {
   const renderer = useRenderer();

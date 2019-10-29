@@ -1,6 +1,6 @@
 import React, { Component, ReactElement } from 'react';
 import FieldEditor from '../../../registry/FieldEditor';
-import MutableField from '../../../../common/data/MutableField';
+import MutableField from '../../../../common/data/fields/MutableField';
 
 import './MutableFieldEditor.scss';
 
@@ -11,7 +11,9 @@ class MutableFieldEditorInner extends Component<Props> {
   private lastText: string | null = null;
 
   public shouldComponentUpdate(nextProps: Props): boolean {
-    return nextProps.value !== this.lastText;
+    console.log('edit', nextProps.value, this.lastText);
+    return nextProps.value !== this.lastText
+      || nextProps.onChange !== this.props.onChange;
   }
 
   public componentDidUpdate(prevProps: Props): void {
@@ -34,6 +36,7 @@ class MutableFieldEditorInner extends Component<Props> {
 
   public render(): ReactElement {
     // TODO: render links specially
+    console.log('rendering', this.props.value, this.lastText)
     return <div
       ref={this.ref}
       className="basic-field-editor"

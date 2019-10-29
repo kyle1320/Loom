@@ -1,5 +1,5 @@
 import React from 'react';
-import LObject from '../../../common/data/LObject';
+import LObject from '../../../common/data/objects/LObject';
 
 import './Toolbar.scss';
 

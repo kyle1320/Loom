@@ -1,9 +1,9 @@
 import React from 'react';
-import LObject from '../../common/data/LObject';
-import MutableField from '../../common/data/MutableField';
+import MutableField from '../../common/data/fields/MutableField';
+import DataObject from '../../common/data/objects/DataObject';
 
 namespace FieldEditor {
-  export interface Props { field: MutableField; context: LObject }
+  export interface Props { field: MutableField; context: DataObject }
 }
 
 type FieldEditor = React.ComponentType<FieldEditor.Props>;

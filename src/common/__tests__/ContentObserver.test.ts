@@ -1,29 +1,29 @@
 import Project from '../data/Project';
-import MutableField from '../data/MutableField';
+import Link from '../data/Link';
 
 const project = new Project();
 
 describe('can listen for field changes', () => {
-  const parent = project.makeObject('test');
-  parent.addOwnField('test', new MutableField('value1'));
-  parent.addOwnField('test.parent.1', new MutableField('value2'));
-  parent.addOwnField('test.parent.2', new MutableField('value3'));
+  const parent = project.makeObject();
+  parent.addOwnField('test', 'value1');
+  parent.addOwnField('test.parent.1', 'value2');
+  parent.addOwnField('test.parent.2', 'value3');
 
-  const obj = project.makeObject('test', parent);
-  obj.addOwnField('test', new MutableField('value4'));
-  obj.addOwnField('test.scope.1', new MutableField('value5'));
-  obj.addOwnField('test.scope.2', new MutableField('value6'));
+  const obj = project.makeObject(parent);
+  obj.addOwnField('test', 'value4');
+  obj.addOwnField('test.scope.1', 'value5');
+  obj.addOwnField('test.scope.2', 'value6');
 
-  const obj2 = project.makeObject('test', parent);
-  obj2.addOwnField('test', new MutableField('value7'));
+  const obj2 = project.makeObject(parent);
+  obj2.addOwnField('test', 'value7');
 
   test('can listen on specific fields', () => {
     const mock = jest.fn();
 
-    obj.getLink('test').observe().content(true).on('update', mock);
+    new Link(obj, 'test').observe().content(true).on('update', mock);
 
-    (obj.getField('test') as MutableField).set('new value');
-    (obj.getField('test.scope.1') as MutableField).set('new value');
+    obj.fields['test'].set('new value');
+    obj.fields['test.scope.1'].set('new value');
 
     expect(mock).toHaveBeenCalledTimes(1);
   });
@@ -31,11 +31,11 @@ describe('can listen for field changes', () => {
   test('can listen on a path with a wildcard', () => {
     const mock = jest.fn();
 
-    obj.getLink('test.*').observe().content(true).on('update', mock);
+    new Link(obj, 'test.*').observe().content(true).on('update', mock);
 
-    (obj.getField('test') as MutableField).set('new value 2');
-    (obj.getField('test.scope.1') as MutableField).set('new value 2');
-    (obj.getField('test.scope.2') as MutableField).set('new value 2');
+    obj.fields['test'].set('new value 2');
+    obj.fields['test.scope.1'].set('new value 2');
+    obj.fields['test.scope.2'].set('new value 2');
 
     expect(mock).toHaveBeenCalledTimes(2);
   });
@@ -43,12 +43,11 @@ describe('can listen for field changes', () => {
   test('if recursive, fires an update when dependencies change', () => {
     const mock = jest.fn();
 
-    obj2.getLink('test').observe().content(true).on('update', mock);
+    new Link(obj2, 'test').observe().content(true).on('update', mock);
 
-    (obj2.getField('test') as MutableField)
-      .set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
-    (obj.getField('test') as MutableField).set('new value 3');
-    (parent.getField('test.parent.2') as MutableField).set('new value 3');
+    obj2.fields['test'].set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
+    obj.fields['test'].set('new value 3');
+    parent.fields['test.parent.2'].set('new value 3');
 
     expect(mock).toHaveBeenCalledTimes(3);
   });
@@ -57,12 +56,11 @@ describe('can listen for field changes', () => {
     () => {
       const mock = jest.fn();
 
-      obj2.getLink('test').observe().content(false).on('update', mock);
+      new Link(obj2, 'test').observe().content(false).on('update', mock);
 
-      (obj2.getField('test') as MutableField)
-        .set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
-      (obj.getField('test') as MutableField).set('new value 3');
-      (parent.getField('test.parent.2') as MutableField).set('new value 3');
+      obj2.fields['test'].set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
+      obj.fields['test'].set('new value 3');
+      parent.fields['test.parent.2'].set('new value 3');
 
       expect(mock).toHaveBeenCalledTimes(1);
     }
@@ -71,59 +69,57 @@ describe('can listen for field changes', () => {
   test('handles dependency changes', () => {
     const mock = jest.fn();
 
-    obj2.getLink('test').observe().content(true).on('update', mock);
+    new Link(obj2, 'test').observe().content(true).on('update', mock);
 
-    (obj2.getField('test') as MutableField)
-      .set(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
+    obj2.fields['test'].set(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
     expect(mock).toHaveBeenCalledTimes(1);
 
     // dependency field change causes update
     obj2.removeOwnField('test');
     expect(mock).toHaveBeenCalledTimes(2);
-    obj2.addOwnField('test', new MutableField('new value 4'));
+    obj2.addOwnField('test', 'new value 4');
     expect(mock).toHaveBeenCalledTimes(3);
 
     // new dependencies cause update
-    (obj2.getField('test') as MutableField).set(`{${parent.id}|test}`);
+    obj2.fields['test'].set(`{${parent.id}|test}`);
     expect(mock).toHaveBeenCalledTimes(4);
 
     // new dependency causes update
-    (parent.getField('test') as MutableField).set('new value 5');
+    parent.fields['test'].set('new value 5');
     expect(mock).toHaveBeenCalledTimes(5);
 
     // old dependency does not cause update
-    (obj2.getField('test.parent.2') as MutableField).set('new value 6');
+    obj2.fields['test.parent.2'].set('new value 6');
     expect(mock).toHaveBeenCalledTimes(5);
   });
 
   test('handles parent field visibility changes', () => {
     const mock = jest.fn();
 
-    const parent = project.makeObject('test');
-    parent.addOwnField('test.1', new MutableField('value1'));
+    const parent = project.makeObject();
+    parent.addOwnField('test.1', 'value1');
 
-    const obj = project.makeObject('test', parent);
-    obj.addOwnField('test.1', new MutableField('value2'));
+    const obj = project.makeObject(parent);
+    obj.addOwnField('test.1', 'value2');
 
-    obj.getLink('test.*')
-      .observe().content(true).on('update', mock);
+    new Link(obj, 'test.*').observe().content(true).on('update', mock);
 
-    (parent.getField('test.1') as MutableField).set('value3');
+    parent.fields['test.1'].set('value3');
     expect(mock).not.toHaveBeenCalled();
 
-    (obj.getField('test.1') as MutableField).set('value4');
+    obj.fields['test.1'].set('value4');
     expect(mock).toHaveBeenCalledTimes(1);
 
     obj.removeOwnField('test.1');
     expect(mock).toHaveBeenCalledTimes(2);
 
-    obj.addOwnField('test.1', new MutableField('value5'));
+    obj.addOwnField('test.1', 'value5');
     expect(mock).toHaveBeenCalledTimes(3);
 
-    obj.addOwnField('test.2', new MutableField('value6'));
+    obj.addOwnField('test.2', 'value6');
     expect(mock).toHaveBeenCalledTimes(4);
 
-    parent.addOwnField('test.3', new MutableField('value6'));
+    parent.addOwnField('test.3', 'value6');
     expect(mock).toHaveBeenCalledTimes(5);
 
     parent.removeOwnField('test.1');
@@ -137,38 +133,36 @@ describe('can listen for field changes', () => {
     test('with no dependencies', () => {
       const mock = jest.fn();
 
-      const obs = obj.getLink('test.*').observe().content(true)
+      const obs = new Link(obj, 'test.*').observe().content(true)
         .on('update', mock);
 
-      (obj.getField('test.scope.1') as MutableField).set(
-        `new value ${obj2.getLink('test')}`
-      );
-      (obj2.getField('test') as MutableField).set('new value 6');
+      obj.fields['test.scope.1'].set(`new value ${new Link(obj2, 'test')}`);
+      obj2.fields['test'].set('new value 6');
       expect(mock).toHaveBeenCalledTimes(2);
 
       obs.destroy();
 
-      (obj2.getField('test') as MutableField).set('new value 7');
+      obj2.fields['test'].set('new value 7');
       expect(mock).toHaveBeenCalledTimes(2);
     });
 
     test('with dependencies', () => {
       const mock = jest.fn();
 
-      const obs = obj.getLink('test.*').observe().content(true)
+      const obs = new Link(obj, 'test.*').observe().content(true)
         .on('update', mock);
 
-      (obj.getField('test.scope.1') as MutableField).set('new value 5');
+      obj.fields['test.scope.1'].set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
 
-      (obj.getField('test') as MutableField).set('new value 5');
+      obj.fields['test'].set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
 
       obs.destroy();
 
-      (obj.getField('test.scope.1') as MutableField).set('another new value 5');
-      (obj.getField('test.scope.2') as MutableField).set('new value 5');
-      (parent.getField('test.parent.1') as MutableField).set('new value 5');
+      obj.fields['test.scope.1'].set('another new value 5');
+      obj.fields['test.scope.2'].set('new value 5');
+      parent.fields['test.parent.1'].set('new value 5');
       expect(mock).toHaveBeenCalledTimes(1);
     });
   });
@@ -177,32 +171,32 @@ describe('can listen for field changes', () => {
     const mock1 = jest.fn();
     const mock2 = jest.fn();
 
-    const parent = project.makeObject('test');
-    const obj = project.makeObject('test', parent);
+    const parent = project.makeObject();
+    const obj = project.makeObject(parent);
 
-    parent.addOwnField('test.1', new MutableField(''));
-    parent.addOwnField('test.2', new MutableField(''));
-    parent.addOwnField('test.3', new MutableField(''));
-    parent.addOwnField('test.nested.1', new MutableField(''));
-    parent.addOwnField('test.nested.2', new MutableField(''));
-    obj.addOwnField('test.1', new MutableField(''));
-    obj.addOwnField('test.2', new MutableField(''));
-    obj.addOwnField('test.nested.1', new MutableField(''));
+    parent.addOwnField('test.1', '');
+    parent.addOwnField('test.2', '');
+    parent.addOwnField('test.3', '');
+    parent.addOwnField('test.nested.1', '');
+    parent.addOwnField('test.nested.2', '');
+    obj.addOwnField('test.1', '');
+    obj.addOwnField('test.2', '');
+    obj.addOwnField('test.nested.1', '');
 
-    obj.getLink('test.*').observe().content(true)
+    new Link(obj, 'test.*').observe().content(true)
       .on('update', mock1);
-    const obs2 = obj.getLink('test.nested.*').observe().content(true)
+    const obs2 = new Link(obj, 'test.nested.*').observe().content(true)
       .on('update', mock2);
 
-    (obj.getField('test.1') as MutableField).set('1');
+    obj.fields['test.1'].set('1');
     expect(mock1).toHaveBeenCalledTimes(1);
     expect(mock2).toHaveBeenCalledTimes(0);
 
-    (obj.getField('test.nested.1') as MutableField).set('1');
+    obj.fields['test.nested.1'].set('1');
     expect(mock1).toHaveBeenCalledTimes(2);
     expect(mock2).toHaveBeenCalledTimes(1);
 
-    obj.addOwnField('test.nested.2', new MutableField(''));
+    obj.addOwnField('test.nested.2', '');
     expect(mock1).toHaveBeenCalledTimes(3);
     expect(mock2).toHaveBeenCalledTimes(2);
 
@@ -218,11 +212,11 @@ describe('can listen for field changes', () => {
     expect(mock1).toHaveBeenCalledTimes(5);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.2') as MutableField).set('1');
+    obj.fields['test.nested.2'].set('1');
     expect(mock1).toHaveBeenCalledTimes(6);
     expect(mock2).toHaveBeenCalledTimes(2);
 
-    (obj.getField('test.nested.1') as MutableField).set('2');
+    obj.fields['test.nested.1'].set('2');
     expect(mock1).toHaveBeenCalledTimes(7);
     expect(mock2).toHaveBeenCalledTimes(2);
   });

@@ -1,6 +1,7 @@
 import Link from '../data/Link';
 import EventEmitter from '../util/EventEmitter';
 import ContentObserver from './ContentObserver';
+import DataObject from '../data/objects/DataObject';
 
 // Watches for changes to the way a Link is resolved.
 // This includes field additions, removals, and replacements.
@@ -20,16 +21,20 @@ class LinkObserver extends EventEmitter<{
 
     // TODO: handle case where object is invalid / not accessible (yet)
     const object = link.getObject();
-    object.on('fieldAdded', this.onFieldAdded);
-    object.on('fieldRemoved', this.onFieldRemoved);
-    object.on('fieldChanged', this.onFieldChanged);
+    if (object instanceof DataObject) {
+      object.on('fieldAdded', this.onFieldAdded);
+      object.on('fieldRemoved', this.onFieldRemoved);
+      object.on('fieldChanged', this.onFieldChanged);
+    }
   }
 
   public destroy(): void {
     const object = this.link.getObject();
-    object.removeListener('fieldAdded', this.onFieldRemoved);
-    object.removeListener('fieldRemoved', this.onFieldAdded);
-    object.removeListener('fieldChanged', this.onFieldChanged);
+    if (object instanceof DataObject) {
+      object.removeListener('fieldAdded', this.onFieldAdded);
+      object.removeListener('fieldRemoved', this.onFieldRemoved);
+      object.removeListener('fieldChanged', this.onFieldChanged);
+    }
   }
 
   public content(recursive: boolean): ContentObserver {

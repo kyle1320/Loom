@@ -1,9 +1,9 @@
-import LObject from './LObject';
+import LObject from '../objects/LObject';
 import Field from './Field';
-import Link from './Link';
-import ContentObserver from '../events/ContentObserver';
-import LinkObserver from '../events/LinkObserver';
-import FieldObserver from '../events/FieldObserver';
+import Link from '../Link';
+import ContentObserver from '../../events/ContentObserver';
+import LinkObserver from '../../events/LinkObserver';
+import FieldObserver from '../../events/FieldObserver';
 
 class ComputedFieldObserver extends FieldObserver {
   private observers: (ContentObserver | LinkObserver)[];
@@ -35,13 +35,5 @@ export default abstract class ComputedField implements Field {
 
   public observe(context: LObject, recursive: boolean): ComputedFieldObserver {
     return new ComputedFieldObserver(this, context, recursive);
-  }
-
-  public clone(): Field {
-    return this;
-  }
-
-  public serialize(): string {
-    return '';
   }
 }

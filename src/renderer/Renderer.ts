@@ -1,13 +1,12 @@
-import Field from '../common/data/Field';
+import Field from '../common/data/fields/Field';
 import Project from '../common/data/Project';
-import LObject from '../common/data/LObject';
-import MutableField from '../common/data/MutableField';
+import LObject from '../common/data/objects/LObject';
+import MutableField from '../common/data/fields/MutableField';
 
 import React from 'react';
 
 import Extension from './extensions/Extension';
 import Components from './extensions/Components';
-import Styles from './extensions/Styles';
 
 import FieldEditor from './registry/FieldEditor';
 import ObjectEditor from './registry/ObjectEditor';
@@ -16,6 +15,7 @@ import FieldDisplay from './registry/FieldDisplay';
 import MutableFieldEditor from './LoomUI/Properties/editors/MutableFieldEditor';
 import PlainObjectEditor from './LoomUI/Properties/editors/PlainObjectEditor';
 import PlainFieldDisplay from './LoomUI/Properties/editors/PlainFieldDisplay';
+import DataObject from '../common/data/objects/DataObject';
 
 export interface CategorySection {
   name: string;
@@ -26,19 +26,21 @@ export interface Category extends CategorySection {
   sections: CategorySection[];
 }
 
-const defaultCategory = { key: 'all', name: 'All', paths: ['*'], sections: [] };
+const allCategory = { key: '_all', name: 'All', paths: ['*'], sections: [] };
+const computedCategory = {
+  key: '_computed', name: 'Computed', paths: ['*()'], sections: []
+};
 
 export default class Renderer {
   private static readonly defaultExtensions: Extension[] = [
-    Components,
-    Styles
+    Components
   ];
 
   private project: Project | null = null;
 
   private fieldEditors: Map<string, FieldEditor> = new Map();
   private fieldDisplays: Map<string, FieldDisplay> = new Map();
-  private fieldCategories: Category[] = [defaultCategory];
+  private fieldCategories: Category[] = [allCategory];
   /** Map from field keys to user-friendly names */
   private fieldNames: Map<string, string> = new Map();
 
@@ -77,7 +79,7 @@ export default class Renderer {
   }
 
   public getCategories(): Category[] {
-    return this.fieldCategories.slice();
+    return this.fieldCategories.concat([ computedCategory ]);
   }
 
   public getDefaultCategory(): Category {
@@ -105,7 +107,7 @@ export default class Renderer {
 
   public getRawFieldEditor(
     field: MutableField,
-    context: LObject
+    context: DataObject
   ): React.ReactElement | null {
     return React.createElement(MutableFieldEditor, { field, context });
   }
@@ -113,7 +115,7 @@ export default class Renderer {
   public getFieldEditor(
     name: string,
     field: MutableField,
-    context: LObject
+    context: DataObject
   ): React.ReactElement<FieldEditor.Props> | null {
     const Editor = this.fieldEditors.get(name);
     return Editor ? React.createElement(Editor, { field, context }) : null;
@@ -140,7 +142,8 @@ export default class Renderer {
   public getObjectEditor(
     object: LObject
   ): React.ReactElement<ObjectEditor.Props> {
-    const Editor = this.objectEditors.get(object.type) || PlainObjectEditor;
+    const Editor = this.objectEditors.get(LObject.baseId(object))
+      || PlainObjectEditor;
     return React.createElement(Editor, { object });
   }
 }

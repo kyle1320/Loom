@@ -1,46 +1,51 @@
 import React from 'react';
-import Field from '../../../common/data/Field';
-import LObject from '../../../common/data/LObject';
-import MutableField from '../../../common/data/MutableField';
+
+import MutableField from '../../../common/data/fields/MutableField';
 import { useRenderer } from '../RendererContext';
+import Field from '../../../common/data/fields/Field';
+import LObject from '../../../common/data/objects/LObject';
+import DataObject from '../../../common/data/objects/DataObject';
 
 import './FieldItem.scss';
 
 interface Props {
-  context: LObject;
+  context: DataObject;
   name: string;
   field: Field;
 }
 
-const FieldItem: React.FC<Props> = (props: Props) => {
+const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
   const renderer = useRenderer();
-  const inherited = !props.context.hasOwnField(props.name);
+  const inherited = !LObject.hasOwnField(context, name);
 
-  const friendlyName = renderer.getFieldName(props.name) || props.name;
-  const hoverName = props.name + (inherited ? ' (inherited)' : '');
+  const friendlyName = renderer.getFieldName(name) || name;
+  const hoverName = name + (inherited ? ' (inherited)' : '');
 
   const className = 'property-field' + (inherited ? ' inherited' : '');
 
-  const isEditable = props.field instanceof MutableField;
-  const hasEditor = isEditable && renderer.hasFieldEditor(props.name);
+  const isEditable = field instanceof MutableField;
+  const hasEditor = isEditable && renderer.hasFieldEditor(name);
   const [raw, toggleRaw] = React.useReducer(
     x => !hasEditor || !x,
     !hasEditor,
   );
 
-  const editor = props.field instanceof MutableField
+  const editor = field instanceof MutableField
     ? (!raw && hasEditor)
-      ? renderer.getFieldEditor(props.name, props.field, props.context)
-      : renderer.getRawFieldEditor(props.field, props.context)
-    : renderer.getFieldDisplay(props.field, props.context);
+      ? renderer.getFieldEditor(name, field, context)
+      : renderer.getRawFieldEditor(field, context)
+    : renderer.getFieldDisplay(field, context);
 
+  const canClone = field instanceof MutableField;
   const clone = React.useCallback(
-    () => props.context.addOwnField(props.name, props.field.clone()),
-    [props.context, props.name, props.field]
+    () => field instanceof MutableField
+      && context.addOwnField(name, field.clone()),
+    [context, name, field]
   );
+  const canDelete = field instanceof MutableField;
   const del = React.useCallback(
-    () => props.context.removeOwnField(props.name),
-    [props.name]
+    () => context.removeOwnField(name),
+    [name]
   );
 
   return <div className={className}>
@@ -49,8 +54,8 @@ const FieldItem: React.FC<Props> = (props: Props) => {
         {friendlyName}
       </div>
       { hasEditor && <button onClick={toggleRaw}>{raw ? 'e' : 'r'}</button> }
-      <button onClick={clone} disabled={!inherited}>+</button>
-      <button onClick={del} disabled={inherited}>x</button>
+      { canClone && <button onClick={clone} disabled={!inherited}>+</button> }
+      { canDelete && <button onClick={del} disabled={inherited}>x</button> }
     </div>
     <div className="property-field__editor">
       {editor}

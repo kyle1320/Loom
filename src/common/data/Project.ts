@@ -1,39 +1,25 @@
 import SerializationError from '../errors/SerializationError';
-import LObject from './LObject';
-import Field from './Field';
-import MissingFieldTypeError from '../errors/MissingFieldTypeError';
+import LObject from './objects/LObject';
 import DataExtension from '../extensions/DataExtension';
-import ComputedField from './ComputedField';
+import DataObject from './objects/DataObject';
+import BaseObject from './objects/BaseObject';
+import ComputedField from './fields/ComputedField';
 
 class Project {
-  private objects: Map<string, LObject>;
+  private idCounter = 0;
+  private objects: Map<string, LObject> = new Map();;
   private extensions: DataExtension[] = [];
 
-  private readonly computedFieldTypes: {
-    [key: string]: Field.Deserializer<ComputedField>;
-  } = {};
-  private readonly defaultFields: {
-    [type: string]: [string, Field][];
-  } = {};
-
-  public constructor() {
-    this.objects = new Map();
+  public freshId(): string {
+    return String(this.idCounter++);
   }
 
-  public makeObject(
-    type: string,
-    parent: null | string | LObject = null
-  ): LObject {
+  public makeObject(parent: null | string | LObject = null): DataObject {
     if (typeof parent === 'string') {
       parent = this.objects.get(parent) || null;
     }
 
-    const obj = new LObject(this, type, parent);
-
-    const defaultFields = this.defaultFields[type] || [];
-    defaultFields.forEach(
-      ([key, field]) => obj.addOwnField(key, field.clone())
-    );
+    const obj = new DataObject(this, parent);
 
     this.objects.set(obj.id, obj);
 
@@ -44,13 +30,17 @@ class Project {
     return this.objects.get(id);
   }
 
-  public addComputedFieldType(type: Field.Deserializer<ComputedField>): void {
-    this.computedFieldTypes[type.name] = type;
-  }
+  public addBaseType(
+    name: string,
+    fields: { [id: string]: ComputedField },
+    parent: null | string | BaseObject = null
+  ): void {
+    if (typeof parent === 'string') {
+      parent = this.objects.get(parent) as BaseObject;
+    }
 
-  public addDefaultFields(type: string, ...fields: [string, Field][]): void {
-    const arr = this.defaultFields[type] || [];
-    this.defaultFields[type] = arr.concat(fields);
+    const obj = new BaseObject(this, fields, parent, name);
+    this.objects.set(name, obj);
   }
 
   public addExtension(ext: DataExtension): void {
@@ -62,13 +52,21 @@ class Project {
     yield* this.objects.values();
   }
 
-  private *objectsInDependencyOrder(): IterableIterator<LObject> {
+  public *DataObjects(): IterableIterator<DataObject> {
+    for (const obj of this.allObjects()) {
+      if (obj instanceof DataObject) yield obj;
+    }
+  }
+
+  private *DataObjectsInDependencyOrder(): IterableIterator<LObject> {
     const seen = new Set();
 
     function* visit(obj: LObject): IterableIterator<LObject> {
       if (seen.has(obj)) return;
 
       seen.add(obj);
+
+      if (!(obj instanceof DataObject)) return;
 
       if (obj.parent) yield* visit(obj.parent);
 
@@ -84,24 +82,11 @@ class Project {
     return {
       serializationVersion: Project.serializationVersion,
 
-      objects: [...this.objectsInDependencyOrder()]
+      idCounter: this.idCounter,
+      objects: [...this.DataObjectsInDependencyOrder()]
+        .filter((x): x is DataObject => x instanceof DataObject)
         .map(obj => obj.serialize())
     };
-  }
-
-  public serializeField(field: Field): string {
-    return `${field.constructor.name}|${field.serialize()}`;
-  }
-
-  public deserializeField(data: string): Field {
-    const [type, val] = data.split('|');
-    const cls = this.computedFieldTypes[type];
-
-    if (!cls) {
-      throw new MissingFieldTypeError();
-    }
-
-    return cls.deserialize(val);
   }
 
   public static deserialize(
@@ -115,11 +100,13 @@ class Project {
 
     const proj = new Project();
 
+    proj.idCounter = data.idCounter;
+
     // TODO: load extenions dynamically from project?
     extensions.forEach(ex => proj.addExtension(ex));
 
     data.objects.forEach(o => {
-      const obj = LObject.deserialize(proj, o);
+      const obj = DataObject.deserialize(proj, o);
       proj.objects.set(obj.id, obj);
     });
 
@@ -132,7 +119,8 @@ namespace Project {
 
   export interface SerializedData {
     serializationVersion: number;
-    objects: LObject.SerializedData[];
+    idCounter: number;
+    objects: DataObject.SerializedData[];
   }
 }
 

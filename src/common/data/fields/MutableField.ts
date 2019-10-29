@@ -1,17 +1,17 @@
-import LObject from './LObject';
+import IObject from '../objects/LObject';
 import Field from './Field';
-import Link from './Link';
-import EventEmitter from '../util/EventEmitter';
-import FieldObserver from '../events/FieldObserver';
-import ContentObserver from '../events/ContentObserver';
-import { diff } from '../util';
+import Link from '../Link';
+import EventEmitter from '../../util/EventEmitter';
+import FieldObserver from '../../events/FieldObserver';
+import ContentObserver from '../../events/ContentObserver';
+import { diff } from '../../util';
 
 class MutableFieldObserver extends FieldObserver {
   public destroy: () => void;
 
   public constructor (
     field: MutableField,
-    context: LObject,
+    context: IObject,
     recursive: boolean
   ) {
     super();
@@ -100,7 +100,7 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
     this.emit('update');
   }
 
-  public raw(context: LObject): MutableField.RawValue {
+  public raw(context: IObject): MutableField.RawValue {
     return this.rawValue
       .map(part => {
         if (typeof part === 'string') return part;
@@ -108,7 +108,7 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
       });
   }
 
-  public get(context: LObject): string {
+  public get(context: IObject): string {
     return this.raw(context)
       .map(part => {
         if (typeof part === 'string') return part;
@@ -117,20 +117,20 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
       .join('');
   }
 
-  public getAsRawString(context: LObject): string {
+  public getAsRawString(context: IObject): string {
     return this.raw(context).map(String).join('');
   }
 
-  public dependencies(context: LObject): Link[] {
+  public dependencies(context: IObject): Link[] {
     return this.raw(context)
       .filter((part): part is Link => typeof part !== 'string');
   }
 
-  public observe(context: LObject, recursive: boolean): MutableFieldObserver {
+  public observe(context: IObject, recursive: boolean): MutableFieldObserver {
     return new MutableFieldObserver(this, context, recursive);
   }
 
-  public clone(): Field {
+  public clone(): MutableField {
     return new MutableField(this.rawValue);
   }
 

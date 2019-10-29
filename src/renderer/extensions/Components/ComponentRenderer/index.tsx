@@ -1,10 +1,10 @@
 import React from 'react';
 import parse from 'html-react-parser';
 import Link from '../../../../common/data/Link';
-import LObject from '../../../../common/data/LObject';
-import MutableField from '../../../../common/data/MutableField';
+import LObject from '../../../../common/data/objects/LObject';
+import MutableField from '../../../../common/data/fields/MutableField';
 import ComponentContentField from '../ComponentContentField';
-import Field from '../../../../common/data/Field';
+import Field from '../../../../common/data/fields/Field';
 import {
   useWatchLink,
   useLink,
@@ -26,7 +26,7 @@ export type Renderer<F extends Field = Field>
 type Manager = (node: HTMLElement | null) => void;
 
 function manageAttributes(comp: LObject): Manager {
-  const attrs = comp.getLink('html.attr.*');
+  const attrs = new Link(comp, 'html.attr.*');
 
   let curNode: HTMLElement | null = null;
   let attrObs: ContentObserver | null = null;
@@ -52,7 +52,7 @@ function manageAttributes(comp: LObject): Manager {
 }
 
 function manageStyles(comp: LObject): Manager {
-  const styles = comp.getLink('style.*');
+  const styles = new Link(comp, 'style.*');
 
   let curNode: HTMLElement | null = null;
   let attrObs: ContentObserver | null = null;

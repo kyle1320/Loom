@@ -1,27 +1,31 @@
 import React from 'react';
-import LObject from '../../../common/data/LObject';
+
 import { Category } from '../../Renderer';
 import SubCategory from './SubCategory';
-
-import './FieldList.scss';
 import FieldItem from './FieldItem';
 import { useWatchPaths } from '../util/hooks';
+import DataObject from '../../../common/data/objects/DataObject';
+import Link from '../../../common/data/Link';
+
+import './FieldList.scss';
 
 interface Props {
-  context: LObject;
+  context: DataObject;
   category: Category;
 }
 
 const FieldList: React.FC<Props> = (props: Props) => {
   useWatchPaths(props.context, props.category.paths);
   const names = ([] as string[]).concat(
-    ...props.category.paths.map(p => [...props.context.getFieldNames(p)])
+    ...props.category.paths.map(
+      p => [...new Link(props.context, p).getFieldNames()]
+    )
   );
   const unmatchedNames = new Set(names);
   const sections = props.category.sections.map(sec => {
     const fields = [];
     for (const path of sec.paths) {
-      const names = [...props.context.getLink(path).getFieldNames()].sort();
+      const names = [...new Link(props.context, path).getFieldNames()].sort();
       for (const name of names) {
         unmatchedNames.delete(name);
         fields.push(name);
@@ -43,7 +47,7 @@ const FieldList: React.FC<Props> = (props: Props) => {
         key={k}
         context={props.context}
         name={k}
-        field={props.context.getField(k)!} />)
+        field={props.context.fields[k]!} />)
     ]}
   </div>;
 }

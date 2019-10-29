@@ -1,13 +1,14 @@
 import React from 'react';
+
 import FieldItem from './FieldItem';
-import LObject from '../../../common/data/LObject';
+import DataObject from '../../../common/data/objects/DataObject';
 
 import './SubCategory.scss';
 
 interface Props {
   title: string;
   fieldNames: string[];
-  context: LObject;
+  context: DataObject;
 }
 
 const SubCategory: React.FC<Props> = (props: Props) => {
@@ -20,7 +21,7 @@ const SubCategory: React.FC<Props> = (props: Props) => {
             key={k}
             context={props.context!}
             name={k}
-            field={props.context!.getField(k)!} />)
+            field={props.context!.fields[k]!} />)
       }
     </div>
     : <></>;

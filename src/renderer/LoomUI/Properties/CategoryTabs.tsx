@@ -1,7 +1,7 @@
 import React from 'react';
+import { Category } from '../../Renderer';
 
 import './CategoryTabs.scss';
-import { Category } from '../../Renderer';
 
 interface Props {
   categories: Category[];

@@ -1,13 +1,13 @@
 import React from 'react';
-import LObject from '../../../common/data/LObject';
-
-import './Navigator.scss';
 import { useRenderer } from '../RendererContext';
 import ObjectItem from './ObjectItem';
+import DataObject from '../../../common/data/objects/DataObject';
+
+import './Navigator.scss';
 
 interface Props {
-  context: LObject | null;
-  onSelect: (obj: LObject | null) => void;
+  context: DataObject | null;
+  onSelect: (obj: DataObject | null) => void;
 }
 
 const Navigator: React.FC<Props> = (props: Props) => {
@@ -15,7 +15,7 @@ const Navigator: React.FC<Props> = (props: Props) => {
 
   return <div className="navigator">
     {
-      [...renderer.getProject()!.allObjects()]
+      [...renderer.getProject()!.DataObjects()]
         .map(o => <ObjectItem
           key={o.id}
           object={o}

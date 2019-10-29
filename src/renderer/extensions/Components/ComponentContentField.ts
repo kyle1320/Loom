@@ -1,29 +1,29 @@
-import LObject from '../../../common/data/LObject';
+import LObject from '../../../common/data/objects/LObject';
 import Link from '../../../common/data/Link';
-import ComputedField from '../../../common/data/ComputedField';
+import ComputedField from '../../../common/data/fields/ComputedField';
 
 export default class ComponentContentField extends ComputedField {
   public get(context: LObject): string {
-    const tag = context.getFieldValueOrDefault('html.tag', 'div');
-    const attrs = [...context.getFieldNames('html.attr.*')]
-      .map(f => ` ${f.substr(10)}="${context.getFieldValue(f)}"`)
+    const tag = this.tag(context).getFieldValueOrDefault('div');
+    const attrs = [...this.attrs(context).getFieldNames()]
+      .map(f => ` ${f.substr(10)}="${context.fields[f].get(context)}"`)
       .join('');
-    const content = context.getFieldValueOrDefault('html.innerContent', '');
+    const content = this.content(context).getFieldValueOrDefault('');
 
     // TODO: handle self-closing tags
     return  `<${tag}${attrs}>${content}</${tag}>`;
   }
 
   public tag(context: LObject): Link {
-    return context.getLink('html.tag');
+    return new Link(context, 'html.tag');
   }
 
   public attrs(context: LObject): Link {
-    return context.getLink('html.attr.*');
+    return new Link(context, 'html.attr.*');
   }
 
   public content(context: LObject): Link {
-    return context.getLink('html.innerContent');
+    return new Link(context, 'html.innercontent');
   }
 
   public dependencies(context: LObject): Link[] {
@@ -32,9 +32,5 @@ export default class ComponentContentField extends ComputedField {
       this.attrs(context),
       this.content(context)
     ];
-  }
-
-  public static deserialize(): ComponentContentField {
-    return new ComponentContentField();
   }
 }
