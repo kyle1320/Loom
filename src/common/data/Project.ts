@@ -2,7 +2,7 @@ import SerializationError from '../errors/SerializationError';
 import LObject from './objects/LObject';
 import DataExtension from '../extensions/DataExtension';
 import DataObject from './objects/DataObject';
-import BaseObject from './objects/BaseObject';
+import ClassObject from './objects/ClassObject';
 import ComputedField from './fields/ComputedField';
 
 class Project {
@@ -30,16 +30,16 @@ class Project {
     return this.objects.get(id);
   }
 
-  public addBaseType(
+  public registerClass(
     name: string,
     fields: { [id: string]: ComputedField },
-    parent: null | string | BaseObject = null
+    parent: null | string | ClassObject = null
   ): void {
     if (typeof parent === 'string') {
-      parent = this.objects.get(parent) as BaseObject;
+      parent = this.objects.get(parent) as ClassObject;
     }
 
-    const obj = new BaseObject(this, fields, parent, name);
+    const obj = new ClassObject(this, fields, parent, name);
     this.objects.set(name, obj);
   }
 

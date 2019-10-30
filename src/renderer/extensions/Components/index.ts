@@ -22,7 +22,7 @@ function registerAttributes(renderer: Renderer): void {
 
 const ext: Extension = {
   initProject(project: Project) {
-    project.addBaseType('component', {
+    project.registerClass('component', {
       'html.outercontent()': new ComponentContentField()
     });
   },

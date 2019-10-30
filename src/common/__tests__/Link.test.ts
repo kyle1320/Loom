@@ -70,7 +70,7 @@ test('can iterate over all fields matching a path', () => {
 test('can iterate over computed & mutable fields separately', () => {
   const proj = new Project();
 
-  proj.addBaseType('base', {
+  proj.registerClass('base', {
     'test1()': new BasicComputedField(),
     'test2()': new BasicComputedField()
   });

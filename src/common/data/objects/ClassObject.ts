@@ -3,13 +3,13 @@ import LObject from './LObject';
 import ComputedField from '../fields/ComputedField';
 import IllegalFieldKeyError from '../../errors/IllegalFieldKeyError';
 
-export default class BaseObject implements LObject {
+export default class ClassObject implements LObject {
   public readonly fields: { [id: string]: ComputedField } = {};
 
   public constructor(
     public readonly project: Project,
     fields: { [id: string]: ComputedField },
-    public readonly parent: BaseObject | null = null,
+    public readonly parent: ClassObject | null = null,
     public readonly id = project.freshId()
   ) {
     for (const key in fields) {
