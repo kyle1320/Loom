@@ -1,62 +1,34 @@
-import React, { Component, ReactElement } from 'react';
+import React from 'react';
+import LObject from '../../../../common/data/objects/LObject';
 import FieldEditor from '../../../registry/FieldEditor';
 import MutableField from '../../../../common/data/fields/MutableField';
+import { Manager, manage } from '../../util/imperative';
 
 import './MutableFieldEditor.scss';
 
-interface Props { value: string; onChange: (val: string) => void }
-
-class MutableFieldEditorInner extends Component<Props> {
-  private ref = React.createRef<HTMLDivElement>();
-  private lastText: string | null = null;
-
-  public shouldComponentUpdate(nextProps: Props): boolean {
-    console.log('edit', nextProps.value, this.lastText);
-    return nextProps.value !== this.lastText
-      || nextProps.onChange !== this.props.onChange;
-  }
-
-  public componentDidUpdate(prevProps: Props): void {
-    if (prevProps.value !== this.props.value) {
-      this.lastText = null;
+function manageContentEditable(field: MutableField, context: LObject): Manager {
+  return manage((node: HTMLElement) => {
+    function onInput(): void {
+      field.set(node.textContent || '');
     }
-  }
 
-  public update = (): void => {
-    const el = this.ref.current;
-
-    if (!el) return;
-
-    const text = el.textContent || '';
-    if (text !== this.lastText) {
-      this.props.onChange(text);
-    }
-    this.lastText = text;
-  }
-
-  public render(): ReactElement {
-    // TODO: render links specially
-    console.log('rendering', this.props.value, this.lastText)
-    return <div
-      ref={this.ref}
-      className="basic-field-editor"
-      contentEditable
-      onInput={this.update} >
-
-      {this.props.value}
-    </div>;
-  }
+    // TODO: support links
+    node.textContent = field.getAsRawString(context);
+    node.addEventListener('input', onInput);
+    return () => node.removeEventListener('input', onInput);
+  });
 }
 
 const MutableFieldEditor: FieldEditor = (props: FieldEditor.Props) => {
-  const field = (props.field as MutableField);
-  const onChange = React.useCallback(
-    (value: string) => field.set(value),
-    [props.field]
+  const manager = React.useMemo(
+    () => manageContentEditable(props.field, props.context),
+    [props.field, props.context]
   );
-  const value = field.getAsRawString(props.context);
 
-  return <MutableFieldEditorInner value={value} onChange={onChange} />
+  return <div
+    ref={manager}
+    className="basic-field-editor"
+    contentEditable ></div>;
 }
 
 export default MutableFieldEditor;

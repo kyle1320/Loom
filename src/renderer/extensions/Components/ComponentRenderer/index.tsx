@@ -11,6 +11,7 @@ import {
   useFieldValue,
   useFieldGetter } from '../../../LoomUI/util/hooks';
 import ContentObserver from '../../../../common/events/ContentObserver';
+import { manage, Manager, manageMany } from '../../../LoomUI/util/imperative';
 
 import './ComponentRenderer.scss';
 
@@ -23,68 +24,45 @@ export interface RendererProps<F extends Field = Field> {
 export type Renderer<F extends Field = Field>
   = React.ComponentType<RendererProps<F>>;
 
-type Manager = (node: HTMLElement | null) => void;
-
 function manageAttributes(comp: LObject): Manager {
   const attrs = new Link(comp, 'html.attr.*');
-
-  let curNode: HTMLElement | null = null;
   let attrObs: ContentObserver | null = null;
 
-  return (node: HTMLElement | null) => {
-    if (curNode && curNode != node) {
-      attrObs!.destroy();
+  return manage((node: HTMLElement) => {
+    const attrMap = attrs.getFieldValues();
+    for (const key in attrMap) {
+      node.setAttribute(key.substring(10), attrMap[key]);
     }
 
-    curNode = node;
+    attrObs = attrs.observe().content(true).on('update', (link: Link) => {
+      node.setAttribute(link.fieldName.substring(10), link.getFieldValue());
+    });
 
-    if (node) {
-      const attrMap = attrs.getFieldValues();
-      for (const key in attrMap) {
-        node.setAttribute(key.substring(10), attrMap[key]);
-      }
-
-      attrObs = attrs.observe().content(true).on('update', (link: Link) => {
-        node.setAttribute(link.fieldName.substring(10), link.getFieldValue());
-      });
-    }
-  };
+    return () => attrObs!.destroy();
+  });
 }
 
 function manageStyles(comp: LObject): Manager {
   const styles = new Link(comp, 'style.*');
 
-  let curNode: HTMLElement | null = null;
-  let attrObs: ContentObserver | null = null;
-
-  return (node: HTMLElement | null) => {
-    if (curNode && curNode != node) {
-      attrObs!.destroy();
+  return manage((node: HTMLElement) => {
+    const styleMap = styles.getFieldValues();
+    for (const key in styleMap) {
+      node.style.setProperty(key.substring(6), styleMap[key]);
     }
 
-    curNode = node;
-
-    if (node) {
-      const styleMap = styles.getFieldValues();
-      for (const key in styleMap) {
-        node.style.setProperty(key.substring(6), styleMap[key]);
-      }
-
-      attrObs = styles.observe().content(true).on('update', (link: Link) => {
+    const attrObs = styles.observe().content(true).on('update',
+      (link: Link) => {
         node.style.setProperty(link.fieldName.substring(6), '');
         node.style.setProperty(
           link.fieldName.substring(6),
           link.getFieldValue()
         );
-      });
-    }
-  };
-}
+      }
+    );
 
-function manageMany(...managers: Manager[]): Manager {
-  return (node: HTMLElement | null) => {
-    managers.forEach(m => m(node));
-  };
+    return () => attrObs!.destroy();
+  });
 }
 
 const ComponentRenderer: ComponentRenderer
