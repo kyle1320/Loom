@@ -6,6 +6,8 @@
     "dev": "electron-webpack dev",
     "dist": "electron-webpack && electron-builder",
     "lint": "eslint src --ext js,ts,jsx,tsx",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run lint",
     "test": "jest"
   },
   "license": "GPL-3.0-or-later",
