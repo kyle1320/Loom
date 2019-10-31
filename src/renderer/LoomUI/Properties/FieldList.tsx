@@ -18,14 +18,14 @@ const FieldList: React.FC<Props> = (props: Props) => {
   useWatchPaths(props.context, props.category.paths);
   const names = ([] as string[]).concat(
     ...props.category.paths.map(
-      p => [...new Link(props.context, p).getFieldNames()]
+      p => [...Link.to(props.context, p).getFieldNames()]
     )
   );
   const unmatchedNames = new Set(names);
   const sections = props.category.sections.map(sec => {
     const fields = [];
     for (const path of sec.paths) {
-      const names = [...new Link(props.context, path).getFieldNames()].sort();
+      const names = [...Link.to(props.context, path).getFieldNames()].sort();
       for (const name of names) {
         unmatchedNames.delete(name);
         fields.push(name);

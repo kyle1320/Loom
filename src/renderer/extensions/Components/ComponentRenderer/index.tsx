@@ -25,7 +25,7 @@ export type Renderer<F extends Field = Field>
   = React.ComponentType<RendererProps<F>>;
 
 function manageAttributes(comp: LObject): Manager {
-  const attrs = new Link(comp, 'html.attr.*');
+  const attrs = Link.to(comp, 'html.attr.*');
   let attrObs: ContentObserver | null = null;
 
   return manage((node: HTMLElement) => {
@@ -43,7 +43,7 @@ function manageAttributes(comp: LObject): Manager {
 }
 
 function manageStyles(comp: LObject): Manager {
-  const styles = new Link(comp, 'style.*');
+  const styles = Link.to(comp, 'style.*');
 
   return manage((node: HTMLElement) => {
     const styleMap = styles.getFieldValues();

@@ -1,6 +1,6 @@
 import IObject from '../objects/LObject';
 import Field from './Field';
-import Link from '../Link';
+import Link, { HeadlessLink } from '../Link';
 import EventEmitter from '../../util/EventEmitter';
 import FieldObserver from '../../events/FieldObserver';
 import ContentObserver from '../../events/ContentObserver';
@@ -62,18 +62,22 @@ class MutableFieldObserver extends FieldObserver {
   }
 }
 
-class MutableField extends EventEmitter<{ update: void }> implements Field {
-  private rawValue: MutableField.RawValue = [];
+type RawValue = (string | HeadlessLink)[]
+export default class MutableField
+  extends EventEmitter<{ update: void }>
+  implements Field
+{
+  private rawValue: RawValue = [];
 
-  public constructor(value: string | MutableField.RawValue) {
+  public constructor(value: string | RawValue) {
     super();
 
     this.set(value);
   }
 
-  public set(value: string | MutableField.RawValue): void {
+  public set(value: string | RawValue): void {
     if (typeof value === 'string') {
-      const re = /\{([^{}|]+)\|([^{}]+)\}/g;
+      const re = /\{([^{}|]*)\|([^{}]+)\}/g;
       let index = 0;
       this.rawValue.length = 0;
 
@@ -83,8 +87,7 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
           this.rawValue.push(value.substring(index, matches.index));
         }
 
-        // TODO: support empty object id
-        this.rawValue.push(new Link(null!, matches[1], matches[2]));
+        this.rawValue.push(new HeadlessLink(matches[1], matches[2]));
 
         index = matches.index + matches[0].length;
         matches = re.exec(value);
@@ -100,11 +103,11 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
     this.emit('update');
   }
 
-  public raw(context: IObject): MutableField.RawValue {
+  public raw(context: IObject): (string | Link)[] {
     return this.rawValue
       .map(part => {
         if (typeof part === 'string') return part;
-        return part.withProject(context.project);
+        else return part.resolve(context);
       });
   }
 
@@ -117,8 +120,8 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
       .join('');
   }
 
-  public getAsRawString(context: IObject): string {
-    return this.raw(context).map(String).join('');
+  public getAsRawString(): string {
+    return this.rawValue.map(String).join('');
   }
 
   public dependencies(context: IObject): Link[] {
@@ -142,9 +145,3 @@ class MutableField extends EventEmitter<{ update: void }> implements Field {
     return new MutableField(data);
   }
 }
-
-namespace MutableField {
-  export type RawValue = (string | Link)[];
-}
-
-export default MutableField;

@@ -15,15 +15,15 @@ export default class ComponentContentField extends ComputedField {
   }
 
   public tag(context: LObject): Link {
-    return new Link(context, 'html.tag');
+    return Link.to(context, 'html.tag');
   }
 
   public attrs(context: LObject): Link {
-    return new Link(context, 'html.attr.*');
+    return Link.to(context, 'html.attr.*');
   }
 
   public content(context: LObject): Link {
-    return new Link(context, 'html.innercontent');
+    return Link.to(context, 'html.innercontent');
   }
 
   public dependencies(context: LObject): Link[] {

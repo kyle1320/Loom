@@ -20,7 +20,7 @@ describe('can listen for field changes', () => {
   test('can listen on specific fields', () => {
     const mock = jest.fn();
 
-    new Link(obj, 'test').observe().content(true).on('update', mock);
+    Link.to(obj, 'test').observe().content(true).on('update', mock);
 
     obj.fields['test'].set('new value');
     obj.fields['test.scope.1'].set('new value');
@@ -31,7 +31,7 @@ describe('can listen for field changes', () => {
   test('can listen on a path with a wildcard', () => {
     const mock = jest.fn();
 
-    new Link(obj, 'test.*').observe().content(true).on('update', mock);
+    Link.to(obj, 'test.*').observe().content(true).on('update', mock);
 
     obj.fields['test'].set('new value 2');
     obj.fields['test.scope.1'].set('new value 2');
@@ -43,7 +43,7 @@ describe('can listen for field changes', () => {
   test('if recursive, fires an update when dependencies change', () => {
     const mock = jest.fn();
 
-    new Link(obj2, 'test').observe().content(true).on('update', mock);
+    Link.to(obj2, 'test').observe().content(true).on('update', mock);
 
     obj2.fields['test'].set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
     obj.fields['test'].set('new value 3');
@@ -56,7 +56,7 @@ describe('can listen for field changes', () => {
     () => {
       const mock = jest.fn();
 
-      new Link(obj2, 'test').observe().content(false).on('update', mock);
+      Link.to(obj2, 'test').observe().content(false).on('update', mock);
 
       obj2.fields['test'].set(`{${obj.id}|test}{${obj.id}|test.parent.2}`);
       obj.fields['test'].set('new value 3');
@@ -69,7 +69,7 @@ describe('can listen for field changes', () => {
   test('handles dependency changes', () => {
     const mock = jest.fn();
 
-    new Link(obj2, 'test').observe().content(true).on('update', mock);
+    Link.to(obj2, 'test').observe().content(true).on('update', mock);
 
     obj2.fields['test'].set(`new {${obj.id}|test}{${obj.id}|test.parent.2}`);
     expect(mock).toHaveBeenCalledTimes(1);
@@ -102,7 +102,7 @@ describe('can listen for field changes', () => {
     const obj = project.makeObject(parent);
     obj.addOwnField('test.1', 'value2');
 
-    new Link(obj, 'test.*').observe().content(true).on('update', mock);
+    Link.to(obj, 'test.*').observe().content(true).on('update', mock);
 
     parent.fields['test.1'].set('value3');
     expect(mock).not.toHaveBeenCalled();
@@ -133,10 +133,10 @@ describe('can listen for field changes', () => {
     test('with no dependencies', () => {
       const mock = jest.fn();
 
-      const obs = new Link(obj, 'test.*').observe().content(true)
+      const obs = Link.to(obj, 'test.*').observe().content(true)
         .on('update', mock);
 
-      obj.fields['test.scope.1'].set(`new value ${new Link(obj2, 'test')}`);
+      obj.fields['test.scope.1'].set(`new value ${Link.to(obj2, 'test')}`);
       obj2.fields['test'].set('new value 6');
       expect(mock).toHaveBeenCalledTimes(2);
 
@@ -149,7 +149,7 @@ describe('can listen for field changes', () => {
     test('with dependencies', () => {
       const mock = jest.fn();
 
-      const obs = new Link(obj, 'test.*').observe().content(true)
+      const obs = Link.to(obj, 'test.*').observe().content(true)
         .on('update', mock);
 
       obj.fields['test.scope.1'].set('new value 5');
@@ -183,9 +183,9 @@ describe('can listen for field changes', () => {
     obj.addOwnField('test.2', '');
     obj.addOwnField('test.nested.1', '');
 
-    new Link(obj, 'test.*').observe().content(true)
+    Link.to(obj, 'test.*').observe().content(true)
       .on('update', mock1);
-    const obs2 = new Link(obj, 'test.nested.*').observe().content(true)
+    const obs2 = Link.to(obj, 'test.nested.*').observe().content(true)
       .on('update', mock2);
 
     obj.fields['test.1'].set('1');

@@ -5,30 +5,74 @@ import FieldReferenceError from '../errors/FieldReferenceError';
 import LObject from './objects/LObject';
 import LinkObserver from '../events/LinkObserver';
 
-export default class Link {
+export class HeadlessLink {
+  protected readonly isComputed: boolean;
+  protected readonly isWildcard: boolean;
+  protected readonly rawPath: string;
+
+  public constructor(
+    public readonly objectId: string,
+    public readonly fieldName: string
+  ) {
+    let rawPath = fieldName;
+
+    const isComputed = rawPath.endsWith('()');
+    if (isComputed) {
+      rawPath = rawPath.substring(0, rawPath.length - 2);
+    }
+
+    const isWildcard = rawPath.endsWith('*');
+    if (isWildcard) {
+      rawPath = rawPath.substring(0, rawPath.length - 1);
+    }
+
+    this.isComputed = isComputed;
+    this.isWildcard = isWildcard;
+    this.rawPath = rawPath;
+  }
+
+  public attach(project: Project): Link {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Link(project, this.objectId, this.fieldName);
+  }
+
+  public resolve(context: LObject): Link {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Link(
+      context.project,
+      this.objectId || context.id, // if id is empty, resolve to 'this'
+      this.fieldName
+    );
+  }
+
+  public withObject(objectId: string): HeadlessLink {
+    return new HeadlessLink(objectId, this.fieldName);
+  }
+
+  public withFieldName(fieldName: string): HeadlessLink {
+    return new HeadlessLink(this.objectId, fieldName);
+  }
+
+  public toString(): string {
+    return `{${this.objectId}|${this.fieldName}}`;
+  }
+
+  public matchesKey(key: string): boolean {
+    if (!this.isWildcard) return key == this.fieldName;
+    else if (this.isComputed !== key.endsWith('()')) return false;
+    else return key.startsWith(this.rawPath);
+  }
+}
+
+export default class Link extends HeadlessLink {
   private object: LObject | null = null;
 
-  public readonly project: Project;
-  public readonly objectId: string;
-  public readonly fieldName: string;
-
-  public constructor(object: LObject, fieldName: string);
-  public constructor(project: Project, objectId: string, fieldName: string);
   public constructor(
-    project: Project | LObject,
+    public readonly project: Project,
     objectId: string,
-    fieldName?: string
+    fieldName: string
   ) {
-    if (typeof fieldName !== 'undefined') {
-      this.project = project as Project;
-      this.objectId = objectId;
-      this.fieldName = fieldName.toLowerCase();
-    } else {
-      this.object = project as LObject;
-      this.project = this.object.project;
-      this.objectId = this.object.id;
-      this.fieldName = objectId.toLowerCase();
-    }
+    super(objectId, fieldName.toLowerCase());
   }
 
   public getObject(): LObject {
@@ -54,25 +98,13 @@ export default class Link {
 
   public *getFieldNames(): IterableIterator<string> {
     const object = this.getObject();
-    let path = this.fieldName;
 
-    if (path in object.fields) {
-      yield path;
-    } else {
-      let computed = false;
-      if (path.endsWith('()')) {
-        computed = true;
-        path = path.substring(0, path.length - 2);
+    if (this.isWildcard) {
+      for (const key in object.fields) {
+        if (this.matchesKey(key)) yield key;
       }
-
-      if (path.endsWith('*')) {
-        path = path.substring(0, path.length - 1);
-        for (const key in object.fields) {
-          if (key.startsWith(path)) {
-            if (key.endsWith('()') == computed) yield key;
-          }
-        }
-      }
+    } else if (this.fieldName in object.fields) {
+      yield this.fieldName;
     }
   }
 
@@ -130,14 +162,6 @@ export default class Link {
     return new LinkObserver(this);
   }
 
-  public matchesKey(key: string): boolean {
-    return Link.pathMatches(this.fieldName, key);
-  }
-
-  public withProject(project: Project): Link {
-    return new Link(project, this.objectId, this.fieldName);
-  }
-
   public withObject(objectId: string): Link {
     return new Link(this.project, objectId, this.fieldName);
   }
@@ -146,18 +170,14 @@ export default class Link {
     return new Link(this.project, this.objectId, fieldName);
   }
 
-  public toString(): string {
-    return `{${this.objectId}|${this.fieldName}}`;
-  }
-
   public static compare(a: Link, b: Link): number {
     return a.objectId < b.objectId ? -1 : a.objectId > b.objectId ? 1 :
       a.fieldName < b.fieldName ? -1 : a.fieldName > b.fieldName ? 1 : 0;
   }
 
-  public static pathMatches(path: string, key: string): boolean {
-    return path.endsWith('*')
-      ? key.startsWith(path.substring(0, path.length - 1))
-      : key === path;
+  public static to(obj: LObject, fieldName: string): Link {
+    const link = new Link(obj.project, obj.id, fieldName);
+    link.object = obj;
+    return link;
   }
 }

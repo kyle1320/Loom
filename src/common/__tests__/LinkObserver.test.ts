@@ -24,7 +24,7 @@ function count(): string {
 describe('can listen for field changes on a single field', () => {
   test('additions', () => {
     const obj = project.makeObject();
-    const add = mocks(new Link(obj, 'test'))[0];
+    const add = mocks(Link.to(obj, 'test'))[0];
 
     obj.addOwnField('test', count());
     expect(add).toHaveBeenCalledTimes(1);
@@ -35,7 +35,7 @@ describe('can listen for field changes on a single field', () => {
 
   test('removals', () => {
     const obj = project.makeObject();
-    const remove = mocks(new Link(obj, 'test'))[1];
+    const remove = mocks(Link.to(obj, 'test'))[1];
 
     obj.addOwnField('test', count());
     expect(remove).toHaveBeenCalledTimes(0);
@@ -50,7 +50,7 @@ describe('can listen for field changes on a single field', () => {
   test('changes', () => {
     const parent = project.makeObject();
     const obj = project.makeObject(parent);
-    const change = mocks(new Link(obj, 'test'))[2];
+    const change = mocks(Link.to(obj, 'test'))[2];
 
     obj.addOwnField('test', count());
     parent.addOwnField('test', count());
@@ -71,7 +71,7 @@ describe('can listen for field changes on a single field', () => {
 describe('can listen for field changes on multiple fields', () => {
   test('additions', () => {
     const obj = project.makeObject();
-    const add = mocks(new Link(obj, 'test.*'))[0];
+    const add = mocks(Link.to(obj, 'test.*'))[0];
 
     obj.addOwnField('test', count());
     expect(add).toHaveBeenCalledTimes(0);
@@ -85,7 +85,7 @@ describe('can listen for field changes on multiple fields', () => {
 
   test('removals', () => {
     const obj = project.makeObject();
-    const remove = mocks(new Link(obj, 'test.*'))[1];
+    const remove = mocks(Link.to(obj, 'test.*'))[1];
 
     obj.addOwnField('test', count());
     expect(remove).toHaveBeenCalledTimes(0);
@@ -107,7 +107,7 @@ describe('can listen for field changes on multiple fields', () => {
   test('changes', () => {
     const parent = project.makeObject();
     const obj = project.makeObject(parent);
-    const change = mocks(new Link(obj, 'test.*'))[2];
+    const change = mocks(Link.to(obj, 'test.*'))[2];
 
     obj.addOwnField('test', count());
     obj.addOwnField('test.1', count());
