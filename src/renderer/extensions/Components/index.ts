@@ -12,7 +12,7 @@ function registerStyles(renderer: Renderer): void {
   renderer.registerFieldName('style.font-size', 'Font Size');
   renderer.registerFieldName('style.font-weight', 'Font Weight');
 
-  renderer.registerFieldEditor('style.color', ColorPicker);
+  renderer.registry.registerFieldEditor('style.color', ColorPicker);
 }
 
 function registerAttributes(renderer: Renderer): void {
@@ -50,7 +50,7 @@ const ext: Extension = {
       ]
     });
 
-    renderer.registerObjectEditor('component', ComponentRenderer);
+    renderer.registry.registerObjectEditor('component', ComponentRenderer);
 
     renderer.registerFieldName('html.outercontent()', 'HTML');
     renderer.registerFieldName('html.innercontent', 'Contents');

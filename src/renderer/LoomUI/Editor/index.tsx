@@ -8,10 +8,13 @@ interface Props { context: LObject | null }
 
 const Editor: React.FC<Props> = (props: Props) => {
   const renderer = useRenderer();
-  const ObjectEditor = props.context && renderer.getObjectEditor(props.context);
+  const registry = renderer.registry;
+  const ObjectEditor = props.context && registry.getObjectEditor(props.context);
 
   return <div className="editor">
-    {ObjectEditor || 'no object selected'}
+    { ObjectEditor
+      ? <ObjectEditor object={props.context!} />
+      : 'no object selected' }
   </div>;
 }
 

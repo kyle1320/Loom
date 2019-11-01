@@ -1,10 +1,13 @@
 import React from 'react';
 
-import MutableField from '../../../common/data/fields/MutableField';
-import { useRenderer } from '../RendererContext';
 import Field from '../../../common/data/fields/Field';
 import LObject from '../../../common/data/objects/LObject';
 import DataObject from '../../../common/data/objects/DataObject';
+import MutableField from '../../../common/data/fields/MutableField';
+
+import { useRenderer } from '../RendererContext';
+import MutableFieldEditor from './editors/MutableFieldEditor';
+import PlainFieldDisplay from './editors/PlainFieldDisplay';
 
 import './FieldItem.scss';
 
@@ -16,6 +19,7 @@ interface Props {
 
 const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
   const renderer = useRenderer();
+  const registry = renderer.registry;
   const inherited = !LObject.hasOwnField(context, name);
 
   const friendlyName = renderer.getFieldName(name) || name;
@@ -24,17 +28,22 @@ const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
   const className = 'property-field' + (inherited ? ' inherited' : '');
 
   const isEditable = field instanceof MutableField;
-  const hasEditor = isEditable && renderer.hasFieldEditor(name);
+  const hasEditor = isEditable && !!registry.getFieldEditor(name);
   const [raw, toggleRaw] = React.useReducer(
     x => !hasEditor || !x,
     !hasEditor,
   );
 
-  const editor = field instanceof MutableField
-    ? (!raw && hasEditor)
-      ? renderer.getFieldEditor(name, field, context)
-      : renderer.getRawFieldEditor(field, context)
-    : renderer.getFieldDisplay(field, context);
+  let editor: React.ReactElement;
+  if (field instanceof MutableField) {
+    const Type = (!raw && hasEditor)
+      ? registry.getFieldEditor(name)!
+      : MutableFieldEditor;
+    editor = <Type field={field} context={context} />;
+  } else {
+    const Type = registry.getFieldDisplay(field) || PlainFieldDisplay;
+    editor = <Type field={field} context={context} />;
+  }
 
   const canClone = field instanceof MutableField;
   const clone = React.useCallback(
