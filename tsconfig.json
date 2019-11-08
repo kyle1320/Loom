@@ -2,9 +2,6 @@
   "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
     "alwaysStrict": true,
-    "downlevelIteration": true,
-    "strict": true,
-    "target": "es2016",
     "jsx": "react"
   }
 }

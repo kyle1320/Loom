@@ -98,7 +98,7 @@ const MutableFieldRenderer: Renderer<MutableField>
     );
 
     return <>{
-      parts && parts.map((p, i) => typeof p === 'string'
+      parts?.map((p, i) => typeof p === 'string'
         ? parse(p)
         : <LinkRenderer key={i} link={p} />)
     }</>

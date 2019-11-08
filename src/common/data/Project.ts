@@ -45,7 +45,7 @@ class Project {
 
   public addExtension(ext: DataExtension): void {
     this.extensions.push(ext);
-    ext.initProject && ext.initProject(this);
+    ext.initProject?.(this);
   }
 
   public *allObjects(): IterableIterator<LObject> {

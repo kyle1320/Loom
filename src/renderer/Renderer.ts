@@ -34,7 +34,7 @@ export default class Renderer {
 
   public constructor () {
     Renderer.defaultExtensions.forEach(ex => {
-      ex.initRenderer && ex.initRenderer(this);
+      ex.initRenderer?.(this);
     });
   }
 

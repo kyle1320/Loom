@@ -8,7 +8,7 @@ export function manage(
 
   return (node: HTMLElement | null) => {
     if (curNode && curNode != node) {
-      onRemove && onRemove();
+      onRemove?.();
       onRemove = null
     }
 

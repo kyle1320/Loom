@@ -7,7 +7,7 @@ interface Props { context: LObject | null }
 
 const Toolbar: React.FC<Props> = (props: Props) => {
   return <div className="toolbar">
-    Toolbar for {props.context && props.context.id}
+    Toolbar for {props.context?.id}
   </div>;
 }
 

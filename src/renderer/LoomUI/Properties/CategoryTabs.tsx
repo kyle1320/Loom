@@ -15,7 +15,7 @@ const CategoryTabs: React.FC<Props> = (props: Props) => {
       props.categories
         .map(c => <div
           className={'category' +
-            (props.active && props.active.key == c.key ? ' active' : '')
+            (props.active?.key == c.key ? ' active' : '')
           }
           key={c.key}
           onClick={() => props.onSelect(c)}>
