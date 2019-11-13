@@ -28,26 +28,19 @@ const ext: Extension = {
   },
   initRenderer(renderer: Renderer) {
     renderer.registerCategory({
-      key: 'component',
-      name: 'Component',
-      paths: ['html.*'],
-      sections: [
-        {
-          name: 'HTML',
-          paths: [
-            'html.tag',
-            'html.innercontent'
-          ]
-        },
-        {
-          name: 'Attributes',
-          paths: ['html.attr.*']
-        },
-        {
-          name: 'Styles',
-          paths: ['style.*'],
-        }
+      name: 'HTML',
+      paths: [
+        'html.tag',
+        'html.innercontent'
       ]
+    });
+    renderer.registerCategory({
+      name: 'Attributes',
+      paths: ['html.attr.*']
+    });
+    renderer.registerCategory({
+      name: 'Styles',
+      paths: ['style.*'],
     });
 
     renderer.registry.registerObjectEditor('component', ComponentRenderer);

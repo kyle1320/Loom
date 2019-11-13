@@ -1,20 +1,19 @@
 import React from 'react';
 
-import Field from '../../../common/data/fields/Field';
-import LObject from '../../../common/data/objects/LObject';
-import DataObject from '../../../common/data/objects/DataObject';
-import MutableField from '../../../common/data/fields/MutableField';
+import LObject from '../../../../common/data/objects/LObject';
+import DataObject from '../../../../common/data/objects/DataObject';
+import MutableField from '../../../../common/data/fields/MutableField';
 
-import { useRenderer } from '../RendererContext';
+import { useRenderer } from '../../RendererContext';
 import MutableFieldEditor from './editors/MutableFieldEditor';
-import PlainFieldDisplay from './editors/PlainFieldDisplay';
+import IconButton from '../../util/IconButton';
 
 import './FieldItem.scss';
 
 interface Props {
   context: DataObject;
   name: string;
-  field: Field;
+  field: MutableField;
 }
 
 const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
@@ -34,24 +33,17 @@ const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
     !hasEditor,
   );
 
-  let editor: React.ReactElement;
-  if (field instanceof MutableField) {
-    const Type = (!raw && hasEditor)
-      ? registry.getFieldEditor(name)!
-      : MutableFieldEditor;
-    editor = <Type field={field} context={context} />;
-  } else {
-    const Type = registry.getFieldDisplay(field) || PlainFieldDisplay;
-    editor = <Type field={field} context={context} />;
-  }
+  const Type = (!raw && hasEditor)
+    ? registry.getFieldEditor(name)!
+    : MutableFieldEditor;
+  const editor = <Type field={field} context={context} />;
 
-  const canClone = field instanceof MutableField;
+  const canClone = inherited;
   const clone = React.useCallback(
-    () => field instanceof MutableField
-      && context.addOwnField(name, field.clone()),
+    () => context.addOwnField(name, field.clone()),
     [context, name, field]
   );
-  const canDelete = field instanceof MutableField;
+  const canDelete = !inherited;
   const del = React.useCallback(
     () => context.removeOwnField(name),
     [name]
@@ -60,11 +52,18 @@ const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
   return <div className={className}>
     <div className="property-field__header">
       <div className="property-field__name" title={hoverName}>
-        {friendlyName}
+        { friendlyName }
       </div>
-      { hasEditor && <button onClick={toggleRaw}>{raw ? 'e' : 'r'}</button> }
-      { canClone && <button onClick={clone} disabled={!inherited}>+</button> }
-      { canDelete && <button onClick={del} disabled={inherited}>x</button> }
+      { hasEditor &&
+        <IconButton
+          onClick={toggleRaw as () => void}
+          icon={raw ? 'fa-image' : 'fa-code'} /> }
+      { canClone &&
+        <IconButton icon="fa-clone" className="icon-float"
+          onClick={clone} title="Clone" /> }
+      { canDelete &&
+        <IconButton icon="fa-times" className="icon-float"
+          onClick={del} title="Delete" /> }
     </div>
     <div className="property-field__editor">
       {editor}

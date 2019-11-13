@@ -1,7 +1,7 @@
 import React from 'react';
-import FieldEditor from '../../../registry/FieldEditor';
-import MutableField from '../../../../common/data/fields/MutableField';
-import { Manager, manage } from '../../util/imperative';
+import FieldEditor from '../../../../registry/FieldEditor';
+import MutableField from '../../../../../common/data/fields/MutableField';
+import { Manager, manage } from '../../../util/imperative';
 
 import './MutableFieldEditor.scss';
 

@@ -3,21 +3,15 @@ import Extension from './extensions/Extension';
 import Components from './extensions/Components';
 import UIRegistry from './registry/UIRegistry';
 
-export interface CategorySection {
+export interface Category {
   name: string;
   paths: string[];
 }
-export interface Category extends CategorySection {
-  key: string;
-  sections: CategorySection[];
-}
 
-const allCategory = {
-  key: '_all', name: 'All', paths: ['*'], sections: []
-};
-const computedCategory = {
-  key: '_computed', name: 'Computed', paths: ['*()'], sections: []
-};
+const defaultCategory = {
+  name: 'Misc.',
+  paths: ['*']
+}
 
 export default class Renderer {
   private static readonly defaultExtensions: Extension[] = [
@@ -27,7 +21,7 @@ export default class Renderer {
   private project: Project | null = null;
   public readonly registry: UIRegistry = new UIRegistry();
 
-  private fieldCategories: Category[] = [allCategory];
+  private fieldCategories: Category[] = [];
   /** Map from field keys to user-friendly names */
   private fieldNames: Map<string, string> = new Map();
 
@@ -65,11 +59,7 @@ export default class Renderer {
   }
 
   public getCategories(): Category[] {
-    return this.fieldCategories.concat([ computedCategory ]);
-  }
-
-  public getDefaultCategory(): Category {
-    return this.fieldCategories[0];
+    return this.fieldCategories.concat([ defaultCategory ]);
   }
 
   /** FIELD NAMES **/

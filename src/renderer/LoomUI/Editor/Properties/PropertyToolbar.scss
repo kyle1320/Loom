@@ -1,0 +1,15 @@
+@import "../../LoomUI";
+
+.property-toolbar {
+  border-bottom: 1px solid #ccc;
+
+  .icon-btn {
+    padding: 3px 8px;
+    border-right: 1px solid #ccc;
+
+    &.active {
+      background-color: white;
+      color: $primary-0;
+    }
+  }
+}

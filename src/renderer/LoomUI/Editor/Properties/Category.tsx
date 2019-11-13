@@ -1,9 +1,9 @@
 import React from 'react';
 
 import FieldItem from './FieldItem';
-import DataObject from '../../../common/data/objects/DataObject';
+import DataObject from '../../../../common/data/objects/DataObject';
 
-import './SubCategory.scss';
+import './Category.scss';
 
 interface Props {
   title: string;
@@ -11,10 +11,10 @@ interface Props {
   context: DataObject;
 }
 
-const SubCategory: React.FC<Props> = (props: Props) => {
+const Category: React.FC<Props> = (props: Props) => {
   return props.fieldNames.length
-    ? <div className="field-subcategory">
-      <div className="field-subcategory__title">{props.title}</div>
+    ? <div className="field-category">
+      <div className="field-category__title">{props.title}</div>
       {
         props.fieldNames
           .map(k => <FieldItem
@@ -27,4 +27,4 @@ const SubCategory: React.FC<Props> = (props: Props) => {
     : <></>;
 }
 
-export default SubCategory;
+export default Category;

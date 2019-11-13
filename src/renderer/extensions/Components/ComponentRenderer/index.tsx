@@ -14,6 +14,10 @@ import ContentObserver from '../../../../common/events/ContentObserver';
 import { manage, Manager, manageMany } from '../../../LoomUI/util/imperative';
 
 import './ComponentRenderer.scss';
+import ObjectEditor from '../../../registry/ObjectEditor';
+import UIContainer from '../../../LoomUI/util/UIContainer';
+import Properties from '../../../LoomUI/Editor/Properties';
+import { primary1 } from '../../../LoomUI/util/color';
 
 export interface ComponentRendererProps { object: LObject }
 export type ComponentRenderer = React.ComponentType<ComponentRendererProps>;
@@ -130,4 +134,12 @@ const LinkRenderer: LinkRenderer = (props: LinkRendererProps) => {
   }
 }
 
-export default ComponentRenderer;
+const ComponentEditorWithProps: ObjectEditor = (props: ObjectEditor.Props) => {
+  return <UIContainer flow="e" size={200}
+    color={primary1}
+    first={<ComponentRenderer object={props.object} />}
+    firstClassName="component-renderer"
+    second={<Properties object={props.object} />} />;
+}
+
+export default ComponentEditorWithProps;

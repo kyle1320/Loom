@@ -1,14 +1,36 @@
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+
+$primary-0: #303040;
+$primary-1: #414157;
+$primary-2: #52526e;
+$primary-3: #636385;
+
+$primary-hl-0: #1c1c40;
+$primary-hl-1: #252557;
+$primary-hl-2: #2f2f6e;
+$primary-hl-3: #393985;
+
 html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 body {
-  background-color: #303040;
+  background-color: $primary-0;
   color: white;
   font-family: arial;
   font-size: 14px;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
 }
 
 .loom-ui {

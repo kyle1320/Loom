@@ -1,5 +1,5 @@
 import React from 'react';
-import ObjectEditor from '../../../registry/ObjectEditor';
+import ObjectEditor from '../../../../registry/ObjectEditor';
 
 import './PlainObjectEditor.scss'
 
