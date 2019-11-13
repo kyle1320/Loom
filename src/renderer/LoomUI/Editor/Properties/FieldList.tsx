@@ -7,7 +7,7 @@ import Link from '../../../../common/data/Link';
 
 import './FieldList.scss';
 import LObject from '../../../../common/data/objects/LObject';
-import { useRenderer } from '../../RendererContext';
+import { useWorkspace } from '../../WorkspaceContext';
 
 interface Props {
   context: DataObject;
@@ -15,8 +15,8 @@ interface Props {
 }
 
 const FieldList: React.FC<Props> = (props: Props) => {
-  const renderer = useRenderer();
-  const categories = renderer.getCategories();
+  const workspace = useWorkspace();
+  const categories = workspace.registry.getCategories();
   const all = Link.to(props.context, '*');
 
   useWatchLink(all);

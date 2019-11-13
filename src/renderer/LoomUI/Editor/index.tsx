@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRenderer } from '../RendererContext';
+import { useWorkspace } from '../WorkspaceContext';
 import DataObject from '../../../common/data/objects/DataObject';
 
 import './Editor.scss';
@@ -8,8 +8,8 @@ import Properties from './Properties';
 interface Props { context: DataObject | null }
 
 const Editor: React.FC<Props> = (props: Props) => {
-  const renderer = useRenderer();
-  const registry = renderer.registry;
+  const workspace = useWorkspace();
+  const registry = workspace.registry;
   const ObjectEditor = props.context
     && registry.getObjectEditor(props.context)
     || Properties;

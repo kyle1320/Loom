@@ -1,5 +1,5 @@
-import Renderer from '../Renderer';
+import Workspace from '../Workspace';
 
 export default interface RendererExtension {
-  initRenderer?(renderer: Renderer): void;
+  initWorkspace?(workspace: Workspace): void;
 }

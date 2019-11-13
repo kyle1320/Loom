@@ -1,23 +1,24 @@
 import ComponentContentField from './ComponentContentField';
 import Extension from '../Extension';
 import Project from '../../../common/data/Project';
-import Renderer from '../../Renderer';
+import Workspace from '../../Workspace';
 import ComponentRenderer from './ComponentRenderer';
 import ColorPicker from './ColorPicker';
+import UIRegistry from '../../registry/UIRegistry';
 
-function registerStyles(renderer: Renderer): void {
-  renderer.registerFieldName('style.border', 'Border');
-  renderer.registerFieldName('style.background', 'Background');
-  renderer.registerFieldName('style.color', 'Font Color');
-  renderer.registerFieldName('style.font-size', 'Font Size');
-  renderer.registerFieldName('style.font-weight', 'Font Weight');
+function registerStyles(registry: UIRegistry): void {
+  registry.registerFieldName('style.border', 'Border');
+  registry.registerFieldName('style.background', 'Background');
+  registry.registerFieldName('style.color', 'Font Color');
+  registry.registerFieldName('style.font-size', 'Font Size');
+  registry.registerFieldName('style.font-weight', 'Font Weight');
 
-  renderer.registry.registerFieldEditor('style.color', ColorPicker);
+  registry.registerFieldEditor('style.color', ColorPicker);
 }
 
-function registerAttributes(renderer: Renderer): void {
-  renderer.registerFieldName('html.attr.style', 'Style');
-  renderer.registerFieldName('html.attr.onclick', 'Click Handler');
+function registerAttributes(registry: UIRegistry): void {
+  registry.registerFieldName('html.attr.style', 'Style');
+  registry.registerFieldName('html.attr.onclick', 'Click Handler');
 }
 
 const ext: Extension = {
@@ -26,31 +27,33 @@ const ext: Extension = {
       'html.outercontent()': new ComponentContentField()
     });
   },
-  initRenderer(renderer: Renderer) {
-    renderer.registerCategory({
+  initWorkspace(workspace: Workspace) {
+    const registry = workspace.registry;
+
+    registry.registerCategory({
       name: 'HTML',
       paths: [
         'html.tag',
         'html.innercontent'
       ]
     });
-    renderer.registerCategory({
+    registry.registerCategory({
       name: 'Attributes',
       paths: ['html.attr.*']
     });
-    renderer.registerCategory({
+    registry.registerCategory({
       name: 'Styles',
       paths: ['style.*'],
     });
 
-    renderer.registry.registerObjectEditor('component', ComponentRenderer);
+    registry.registerObjectEditor('component', ComponentRenderer);
 
-    renderer.registerFieldName('html.outercontent()', 'HTML');
-    renderer.registerFieldName('html.innercontent', 'Contents');
-    renderer.registerFieldName('html.tag', 'Tag');
+    registry.registerFieldName('html.outercontent()', 'HTML');
+    registry.registerFieldName('html.innercontent', 'Contents');
+    registry.registerFieldName('html.tag', 'Tag');
 
-    registerAttributes(renderer);
-    registerStyles(renderer);
+    registerAttributes(registry);
+    registerStyles(registry);
   }
 };
 

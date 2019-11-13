@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDom from 'react-dom';
 
 import LoomUI from './LoomUI';
-import Renderer from './Renderer';
+import Workspace from './Workspace';
 
 window.addEventListener('load', function () {
-  const renderer = new Renderer();
+  const workspace = new Workspace();
 
-  renderer.newProject();
+  workspace.newProject();
 
-  const project = renderer.getProject()!;
+  const project = workspace.getProject()!;
 
   const obj1 = project.makeObject('component');
   obj1.addOwnField('html.tag', 'button');
@@ -31,7 +31,7 @@ window.addEventListener('load', function () {
   );
 
   ReactDom.render(
-    <LoomUI renderer={renderer}></LoomUI>,
+    <LoomUI workspace={workspace}></LoomUI>,
     document.getElementById('app')
   );
 });
