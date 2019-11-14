@@ -1,18 +1,23 @@
 import Project from '../common/data/Project';
 import Extension from './extensions/Extension';
-import Components from './extensions/Components';
 import UIRegistry from './registry/UIRegistry';
 
-export default class Workspace {
-  private static readonly defaultExtensions: Extension[] = [
-    Components
-  ];
+const builtinExtensions: Extension[] = [
+  require('./extensions/Components').default
+];
 
+// TODO:
+// * keep track of current working directory
+// * provide methods for loading / saving files
+// * load extensions automatically from project
+// * provide methods for opening dialog windows
+// *
+export default class Workspace {
   private project: Project | null = null;
   public readonly registry: UIRegistry = new UIRegistry();
 
   public constructor () {
-    Workspace.defaultExtensions.forEach(ex => {
+    builtinExtensions.forEach(ex => {
       ex.initWorkspace?.(this);
     });
   }
@@ -23,17 +28,18 @@ export default class Workspace {
     return this.project;
   }
 
-  public setProject(project: Project): void {
+  private setProject(project: Project): void {
     this.project = project;
   }
 
   public loadProject(data: Project.SerializedData): void {
-    this.setProject(Project.deserialize(data, Workspace.defaultExtensions));
+    this.setProject(Project.deserialize(data, builtinExtensions));
   }
 
-  public newProject(): void {
+  public newProject(): Project {
     const proj = new Project();
-    Workspace.defaultExtensions.forEach(ex => proj.addExtension(ex));
+    builtinExtensions.forEach(ex => proj.addExtension(ex));
     this.setProject(proj);
+    return proj;
   }
 }

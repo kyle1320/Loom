@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import SplitPane from 'react-split-pane';
+
 import Editor from './Editor';
 import Toolbar from './Toolbar';
 import Navigator from './Navigator';
@@ -19,9 +21,14 @@ const LoomUI: React.FC<Props> = (props: Props) => {
     <UIContainer flow="n" size={30} color={color.primary3}
       first={<Toolbar context={selected} />}
       second={
-        <UIContainer flow="w" size={200} color={color.primary1}
-          first={<Navigator context={selected} onSelect={select} />}
-          second={<Editor context={selected} />} />
+        <SplitPane
+          split="vertical"
+          minSize={100}
+          defaultSize={200}
+          pane1Style={{ backgroundColor: color.primary1 }} >
+          <Navigator context={selected} onSelect={select} />
+          <Editor context={selected} />
+        </SplitPane>
       } />
   </WorkspaceContext.Provider>;
 }

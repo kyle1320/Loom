@@ -1,5 +1,7 @@
 import React from 'react';
 import parse from 'html-react-parser';
+import SplitPane from 'react-split-pane';
+
 import Link from '../../../../common/data/Link';
 import LObject from '../../../../common/data/objects/LObject';
 import MutableField from '../../../../common/data/fields/MutableField';
@@ -15,7 +17,6 @@ import { manage, Manager, manageMany } from '../../../LoomUI/util/imperative';
 
 import './ComponentRenderer.scss';
 import ObjectEditor from '../../../registry/ObjectEditor';
-import UIContainer from '../../../LoomUI/util/UIContainer';
 import Properties from '../../../LoomUI/Editor/Properties';
 import { primary1 } from '../../../LoomUI/util/color';
 
@@ -135,11 +136,16 @@ const LinkRenderer: LinkRenderer = (props: LinkRendererProps) => {
 }
 
 const ComponentEditorWithProps: ObjectEditor = (props: ObjectEditor.Props) => {
-  return <UIContainer flow="e" size={200}
-    color={primary1}
-    first={<ComponentRenderer object={props.object} />}
-    firstClassName="component-renderer"
-    second={<Properties object={props.object} />} />;
+  return <SplitPane
+    split="vertical"
+    minSize={200}
+    primary="second"
+    pane2Style={{ backgroundColor: primary1 }} >
+    <div className="component-renderer">
+      <ComponentRenderer object={props.object} />
+    </div>
+    <Properties object={props.object} />
+  </SplitPane>;
 }
 
 export default ComponentEditorWithProps;
