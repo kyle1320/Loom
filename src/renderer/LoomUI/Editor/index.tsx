@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWorkspace } from '../WorkspaceContext';
+import { useRegistry } from '../WorkspaceContext';
 import DataObject from '../../../common/data/objects/DataObject';
 
 import './Editor.scss';
@@ -16,8 +16,7 @@ const NoObjectEditor: ObjectEditor = () => {
 }
 
 const Editor: React.FC<Props> = (props: Props) => {
-  const workspace = useWorkspace();
-  const registry = workspace.registry;
+  const registry = useRegistry();
   const ObjectEditor = props.context
     ? registry.getObjectEditor(props.context) || Properties
     : NoObjectEditor;

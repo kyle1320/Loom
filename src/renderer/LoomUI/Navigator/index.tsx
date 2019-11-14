@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWorkspace } from '../WorkspaceContext';
+import { useProject } from '../WorkspaceContext';
 import ObjectItem from './ObjectItem';
 import DataObject from '../../../common/data/objects/DataObject';
 
@@ -11,11 +11,11 @@ interface Props {
 }
 
 const Navigator: React.FC<Props> = (props: Props) => {
-  const workspace = useWorkspace()
+  const project = useProject()!;
 
   return <div className="navigator">
     {
-      [...workspace.getProject()!.DataObjects()]
+      [...project.DataObjects()]
         .map(o => <ObjectItem
           key={o.id}
           object={o}

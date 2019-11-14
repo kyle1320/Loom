@@ -4,7 +4,7 @@ import LObject from '../../../../common/data/objects/LObject';
 import DataObject from '../../../../common/data/objects/DataObject';
 import MutableField from '../../../../common/data/fields/MutableField';
 
-import { useWorkspace } from '../../WorkspaceContext';
+import { useRegistry } from '../../WorkspaceContext';
 import MutableFieldEditor from './editors/MutableFieldEditor';
 import IconButton from '../../util/IconButton';
 
@@ -17,8 +17,7 @@ interface Props {
 }
 
 const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
-  const workspace = useWorkspace();
-  const registry = workspace.registry;
+  const registry = useRegistry();
   const inherited = !LObject.hasOwnField(context, name);
 
   const friendlyName = registry.getFieldName(name) || name;
