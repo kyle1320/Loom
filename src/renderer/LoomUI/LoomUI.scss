@@ -3,15 +3,15 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~@fortawesome/fontawesome-free/scss/regular";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 
-$primary-0: #303040;
-$primary-1: #414157;
-$primary-2: #52526e;
-$primary-3: #636385;
+$primary-0: #FFFFFF;
+$primary-1: #F6F6F6;
+$primary-2: #EAEAEA;
+$primary-3: #E2E2E2;
 
-$primary-hl-0: #1c1c40;
-$primary-hl-1: #252557;
-$primary-hl-2: #2f2f6e;
-$primary-hl-3: #393985;
+$primary-hl-0: #d8d8ff;
+$primary-hl-1: #cfcff5;
+$primary-hl-2: #c7c7eb;
+$primary-hl-3: #bebee0;
 
 html, body {
   margin: 0;
@@ -23,7 +23,7 @@ html, body {
 
 body {
   background-color: $primary-0;
-  color: white;
+  color: #404040;
   font-family: arial;
   font-size: 14px;
 }
@@ -48,6 +48,8 @@ body {
 
 .Resizer {
   z-index: 1;
+  padding: 1px;
+  background: rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   background-clip: padding-box;
 }

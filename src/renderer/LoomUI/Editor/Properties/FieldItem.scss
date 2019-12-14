@@ -5,8 +5,9 @@
   position: relative;
 
   &.inherited {
-    color: gray;
-    border-color: gray;
+    .property-field__header {
+      opacity: 0.6;
+    }
   }
 
   &__header {
