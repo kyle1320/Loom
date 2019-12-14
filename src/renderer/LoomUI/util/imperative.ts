@@ -1,12 +1,13 @@
-export type Manager = (node: HTMLElement | null) => void;
+export type Manager<E extends HTMLElement = HTMLElement>
+  = (node: E | null) => void;
 
-export function manage(
-  cb: (node: HTMLElement) => (() => void) | undefined
-): Manager {
-  let curNode: HTMLElement | null = null;
+export function manage<E extends HTMLElement = HTMLElement>(
+  cb: (node: E) => (() => void) | undefined
+): Manager<E> {
+  let curNode: E | null = null;
   let onRemove: (() => void) | null | undefined;
 
-  return (node: HTMLElement | null) => {
+  return (node: E | null) => {
     if (curNode && curNode != node) {
       onRemove?.();
       onRemove = null
@@ -20,8 +21,10 @@ export function manage(
   };
 }
 
-export function manageMany(...managers: Manager[]): Manager {
-  return (node: HTMLElement | null) => {
+export function manageMany<E extends HTMLElement>(
+  ...managers: Manager<E>[]
+): Manager<E> {
+  return (node: E | null) => {
     managers.forEach(m => m(node));
   };
 }

@@ -19,6 +19,7 @@ import './ComponentRenderer.scss';
 import ObjectEditor from '../../../registry/ObjectEditor';
 import Properties from '../../../LoomUI/Editor/Properties';
 import { primary1 } from '../../../LoomUI/util/color';
+import { ResizableFrame } from '../../../LoomUI/util/Frame';
 
 export interface ComponentRendererProps { object: LObject }
 export type ComponentRenderer = React.ComponentType<ComponentRendererProps>;
@@ -142,7 +143,10 @@ const ComponentEditorWithProps: ObjectEditor = (props: ObjectEditor.Props) => {
     primary="second"
     pane2Style={{ backgroundColor: primary1 }} >
     <div className="component-renderer">
-      <ComponentRenderer object={props.object} />
+      <ResizableFrame body={React.useCallback(
+        () => <ComponentRenderer object={props.object} />,
+        [props.object]
+      )} />
     </div>
     <Properties object={props.object} />
   </SplitPane>;
