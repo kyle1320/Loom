@@ -52,6 +52,7 @@ const UIContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
   const dir = props.flow === 'n' || props.flow === 's' ? 'v' : 'h';
 
   const controlPanel = <UIPanel
+    key='control'
     direction={dir}
     control={true}
     size={props.size}
@@ -61,6 +62,7 @@ const UIContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 
   </UIPanel>;
   const nonControlPanel = <UIPanel
+    key='passive'
     direction={dir}
     control={false}
     className={controlFirst ? props.secondClassName : props.firstClassName}>
