@@ -12,6 +12,8 @@ export const primary0 = '#ffffff';
 export const primary1 = '#f5f5f5';
 export const primary2 = '#ebebeb';
 export const primary3 = '#e0e0e0';
+export const primary4 = '#d6d6d6';
+export const primary5 = '#cccccc';
 
 export const primaryhl0 = '#d8d8ff';
 export const primaryhl1 = '#cfcff5';
