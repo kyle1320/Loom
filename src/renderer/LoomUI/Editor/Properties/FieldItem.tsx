@@ -45,7 +45,7 @@ const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
   const canDelete = !inherited;
   const del = React.useCallback(
     () => context.removeOwnField(name),
-    [name]
+    [context, name]
   );
 
   return <div className={className}>
