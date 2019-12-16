@@ -2,7 +2,7 @@ import ComponentContentField from './ComponentContentField';
 import Extension from '../Extension';
 import Project from '../../../common/data/Project';
 import Workspace from '../../Workspace';
-import ComponentRenderer from './ComponentRenderer';
+import ComponentEditor from './ComponentEditor';
 import ColorPicker from './ColorPicker';
 import UIRegistry from '../../registry/UIRegistry';
 
@@ -46,7 +46,7 @@ const ext: Extension = {
       paths: ['style.*'],
     });
 
-    registry.registerObjectEditor('component', ComponentRenderer);
+    registry.registerObjectEditor('component', ComponentEditor);
 
     registry.registerFieldName('html.outercontent()', 'HTML');
     registry.registerFieldName('html.innercontent', 'Contents');
