@@ -4,9 +4,15 @@ import FieldEditor from '../../../registry/FieldEditor';
 import './ColorPicker.scss';
 import { useFieldValue } from '../../../LoomUI/util/hooks';
 
+export function randomColor(): string {
+  return [
+    'red', 'green', 'blue', 'yellow', 'orange', 'magenta'
+  ][Math.floor(Math.random()*6)];
+}
+
 const ColorPicker: FieldEditor = (props: FieldEditor.Props) => {
   const onClick = React.useCallback(() => {
-    const col = ['red', 'green', 'blue', 'yellow'][Math.floor(Math.random()*4)];
+    const col = randomColor();
     props.field.set(col);
   }, [props.field]);
   const color = useFieldValue(props.field, props.context) || '';

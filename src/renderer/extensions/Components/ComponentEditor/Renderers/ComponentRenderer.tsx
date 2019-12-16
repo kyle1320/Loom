@@ -8,6 +8,7 @@ import { manageMany, Manager, manage }
   from '../../../../LoomUI/util/imperative';
 import Link from '../../../../../common/data/Link';
 import ContentObserver from '../../../../../common/events/ContentObserver';
+import { EditFrameContext } from '../EditFrame/WithEditFrame';
 
 export interface ComponentRendererProps { object: DataObject }
 export type ComponentRenderer = React.ComponentType<ComponentRendererProps>;
@@ -66,19 +67,22 @@ const ComponentRenderer: ComponentRenderer
     useWatchLink(tagLink, true);
     const tag = tagLink.getFieldValueOrDefault('') || 'div';
 
+    const frameProps = React.useContext(EditFrameContext)(props.object);
     const manager = React.useMemo(
       () => manageMany(
         manageAttributes(props.object),
-        manageStyles(props.object)
+        manageStyles(props.object),
+        frameProps.ref
       ),
       [props.object]
     );
+    frameProps.ref = manager;
 
     const icLink = useLink(props.object, 'html.innercontent');
 
     return React.createElement(
       tag,
-      { ref: manager },
+      frameProps,
       <LinkRenderer link={icLink} />
     );
   }

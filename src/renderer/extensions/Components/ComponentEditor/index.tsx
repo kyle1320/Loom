@@ -2,6 +2,7 @@ import React from 'react';
 import SplitPane from 'react-split-pane';
 
 import ComponentRenderer from './Renderers/ComponentRenderer';
+import WithEditFrame from './EditFrame/WithEditFrame';
 
 import ObjectEditor from '../../../registry/ObjectEditor';
 import Properties from '../../../LoomUI/Editor/Properties';
@@ -13,7 +14,9 @@ import './ComponentEditor.scss';
 const ComponentEditor: ObjectEditor = (props: ObjectEditor.Props) => {
   return <div className="component-editor">
     <ResizableFrame body={React.useCallback(
-      () => <ComponentRenderer object={props.object} />,
+      () => <WithEditFrame>
+        <ComponentRenderer object={props.object} />
+      </WithEditFrame>,
       [props.object]
     )} />
   </div>;
