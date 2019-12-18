@@ -1,5 +1,6 @@
 import React from 'react';
 import SplitPane from 'react-split-pane';
+import Measure from 'react-measure';
 
 import ComponentRenderer from './Renderers/ComponentRenderer';
 import EditingContext from './EditFrame/EditingContext';
@@ -20,11 +21,17 @@ const ComponentEditor: ObjectEditor = (props: ObjectEditor.Props) => {
       <EditingContext.Provider key={props.object.id}>
         <Consumer context={EditingContext.PropGetterContext}>
           {context =>
-            <Frame>
-              <EditingContext.PropGetterContext.Provider value={context}>
-                <ComponentRenderer object={props.object} />
-              </EditingContext.PropGetterContext.Provider>
-            </Frame>
+            <Consumer context={EditingContext.RefreshContext}>
+              {refresh =>
+                <Measure onResize={refresh}>{({measureRef}) =>
+                  <Frame elRef={measureRef}>
+                    <EditingContext.PropGetterContext.Provider value={context}>
+                      <ComponentRenderer object={props.object} />
+                    </EditingContext.PropGetterContext.Provider>
+                  </Frame>
+                }</Measure>
+              }
+            </Consumer>
           }
         </Consumer>
         <EditFrame />

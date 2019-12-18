@@ -17,6 +17,8 @@ namespace EditingContext {
     { object: null; el: null };
   export const SelectedContext = React.createContext<Selected>(null!);
 
+  export const RefreshContext = React.createContext<() => void>(() => {});
+
 
   type Props = { children: React.ReactNode };
   type State = Selected;
@@ -47,11 +49,18 @@ namespace EditingContext {
       return res;
     }
 
+    private refresh = (): void => {
+      console.log('refresh');
+      this.setState(this.state);
+    }
+
     public render(): JSX.Element {
       return (
         <PropGetterContext.Provider value={this.getComponentProps}>
           <SelectedContext.Provider value={this.state}>
-            {this.props.children}
+            <RefreshContext.Provider value={this.refresh}>
+              {this.props.children}
+            </RefreshContext.Provider>
           </SelectedContext.Provider>
         </PropGetterContext.Provider>
       );

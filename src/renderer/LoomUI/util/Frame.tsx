@@ -3,7 +3,10 @@ import ReactDom from 'react-dom';
 
 import './Frame.scss';
 
-export type FrameProps = React.IframeHTMLAttributes<HTMLIFrameElement>;
+export type FrameProps =
+  React.IframeHTMLAttributes<HTMLIFrameElement> & {
+    elRef: (node: HTMLIFrameElement | null) => void;
+  }
 
 function isEl(x: React.ReactNode): x is React.ReactElement {
   return typeof x === 'object' && !!x && 'type' in x;
@@ -21,6 +24,8 @@ class Frame extends React.Component<FrameProps> {
   }
 
   private ref = (node: HTMLIFrameElement | null): void => {
+    this.props.elRef?.(node);
+
     this.iframe = null;
 
     if (node) {
