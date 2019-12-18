@@ -15,6 +15,7 @@ function isEl(x: React.ReactNode): x is React.ReactElement {
 class Frame extends React.Component<FrameProps> {
   private url: string;
   private iframe: HTMLIFrameElement | null = null;
+  private loaded = false;
 
   public constructor(props: FrameProps) {
     super(props);
@@ -26,18 +27,27 @@ class Frame extends React.Component<FrameProps> {
   private ref = (node: HTMLIFrameElement | null): void => {
     this.props.elRef?.(node);
 
-    this.iframe = null;
-
-    if (node) {
-      node.onload = () => {
+    if (this.loaded) {
+      if (node) {
         this.iframe = node;
         this.componentDidUpdate();
-      };
+      } else if (this.iframe) {
+        const doc = this.iframe.contentDocument!;
+        ReactDom.unmountComponentAtNode(doc.head);
+        ReactDom.unmountComponentAtNode(doc.body);
+      }
     }
+
+    this.iframe = node;
+  }
+
+  private frameLoaded = (): void => {
+    this.loaded = true;
+    this.componentDidUpdate();
   }
 
   public componentDidUpdate(): void {
-    if (this.iframe) {
+    if (this.loaded && this.iframe) {
       const doc = this.iframe.contentDocument!;
       let ch = this.props.children;
 
@@ -68,10 +78,13 @@ class Frame extends React.Component<FrameProps> {
 
   public render(): JSX.Element {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { children, ...otherProps } = this.props;
+    const { children, elRef, ...otherProps } = this.props;
 
     return <iframe
-      ref={this.ref} src={this.url} width="100%" height="100%" frameBorder="0"
+      ref={this.ref} src={this.url}
+      width="100%" height="100%"
+      frameBorder="0"
+      onLoad={this.frameLoaded}
       {...otherProps}></iframe>;
   }
 }
