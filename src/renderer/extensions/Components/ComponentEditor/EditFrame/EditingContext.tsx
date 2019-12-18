@@ -50,7 +50,6 @@ namespace EditingContext {
     }
 
     private refresh = (): void => {
-      console.log('refresh');
       this.setState(this.state);
     }
 
