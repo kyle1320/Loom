@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { randomColor } from '../../ColorPicker';
 import EditingContext from './EditingContext';
 
 import './EditFrame.scss';
+import ColorPicker from './Widgets/ColorPicker';
 
 type EditFrame = React.ComponentType;
 
@@ -15,7 +15,7 @@ const EditFrame: EditFrame = () => {
 
   if (ctx.el) {
     const rect = ctx.el.getBoundingClientRect();
-    style.top = rect.top - 11;
+    style.top = rect.top - 1;
     style.left = rect.left - 3;
     style.width = rect.width + 6;
     bodyStyle.height = rect.height + 2;
@@ -23,13 +23,10 @@ const EditFrame: EditFrame = () => {
     style.display = 'none';
   }
 
-  const headClick = React.useCallback(
-    () => ctx.object?.setOwnField('style.color', randomColor()),
-    [ctx.object]
-  );
-
   return <div className="edit-frame" style={style}>
-    <div className="edit-frame__head" onClick={headClick} />
+    <div className="edit-frame__head" >
+      <ColorPicker object={ctx.object} />
+    </div>
     <div className="edit-frame__frame" style={bodyStyle} />
   </div>;
 }

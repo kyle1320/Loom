@@ -1,15 +1,25 @@
+@import '../../../../LoomUI/LoomUI.scss';
+
 .edit-frame {
   position: absolute;
   pointer-events: none;
 
   &__head {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
     pointer-events: auto;
-    height: 10px;
-    background-color: #8AF;
+    background-color: $accent;
+    display: flex;
+    flex-flow: row nowrap;
+    color: white;
+    border-radius: 3px 3px 0 0;
   }
 
   &__frame {
-    border: 2px dashed #8AF;
+    border: 2px dashed $accent;
     border-top: none;
+    border-radius: 0 0 3px 3px;
   }
 }
