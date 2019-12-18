@@ -8,7 +8,7 @@ import { manageMany, Manager, manage }
   from '../../../../LoomUI/util/imperative';
 import Link from '../../../../../common/data/Link';
 import ContentObserver from '../../../../../common/events/ContentObserver';
-import { EditFrameContext } from '../EditFrame/WithEditFrame';
+import EditingContext from '../EditFrame/EditingContext';
 
 export interface ComponentRendererProps { object: DataObject }
 export type ComponentRenderer = React.ComponentType<ComponentRendererProps>;
@@ -67,7 +67,8 @@ const ComponentRenderer: ComponentRenderer
     useWatchLink(tagLink, true);
     const tag = tagLink.getFieldValueOrDefault('') || 'div';
 
-    const frameProps = React.useContext(EditFrameContext)(props.object);
+    const frameProps = React
+      .useContext(EditingContext.PropGetterContext)(props.object);
     const manager = React.useMemo(
       () => manageMany(
         manageAttributes(props.object),

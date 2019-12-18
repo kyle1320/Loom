@@ -1,0 +1,15 @@
+.edit-frame {
+  position: absolute;
+  pointer-events: none;
+
+  &__head {
+    pointer-events: auto;
+    height: 10px;
+    background-color: #8AF;
+  }
+
+  &__frame {
+    border: 2px dashed #8AF;
+    border-top: none;
+  }
+}

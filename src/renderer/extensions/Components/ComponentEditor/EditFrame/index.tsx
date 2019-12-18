@@ -1,30 +1,20 @@
 import React from 'react';
-import DataObject from '../../../../../common/data/objects/DataObject';
+
 import { randomColor } from '../../ColorPicker';
+import EditingContext from './EditingContext';
 
+import './EditFrame.scss';
 
-type EditFrameProps =
-  { object: DataObject; el: HTMLElement } |
-  { object: null; el: null }
-type EditFrame = React.ComponentType<EditFrameProps>;
+type EditFrame = React.ComponentType;
 
-const EditFrame: EditFrame = (props: EditFrameProps) => {
-  const style: React.CSSProperties = {
-    position: 'absolute',
-    pointerEvents: 'none'
-  };
-  const headerStyle: React.CSSProperties = {
-    pointerEvents: 'auto',
-    height: '10px',
-    backgroundColor: '#8AF'
-  };
-  const bodyStyle: React.CSSProperties = {
-    border: '2px dashed #8AF',
-    borderTop: ''
-  };
+const EditFrame: EditFrame = () => {
+  const ctx = React.useContext(EditingContext.SelectedContext);
 
-  if (props.el) {
-    const rect = props.el.getBoundingClientRect();
+  const style: React.CSSProperties = {};
+  const bodyStyle: React.CSSProperties = {};
+
+  if (ctx.el) {
+    const rect = ctx.el.getBoundingClientRect();
     style.top = rect.top - 11;
     style.left = rect.left - 3;
     style.width = rect.width + 6;
@@ -34,13 +24,13 @@ const EditFrame: EditFrame = (props: EditFrameProps) => {
   }
 
   const headClick = React.useCallback(
-    () => props.object?.addOwnField('style.color', randomColor()),
-    [props.object]
+    () => ctx.object?.setOwnField('style.color', randomColor()),
+    [ctx.object]
   );
 
-  return <div style={style}>
-    <div style={headerStyle} onClick={headClick} />
-    <div style={bodyStyle} />
+  return <div className="edit-frame" style={style}>
+    <div className="edit-frame__head" onClick={headClick} />
+    <div className="edit-frame__frame" style={bodyStyle} />
   </div>;
 }
 

@@ -2,23 +2,41 @@ import React from 'react';
 import SplitPane from 'react-split-pane';
 
 import ComponentRenderer from './Renderers/ComponentRenderer';
-import WithEditFrame from './EditFrame/WithEditFrame';
+import EditingContext from './EditFrame/EditingContext';
+import EditFrame from './EditFrame';
 
 import ObjectEditor from '../../../registry/ObjectEditor';
 import Properties from '../../../LoomUI/Editor/Properties';
 import { primary1 } from '../../../LoomUI/util/color';
-import { ResizableFrame } from '../../../LoomUI/util/Frame';
+import Floating from '../../../LoomUI/util/Floating';
+import Frame from '../../../LoomUI/util/Frame';
 
 import './ComponentEditor.scss';
 
+interface Props {
+  children: (ctx: EditingContext.PropGetter) => React.ReactNode;
+}
+const PropGetterConsumer: React.ComponentType<Props> = (props: Props) => {
+  const context = React.useContext(EditingContext.PropGetterContext);
+  return <>{props.children(context)}</>;
+}
+
 const ComponentEditor: ObjectEditor = (props: ObjectEditor.Props) => {
   return <div className="component-editor">
-    <ResizableFrame body={React.useCallback(
-      () => <WithEditFrame>
-        <ComponentRenderer object={props.object} />
-      </WithEditFrame>,
-      [props.object]
-    )} />
+    <Floating>
+      <EditingContext.Provider>
+        <PropGetterConsumer>
+          {context =>
+            <Frame>
+              <EditingContext.PropGetterContext.Provider value={context}>
+                <ComponentRenderer object={props.object} />
+              </EditingContext.PropGetterContext.Provider>
+            </Frame>
+          }
+        </PropGetterConsumer>
+        <EditFrame />
+      </EditingContext.Provider>
+    </Floating>
   </div>;
 }
 
