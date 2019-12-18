@@ -6,10 +6,10 @@
   .icon-btn {
     padding: 3px 8px;
     border-right: 1px solid #ccc;
+    color: $primary-5;
 
     &.active {
-      background-color: #666;
-      color: $primary-0;
+      color: $accent;
     }
   }
 }
