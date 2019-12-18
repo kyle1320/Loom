@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Category from './Category';
-import { useWatchLink } from '../../util/hooks';
+import { useWatchLink, useLink } from '../../util/hooks';
 import DataObject from '../../../../common/data/objects/DataObject';
 import Link from '../../../../common/data/Link';
 
@@ -17,7 +17,7 @@ interface Props {
 const FieldList: React.FC<Props> = (props: Props) => {
   const registry = useRegistry();
   const categories = registry.getCategories();
-  const all = Link.to(props.context, '*');
+  const all = useLink(props.context, '*');
 
   useWatchLink(all);
   const names = [...all.getFieldNames()]

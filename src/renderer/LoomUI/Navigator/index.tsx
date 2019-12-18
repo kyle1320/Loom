@@ -19,7 +19,9 @@ const Navigator: React.FC<Props> = (props: Props) => {
         .map(o => <ObjectItem
           key={o.id}
           object={o}
-          onSelect={() => props.onSelect(o)}
+          onSelect={
+            React.useCallback(() => props.onSelect(o), [props.onSelect])
+          }
           selected={o == props.context} /> )
     }
   </div>;
