@@ -65,6 +65,14 @@ class DataObject extends EventEmitter<{
     this.emit('pathChanged');
   }
 
+  public setOwnField(key: string, value: string): void {
+    if (LObject.hasOwnField(this, key)) {
+      this.fields[key].set(value);
+    } else {
+      this.addOwnField(key, value);
+    }
+  }
+
   public addOwnField(key: string, value: string | MutableField): void {
     key = key.toLowerCase();
 
