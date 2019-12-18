@@ -1,52 +1,74 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 
-import { Manager, manage } from './imperative';
-
 import './Frame.scss';
 
-export type FrameProps = {
-  head?: (() => React.ReactElement);
-  body?: (() => React.ReactElement);
-} & React.IframeHTMLAttributes<HTMLIFrameElement>
-export type Frame = React.ComponentType<FrameProps>;
+export type FrameProps = React.IframeHTMLAttributes<HTMLIFrameElement>;
 
-function getFrameManager(
-  head: (() => React.ReactElement) | void,
-  body: (() => React.ReactElement) | void
-): Manager<HTMLIFrameElement> {
-  return manage((node: HTMLIFrameElement) => {
-    node.onload = () => {
-      const doc = node.contentDocument!;
-      head && ReactDom.render(head(), doc.head);
-      body && ReactDom.render(body(), doc.body);
-    };
-    return () => {};
-  });
+function isEl(x: React.ReactNode): x is React.ReactElement {
+  return typeof x === 'object' && !!x && 'type' in x;
 }
 
-export const Frame: Frame = (props: FrameProps) => {
-  const { head, body, ...otherProps } = props;
+class Frame extends React.Component<FrameProps> {
+  private url: string;
+  private iframe: HTMLIFrameElement | null = null;
 
-  const ref = React.useMemo(
-    () => getFrameManager(head, body),
-    [head, body]
-  );
-  const url = React.useMemo(() => {
+  public constructor(props: FrameProps) {
+    super(props);
+
     const blob = new Blob([''], { type: 'text/html' });
-    return window.URL.createObjectURL(blob);
-  }, [head, body]);
-  return <iframe
-    ref={ref} src={url} width="100%" height="100%" frameBorder="0"
-    {...otherProps}></iframe>;
+    this.url = window.URL.createObjectURL(blob);
+  }
+
+  private ref = (node: HTMLIFrameElement | null): void => {
+    this.iframe = null;
+
+    if (node) {
+      node.onload = () => {
+        this.iframe = node;
+        this.componentDidUpdate();
+      };
+    }
+  }
+
+  public componentDidUpdate(): void {
+    if (this.iframe) {
+      const doc = this.iframe.contentDocument!;
+      let ch = this.props.children;
+
+      // render from <head> element
+      if (ch instanceof Array) {
+        const [hd, ...body] = ch;
+        if (isEl(hd) && hd.type === 'head') {
+          ReactDom.render(<>{hd.props.children}</>, doc.head);
+          ch = body;
+        }
+      }
+
+      // render from <body> element
+      if (ch instanceof Array && ch.length === 1) {
+        const bd = ch[0];
+        if (isEl(bd) && bd.type === 'body') {
+          ReactDom.render(<>{bd.props.children}</>, doc.body);
+          ch = null;
+        }
+      }
+
+      // render remaining elements into body
+      if (ch) {
+        ReactDom.render(<>{ch}</>, doc.body);
+      }
+    }
+  }
+
+  public render(): JSX.Element {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { children, ...otherProps } = this.props;
+
+    return <iframe
+      ref={this.ref} src={this.url} width="100%" height="100%" frameBorder="0"
+      {...otherProps}></iframe>;
+  }
 }
 
-export const ResizableFrame: Frame = (props: FrameProps) => {
-  const className = props.className
-    ? props.className + ' resizable-frame'
-    : 'resizable-frame';
-
-  return <div className="resizable-frame__container">
-    <Frame {...props} className={className} />
-  </div>;
-}
+export default Frame;
