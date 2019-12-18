@@ -10,22 +10,15 @@ import Properties from '../../../LoomUI/Editor/Properties';
 import { primary1 } from '../../../LoomUI/util/color';
 import Floating from '../../../LoomUI/util/Floating';
 import Frame from '../../../LoomUI/util/Frame';
+import { Consumer } from '../../../LoomUI/util/Context';
 
 import './ComponentEditor.scss';
-
-interface Props {
-  children: (ctx: EditingContext.PropGetter) => React.ReactNode;
-}
-const PropGetterConsumer: React.ComponentType<Props> = (props: Props) => {
-  const context = React.useContext(EditingContext.PropGetterContext);
-  return <>{props.children(context)}</>;
-}
 
 const ComponentEditor: ObjectEditor = (props: ObjectEditor.Props) => {
   return <div className="component-editor">
     <Floating>
-      <EditingContext.Provider>
-        <PropGetterConsumer>
+      <EditingContext.Provider key={props.object.id}>
+        <Consumer context={EditingContext.PropGetterContext}>
           {context =>
             <Frame>
               <EditingContext.PropGetterContext.Provider value={context}>
@@ -33,7 +26,7 @@ const ComponentEditor: ObjectEditor = (props: ObjectEditor.Props) => {
               </EditingContext.PropGetterContext.Provider>
             </Frame>
           }
-        </PropGetterConsumer>
+        </Consumer>
         <EditFrame />
       </EditingContext.Provider>
     </Floating>
