@@ -8,6 +8,8 @@ interface LObject {
   readonly fields: { [key: string]: Field };
 }
 
+export class IllegalFieldKeyError extends Error {}
+
 namespace LObject {
   export const hasOwnField = (obj: LObject, key: string): boolean => {
     return Object.prototype.hasOwnProperty.call(obj.fields, key.toLowerCase());

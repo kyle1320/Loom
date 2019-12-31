@@ -1,7 +1,6 @@
 import Project from '../Project';
-import LObject from './LObject';
+import LObject, { IllegalFieldKeyError } from './LObject';
 import ComputedField from '../fields/ComputedField';
-import IllegalFieldKeyError from '../../errors/IllegalFieldKeyError';
 
 export default class ClassObject implements LObject {
   public readonly fields: { [id: string]: ComputedField } = {};

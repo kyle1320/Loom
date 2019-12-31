@@ -1,9 +1,10 @@
-import SerializationError from '../errors/SerializationError';
 import LObject from './objects/LObject';
 import DataExtension from '../extensions/DataExtension';
 import DataObject from './objects/DataObject';
 import ClassObject from './objects/ClassObject';
 import ComputedField from './fields/ComputedField';
+
+export class SerializationError extends Error {}
 
 class Project {
   private idCounter = 0;

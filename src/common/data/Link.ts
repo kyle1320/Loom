@@ -1,9 +1,10 @@
 import Project from './Project';
 import Field from './fields/Field';
-import ObjectReferenceError from '../errors/ObjectReferenceError';
-import FieldReferenceError from '../errors/FieldReferenceError';
 import LObject from './objects/LObject';
 import LinkObserver from '../events/LinkObserver';
+
+export class FieldReferenceError extends Error {}
+export class ObjectReferenceError extends Error {}
 
 export class HeadlessLink {
   protected readonly isComputed: boolean;

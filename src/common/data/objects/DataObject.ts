@@ -1,8 +1,6 @@
 import Project from '../Project';
-import IllegalPathError from '../../errors/IllegalPathError';
 import MutableField from '../fields/MutableField';
-import IllegalFieldKeyError from '../../errors/IllegalFieldKeyError';
-import LObject from './LObject';
+import LObject, { IllegalFieldKeyError } from './LObject';
 import EventEmitter from '../../util/EventEmitter';
 
 namespace DataObject {
