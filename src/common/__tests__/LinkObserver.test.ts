@@ -1,8 +1,6 @@
 import ObjectDB from '../data/db/ObjectDB';
 import Link from '../data/Link';
 
-const db = new ObjectDB();
-
 function mocks(link: Link): [jest.Mock, jest.Mock, jest.Mock] {
   const add = jest.fn();
   const remove = jest.fn();
@@ -23,7 +21,9 @@ function count(): string {
 
 describe('can listen for field changes on a single field', () => {
   test('additions', () => {
-    const obj = db.makeObject();
+    const db = new ObjectDB();
+
+    const obj = db.makeObject('a', null);
     const add = mocks(Link.to(obj, 'test'))[0];
 
     obj.addOwnField('test', count());
@@ -34,7 +34,9 @@ describe('can listen for field changes on a single field', () => {
   });
 
   test('removals', () => {
-    const obj = db.makeObject();
+    const db = new ObjectDB();
+
+    const obj = db.makeObject('a', null);
     const remove = mocks(Link.to(obj, 'test'))[1];
 
     obj.addOwnField('test', count());
@@ -48,8 +50,10 @@ describe('can listen for field changes on a single field', () => {
   });
 
   test('changes', () => {
-    const parent = db.makeObject();
-    const obj = db.makeObject(parent);
+    const db = new ObjectDB();
+
+    const parent = db.makeObject('a', null);
+    const obj = db.makeObject('b', parent);
     const change = mocks(Link.to(obj, 'test'))[2];
 
     obj.addOwnField('test', count());
@@ -70,7 +74,9 @@ describe('can listen for field changes on a single field', () => {
 
 describe('can listen for field changes on multiple fields', () => {
   test('additions', () => {
-    const obj = db.makeObject();
+    const db = new ObjectDB();
+
+    const obj = db.makeObject('a', null);
     const add = mocks(Link.to(obj, 'test.*'))[0];
 
     obj.addOwnField('test', count());
@@ -84,7 +90,9 @@ describe('can listen for field changes on multiple fields', () => {
   });
 
   test('removals', () => {
-    const obj = db.makeObject();
+    const db = new ObjectDB();
+
+    const obj = db.makeObject('a', null);
     const remove = mocks(Link.to(obj, 'test.*'))[1];
 
     obj.addOwnField('test', count());
@@ -105,8 +113,10 @@ describe('can listen for field changes on multiple fields', () => {
   });
 
   test('changes', () => {
-    const parent = db.makeObject();
-    const obj = db.makeObject(parent);
+    const db = new ObjectDB();
+
+    const parent = db.makeObject('a', null);
+    const obj = db.makeObject('b', parent);
     const change = mocks(Link.to(obj, 'test.*'))[2];
 
     obj.addOwnField('test', count());

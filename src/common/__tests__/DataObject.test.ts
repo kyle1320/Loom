@@ -3,18 +3,23 @@ import DataObject from '../data/objects/DataObject';
 
 const db = new ObjectDB();
 
+const freshId = (function () {
+  let id = 1;
+  return () => String(id++);
+}());
+
 test('can be instantiated', () => {
-  new DataObject(db);
+  new DataObject(db, freshId());
 });
 
 test('can be serialized and deserialized', () => {
-  const obj = new DataObject(db);
+  const obj = new DataObject(db, freshId());
   const serial = obj.serialize();
   DataObject.deserialize(db, serial);
 });
 
 test('can have fields', () => {
-  const obj = new DataObject(db);
+  const obj = new DataObject(db, freshId());
   obj.addOwnField('test1', 'value1');
   obj.addOwnField('test2', 'value2');
 
@@ -23,10 +28,10 @@ test('can have fields', () => {
 });
 
 test('can have a parent', () => {
-  const parent = new DataObject(db);
+  const parent = new DataObject(db, freshId());
   parent.addOwnField('test1', 'value1');
 
-  const obj = new DataObject(db, parent);
+  const obj = new DataObject(db, freshId(), parent);
   obj.addOwnField('test2', 'value2');
 
   expect(obj.fields['test1']!.get(obj)).toEqual('value1');
@@ -34,14 +39,14 @@ test('can have a parent', () => {
 });
 
 test('can have a chain of parents', () => {
-  const grandparent = new DataObject(db);
+  const grandparent = new DataObject(db, freshId());
   grandparent.addOwnField('test1', 'value1');
   grandparent.addOwnField('test2', 'hidden value');
 
-  const parent = new DataObject(db, grandparent);
+  const parent = new DataObject(db, freshId(), grandparent);
   parent.addOwnField('test2', 'value2');
 
-  const obj = new DataObject(db, parent);
+  const obj = new DataObject(db, freshId(), parent);
   obj.addOwnField('test3', 'value3');
 
   expect(obj.fields['test1']!.get(obj)).toEqual('value1');
@@ -50,12 +55,12 @@ test('can have a chain of parents', () => {
 });
 
 describe('has methods to fetch fields', () => {
-  const parent = new DataObject(db);
+  const parent = new DataObject(db, freshId());
   parent.addOwnField('test', 'value1');
   parent.addOwnField('test.parent.1', 'value2');
   parent.addOwnField('test.parent.2', 'value3');
 
-  const obj = new DataObject(db, parent);
+  const obj = new DataObject(db, freshId(), parent);
   obj.addOwnField('test', 'value4');
   obj.addOwnField('test.scope.1', 'value5');
   obj.addOwnField('test.scope.2', 'value6');
@@ -109,7 +114,7 @@ describe('has methods to fetch fields', () => {
 
 describe('can listen for field addition / removal', () => {
   test('on an object with no parent', () => {
-    const obj = db.makeObject();
+    const obj = db.makeObject('a', null);
     const add = jest.fn();
     const remove = jest.fn();
     const change = jest.fn();

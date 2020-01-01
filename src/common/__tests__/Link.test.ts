@@ -15,10 +15,10 @@ class BasicComputedField extends ComputedField {
 test('can fetch field values from objects', () => {
   const db = new ObjectDB();
 
-  const obj1 = db.makeObject('user');
+  const obj1 = db.makeObject('a', null);
   obj1.addOwnField('field1', 'value1');
 
-  const obj2 = db.makeObject('user');
+  const obj2 = db.makeObject('b', null);
   obj2.addOwnField('field2', 'value2');
 
   const value1 = new Link(db, obj1.id, 'field1').getFieldValue();
@@ -31,10 +31,10 @@ test('can fetch field values from objects', () => {
 test('throws an error when fetching the value of an invalid field', () => {
   const db = new ObjectDB();
 
-  const obj1 = db.makeObject('user');
+  const obj1 = db.makeObject('a', null);
   obj1.addOwnField('field1', 'value1');
 
-  const obj2 = db.makeObject('user');
+  const obj2 = db.makeObject('b', null);
   obj2.addOwnField('field2', 'value2');
 
   expect(() => {
@@ -49,7 +49,7 @@ test('throws an error when fetching the value of an invalid field', () => {
 test('can iterate over all fields matching a path', () => {
   const db = new ObjectDB();
 
-  const obj = db.makeObject();
+  const obj = db.makeObject('a', null);
   obj.addOwnField('test', 'value1');
   obj.addOwnField('test.a', 'value2');
   obj.addOwnField('test.b', 'value3');
@@ -75,7 +75,7 @@ test('can iterate over computed & mutable fields separately', () => {
     'test2()': new BasicComputedField()
   });
 
-  const obj = db.makeObject('base');
+  const obj = db.makeObject('a', 'base');
   obj.addOwnField('test', 'value1');
   obj.addOwnField('test.a', 'value2');
   obj.addOwnField('test.b', 'value3');

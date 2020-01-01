@@ -15,7 +15,7 @@ const Navigator: React.FC<Props> = (props: Props) => {
 
   return <div className="navigator">
     {
-      [...project.db.getDataObjectsInDependencyOrder()]
+      [...project.db.getDataObjects()]
         .map(o => <ObjectItem
           key={o.id}
           object={o}

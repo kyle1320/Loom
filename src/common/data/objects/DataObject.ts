@@ -22,8 +22,8 @@ class DataObject extends EventEmitter<{
 
   public constructor(
     public readonly db: ObjectDB,
-    public readonly parent: LObject | null = null,
-    public readonly id: string = db.freshId()
+    public readonly id: string,
+    public readonly parent: LObject | null = null
   ) {
     super();
 
@@ -108,8 +108,8 @@ class DataObject extends EventEmitter<{
   ): DataObject {
     const obj = new DataObject(
       db,
-      data.parentId && db.getObject(data.parentId) || null,
-      data.id
+      data.id,
+      data.parentId && db.getObject(data.parentId) || null
     );
 
     for (const key in data.ownFields) {

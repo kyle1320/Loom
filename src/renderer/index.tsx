@@ -11,7 +11,7 @@ window.addEventListener('load', function () {
 
   const project = workspace.getProject()!;
 
-  const obj1 = project.db.makeObject('component');
+  const obj1 = project.db.makeObject('a', 'component');
   obj1.addOwnField('html.tag', 'button');
   obj1.addOwnField('html.innerContent', 'Click Me');
   obj1.addOwnField('html.attr.onclick', 'alert(\'Base\')');
@@ -19,12 +19,12 @@ window.addEventListener('load', function () {
   obj1.addOwnField('style.font-weight', '');
   obj1.addOwnField('style.border', '');
 
-  const obj2 = project.db.makeObject(obj1);
+  const obj2 = project.db.makeObject('b', obj1);
   obj2.addOwnField('html.innerContent', 'Custom Text');
   obj2.addOwnField('html.attr.onclick', 'alert(\'Custom\')');
   obj2.addOwnField('test', 'Testing');
 
-  const obj3 = project.db.makeObject('component');
+  const obj3 = project.db.makeObject('c', 'component');
   obj3.addOwnField(
     'html.innerContent',
     `The button is: {${obj2.id}|html.outercontent()}`

@@ -1,20 +1,20 @@
 import ObjectDB from '../data/db/ObjectDB';
 import Link from '../data/Link';
 
-const db = new ObjectDB();
-
 describe('can listen for field changes', () => {
-  const parent = db.makeObject();
+  const db = new ObjectDB();
+
+  const parent = db.makeObject('a', null);
   parent.addOwnField('test', 'value1');
   parent.addOwnField('test.parent.1', 'value2');
   parent.addOwnField('test.parent.2', 'value3');
 
-  const obj = db.makeObject(parent);
+  const obj = db.makeObject('b', parent);
   obj.addOwnField('test', 'value4');
   obj.addOwnField('test.scope.1', 'value5');
   obj.addOwnField('test.scope.2', 'value6');
 
-  const obj2 = db.makeObject(parent);
+  const obj2 = db.makeObject('c', parent);
   obj2.addOwnField('test', 'value7');
 
   test('can listen on specific fields', () => {
@@ -93,42 +93,6 @@ describe('can listen for field changes', () => {
     expect(mock).toHaveBeenCalledTimes(5);
   });
 
-  test('handles parent field visibility changes', () => {
-    const mock = jest.fn();
-
-    const parent = db.makeObject();
-    parent.addOwnField('test.1', 'value1');
-
-    const obj = db.makeObject(parent);
-    obj.addOwnField('test.1', 'value2');
-
-    Link.to(obj, 'test.*').observe().content(true).on('update', mock);
-
-    parent.fields['test.1']!.set('value3');
-    expect(mock).not.toHaveBeenCalled();
-
-    obj.fields['test.1']!.set('value4');
-    expect(mock).toHaveBeenCalledTimes(1);
-
-    obj.removeOwnField('test.1');
-    expect(mock).toHaveBeenCalledTimes(2);
-
-    obj.addOwnField('test.1', 'value5');
-    expect(mock).toHaveBeenCalledTimes(3);
-
-    obj.addOwnField('test.2', 'value6');
-    expect(mock).toHaveBeenCalledTimes(4);
-
-    parent.addOwnField('test.3', 'value6');
-    expect(mock).toHaveBeenCalledTimes(5);
-
-    parent.removeOwnField('test.1');
-    expect(mock).toHaveBeenCalledTimes(5);
-
-    parent.removeOwnField('test.3');
-    expect(mock).toHaveBeenCalledTimes(6);
-  });
-
   describe('handles removing listeners', () => {
     test('with no dependencies', () => {
       const mock = jest.fn();
@@ -167,12 +131,54 @@ describe('can listen for field changes', () => {
     });
   });
 
+  //
+
+  test('handles parent field visibility changes', () => {
+    const db = new ObjectDB();
+
+    const mock = jest.fn();
+
+    const parent = db.makeObject('a', null);
+    parent.addOwnField('test.1', 'value1');
+
+    const obj = db.makeObject('b', parent);
+    obj.addOwnField('test.1', 'value2');
+
+    Link.to(obj, 'test.*').observe().content(true).on('update', mock);
+
+    parent.fields['test.1']!.set('value3');
+    expect(mock).not.toHaveBeenCalled();
+
+    obj.fields['test.1']!.set('value4');
+    expect(mock).toHaveBeenCalledTimes(1);
+
+    obj.removeOwnField('test.1');
+    expect(mock).toHaveBeenCalledTimes(2);
+
+    obj.addOwnField('test.1', 'value5');
+    expect(mock).toHaveBeenCalledTimes(3);
+
+    obj.addOwnField('test.2', 'value6');
+    expect(mock).toHaveBeenCalledTimes(4);
+
+    parent.addOwnField('test.3', 'value6');
+    expect(mock).toHaveBeenCalledTimes(5);
+
+    parent.removeOwnField('test.1');
+    expect(mock).toHaveBeenCalledTimes(5);
+
+    parent.removeOwnField('test.3');
+    expect(mock).toHaveBeenCalledTimes(6);
+  });
+
   test('handles multiple overlapping listeners', () => {
+    const db = new ObjectDB();
+
     const mock1 = jest.fn();
     const mock2 = jest.fn();
 
-    const parent = db.makeObject();
-    const obj = db.makeObject(parent);
+    const parent = db.makeObject('a', null);
+    const obj = db.makeObject('b', parent);
 
     parent.addOwnField('test.1', '');
     parent.addOwnField('test.2', '');
