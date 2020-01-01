@@ -18,8 +18,8 @@ test('can have fields', () => {
   obj.addOwnField('test1', 'value1');
   obj.addOwnField('test2', 'value2');
 
-  expect(obj.fields['test1'].get(obj)).toEqual('value1');
-  expect(obj.fields['test2'].get(obj)).toEqual('value2');
+  expect(obj.fields['test1']!.get(obj)).toEqual('value1');
+  expect(obj.fields['test2']!.get(obj)).toEqual('value2');
 });
 
 test('can have a parent', () => {
@@ -29,8 +29,8 @@ test('can have a parent', () => {
   const obj = new DataObject(project, parent);
   obj.addOwnField('test2', 'value2');
 
-  expect(obj.fields['test1'].get(obj)).toEqual('value1');
-  expect(obj.fields['test2'].get(obj)).toEqual('value2');
+  expect(obj.fields['test1']!.get(obj)).toEqual('value1');
+  expect(obj.fields['test2']!.get(obj)).toEqual('value2');
 });
 
 test('can have a chain of parents', () => {
@@ -44,9 +44,9 @@ test('can have a chain of parents', () => {
   const obj = new DataObject(project, parent);
   obj.addOwnField('test3', 'value3');
 
-  expect(obj.fields['test1'].get(obj)).toEqual('value1');
-  expect(obj.fields['test2'].get(obj)).toEqual('value2');
-  expect(obj.fields['test3'].get(obj)).toEqual('value3');
+  expect(obj.fields['test1']!.get(obj)).toEqual('value1');
+  expect(obj.fields['test2']!.get(obj)).toEqual('value2');
+  expect(obj.fields['test3']!.get(obj)).toEqual('value3');
 });
 
 describe('has methods to fetch fields', () => {

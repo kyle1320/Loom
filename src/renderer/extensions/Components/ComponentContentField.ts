@@ -6,7 +6,7 @@ export default class ComponentContentField extends ComputedField {
   public get(context: LObject): string {
     const tag = this.tag(context).getFieldValueOrDefault('div');
     const attrs = [...this.attrs(context).getFieldNames()]
-      .map(f => ` ${f.substr(10)}="${context.fields[f].get(context)}"`)
+      .map(f => ` ${f.substr(10)}="${context.fields[f]!.get(context)}"`)
       .join('');
     const content = this.content(context).getFieldValueOrDefault('');
 

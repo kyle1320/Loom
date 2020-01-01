@@ -128,7 +128,7 @@ export default class Link extends HeadlessLink {
     const res: { [key: string]: Field } = {};
 
     for (const key of this.getFieldNames()) {
-      res[key] = object.fields[key];
+      res[key] = object.fields[key]!;
     }
 
     return res;
@@ -153,7 +153,7 @@ export default class Link extends HeadlessLink {
     const res: { [key: string]: string } = {};
 
     for (const key of this.getFieldNames()) {
-      res[key] = object.fields[key].get(object);
+      res[key] = object.fields[key]!.get(object);
     }
 
     return res;

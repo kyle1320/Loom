@@ -65,7 +65,7 @@ class DataObject extends EventEmitter<{
 
   public setOwnField(key: string, value: string): void {
     if (LObject.hasOwnField(this, key)) {
-      this.fields[key].set(value);
+      this.fields[key]!.set(value);
     } else {
       this.addOwnField(key, value);
     }
@@ -118,7 +118,7 @@ class DataObject extends EventEmitter<{
     };
 
     for (const key of Object.getOwnPropertyNames(this.fields)) {
-      data.ownFields[key] = this.fields[key].serialize();
+      data.ownFields[key] = this.fields[key]!.serialize();
     }
 
     return data;

@@ -19,9 +19,9 @@ const Category: React.FC<Props> = (props: Props) => {
         props.fieldNames
           .map(k => <FieldItem
             key={k}
-            context={props.context!}
+            context={props.context}
             name={k}
-            field={props.context!.fields[k]!} />)
+            field={props.context.fields[k]!} />)
       }
     </div>
     : <></>;

@@ -28,7 +28,7 @@ namespace LObject {
 
   export const TypeField = Symbol('type');
   export type Fields<F extends Field = Field> =
-    { [key: string]: F } &
+    { [S in string]?: F } &
     { [LObject.TypeField]?: string }
 }
 

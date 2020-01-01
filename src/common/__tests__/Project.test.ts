@@ -37,8 +37,8 @@ test('can serialize and deserialize objects and fields', () => {
   const proj_ = Project.deserialize(proj.serialize(), []);
   const obj1_ = proj_.getObject(obj1.id)!;
   const obj2_ = proj_.getObject(obj2.id)!;
-  const value1 = obj1_.fields['field1'].get(obj1_);
-  const value2 = obj2_.fields['field2'].get(obj2_);
+  const value1 = obj1_.fields['field1']!.get(obj1_);
+  const value2 = obj2_.fields['field2']!.get(obj2_);
 
   expect(obj1_).not.toBeUndefined();
   expect(obj2_).not.toBeUndefined();
