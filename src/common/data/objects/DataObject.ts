@@ -7,35 +7,25 @@ namespace DataObject {
   export interface SerializedData {
     id: string;
     parentId: string | null;
-    path: string;
     ownFields: { [key: string]: string };
   }
 }
 
-const validPathRegex = /^[a-zA-Z0-9/_.-]+$/;
 const validFieldNameRegex = /^[a-z][a-z0-9_.-]*$/;
 
 class DataObject extends EventEmitter<{
   fieldAdded: string;
   fieldRemoved: string;
   fieldChanged: string;
-  pathChanged: void;
 }> implements LObject {
   public readonly fields: LObject.Fields<MutableField>;
-
-  private path: string;
 
   public constructor(
     public readonly db: ObjectDB,
     public readonly parent: LObject | null = null,
-    public readonly id: string = db.freshId(),
-    path?: string,
+    public readonly id: string = db.freshId()
   ) {
     super();
-
-    if (!path) path = id;
-    if (!validPathRegex.test(path)) throw new IllegalPathError(path);
-    this.path = path;
 
     this.fields = Object.create(parent && parent.fields);
 
@@ -50,17 +40,6 @@ class DataObject extends EventEmitter<{
         });
       }
     }
-  }
-
-  public getPath(): string {
-    return this.path;
-  }
-
-  public setPath(path: string): void {
-    if (!validPathRegex.test(path)) throw new IllegalPathError(path);
-
-    this.path = path;
-    this.emit('pathChanged');
   }
 
   public setOwnField(key: string, value: string): void {
@@ -113,7 +92,6 @@ class DataObject extends EventEmitter<{
     const data: DataObject.SerializedData = {
       id: this.id,
       parentId: this.parent && this.parent.id,
-      path: this.path,
       ownFields: {}
     };
 
@@ -131,7 +109,6 @@ class DataObject extends EventEmitter<{
     const obj = new DataObject(
       db,
       data.parentId && db.getObject(data.parentId) || null,
-      data.path,
       data.id
     );
 

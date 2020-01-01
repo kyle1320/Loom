@@ -13,7 +13,7 @@ const ObjectItem: React.FC<Props> = (props: Props) => {
   const className = 'nav-object' + (props.selected ? ' selected' : '');
 
   return <div className={className} onClick={props.onSelect}>
-    {props.object.id} : {props.object.getPath()}
+    {props.object.id}
   </div>;
 }
 
