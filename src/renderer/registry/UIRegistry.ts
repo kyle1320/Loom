@@ -45,7 +45,7 @@ export default class UIRegistry {
   public getObjectEditor(
     object: LObject
   ): React.ComponentType<ObjectEditor.Props> | undefined {
-    return this.objectEditors.get(LObject.baseId(object));
+    return this.objectEditors.get(LObject.typeOf(object) || '');
   }
 
   /** CATEGORIES **/

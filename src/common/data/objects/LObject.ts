@@ -1,13 +1,6 @@
 import Field from '../fields/Field';
 import Project from '../Project';
 
-interface LObject {
-  readonly id: string;
-  readonly parent: LObject | null;
-  readonly project: Project;
-  readonly fields: { [key: string]: Field };
-}
-
 export class IllegalFieldKeyError extends Error {}
 
 namespace LObject {
@@ -15,8 +8,8 @@ namespace LObject {
     return Object.prototype.hasOwnProperty.call(obj.fields, key.toLowerCase());
   }
 
-  export const baseId = (obj: LObject): string => {
-    return obj.parent ? baseId(obj.parent) : obj.id;
+  export const typeOf = (obj: LObject): string | undefined => {
+    return obj.fields[LObject.TypeField];
   }
 
   export const isInstance = (
@@ -32,6 +25,18 @@ namespace LObject {
     // eslint-disable-next-line no-prototype-builtins
     return parent.fields.isPrototypeOf(obj.fields);
   }
+
+  export const TypeField = Symbol('type');
+  export type Fields<F extends Field = Field> =
+    { [key: string]: F } &
+    { [LObject.TypeField]?: string }
+}
+
+interface LObject {
+  readonly id: string;
+  readonly parent: LObject | null;
+  readonly project: Project;
+  readonly fields: LObject.Fields;
 }
 
 export default LObject

@@ -40,7 +40,7 @@ class Project {
       parent = this.objects.get(parent) as ClassObject;
     }
 
-    const obj = new ClassObject(this, fields, parent, name);
+    const obj = new ClassObject(this, fields, name, parent);
     this.objects.set(name, obj);
   }
 

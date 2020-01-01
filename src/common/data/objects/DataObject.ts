@@ -21,7 +21,7 @@ class DataObject extends EventEmitter<{
   fieldChanged: string;
   pathChanged: void;
 }> implements LObject {
-  public readonly fields: { [id: string]: MutableField };
+  public readonly fields: LObject.Fields<MutableField>;
 
   private path: string;
 
