@@ -23,7 +23,7 @@ function registerAttributes(registry: UIRegistry): void {
 
 const ext: Extension = {
   initProject(project: Project) {
-    project.registerClass('component', {
+    project.db.registerClass('component', {
       'html.outercontent()': new ComponentContentField()
     });
   },

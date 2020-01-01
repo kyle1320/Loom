@@ -1,5 +1,5 @@
 import Field from '../fields/Field';
-import Project from '../Project';
+import ObjectDB from '../db/ObjectDB';
 
 export class IllegalFieldKeyError extends Error {}
 
@@ -17,7 +17,7 @@ namespace LObject {
     parent: string | LObject
   ): boolean => {
     if (typeof parent === 'string') {
-      const par = obj.project.getObject(parent);
+      const par = obj.db.getObject(parent);
       if (!par) return false;
       parent = par;
     }
@@ -35,7 +35,7 @@ namespace LObject {
 interface LObject {
   readonly id: string;
   readonly parent: LObject | null;
-  readonly project: Project;
+  readonly db: ObjectDB;
   readonly fields: LObject.Fields;
 }
 

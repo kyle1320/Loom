@@ -1,4 +1,4 @@
-import Project from '../Project';
+import ObjectDB from '../db/ObjectDB';
 import MutableField from '../fields/MutableField';
 import LObject, { IllegalFieldKeyError } from './LObject';
 import EventEmitter from '../../util/EventEmitter';
@@ -26,9 +26,9 @@ class DataObject extends EventEmitter<{
   private path: string;
 
   public constructor(
-    public readonly project: Project,
+    public readonly db: ObjectDB,
     public readonly parent: LObject | null = null,
-    public readonly id: string = project.freshId(),
+    public readonly id: string = db.freshId(),
     path?: string,
   ) {
     super();
@@ -125,12 +125,12 @@ class DataObject extends EventEmitter<{
   }
 
   public static deserialize(
-    project: Project,
+    db: ObjectDB,
     data: DataObject.SerializedData
   ): DataObject {
     const obj = new DataObject(
-      project,
-      data.parentId && project.getObject(data.parentId) || null,
+      db,
+      data.parentId && db.getObject(data.parentId) || null,
       data.path,
       data.id
     );

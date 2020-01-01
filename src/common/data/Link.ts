@@ -1,4 +1,4 @@
-import Project from './Project';
+import ObjectDB from './db/ObjectDB';
 import Field from './fields/Field';
 import LObject from './objects/LObject';
 import LinkObserver from '../events/LinkObserver';
@@ -32,15 +32,15 @@ export class HeadlessLink {
     this.rawPath = rawPath;
   }
 
-  public attach(project: Project): Link {
+  public attach(db: ObjectDB): Link {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Link(project, this.objectId, this.fieldName);
+    return new Link(db, this.objectId, this.fieldName);
   }
 
   public resolve(context: LObject): Link {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Link(
-      context.project,
+      context.db,
       this.objectId || context.id, // if id is empty, resolve to 'this'
       this.fieldName
     );
@@ -69,7 +69,7 @@ export default class Link extends HeadlessLink {
   private object: LObject | null = null;
 
   public constructor(
-    public readonly project: Project,
+    public readonly db: ObjectDB,
     objectId: string,
     fieldName: string
   ) {
@@ -79,11 +79,7 @@ export default class Link extends HeadlessLink {
   public getObject(): LObject {
     if (this.object) return this.object;
 
-    if (!this.project) {
-      throw new Error('Link is missing project');
-    }
-
-    const object = this.project.getObject(this.objectId);
+    const object = this.db.getObject(this.objectId);
 
     if (!object) {
       throw new ObjectReferenceError();
@@ -164,11 +160,11 @@ export default class Link extends HeadlessLink {
   }
 
   public withObject(objectId: string): Link {
-    return new Link(this.project, objectId, this.fieldName);
+    return new Link(this.db, objectId, this.fieldName);
   }
 
   public withFieldName(fieldName: string): Link {
-    return new Link(this.project, this.objectId, fieldName);
+    return new Link(this.db, this.objectId, fieldName);
   }
 
   public static compare(a: Link, b: Link): number {
@@ -177,7 +173,7 @@ export default class Link extends HeadlessLink {
   }
 
   public static to(obj: LObject, fieldName: string): Link {
-    const link = new Link(obj.project, obj.id, fieldName);
+    const link = new Link(obj.db, obj.id, fieldName);
     link.object = obj;
     return link;
   }

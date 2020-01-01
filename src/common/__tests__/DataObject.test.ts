@@ -1,20 +1,20 @@
-import Project from '../data/Project';
+import ObjectDB from '../data/db/ObjectDB';
 import DataObject from '../data/objects/DataObject';
 
-const project = new Project();
+const db = new ObjectDB();
 
 test('can be instantiated', () => {
-  new DataObject(project);
+  new DataObject(db);
 });
 
 test('can be serialized and deserialized', () => {
-  const obj = new DataObject(project);
+  const obj = new DataObject(db);
   const serial = obj.serialize();
-  DataObject.deserialize(project, serial);
+  DataObject.deserialize(db, serial);
 });
 
 test('can have fields', () => {
-  const obj = new DataObject(project);
+  const obj = new DataObject(db);
   obj.addOwnField('test1', 'value1');
   obj.addOwnField('test2', 'value2');
 
@@ -23,10 +23,10 @@ test('can have fields', () => {
 });
 
 test('can have a parent', () => {
-  const parent = new DataObject(project);
+  const parent = new DataObject(db);
   parent.addOwnField('test1', 'value1');
 
-  const obj = new DataObject(project, parent);
+  const obj = new DataObject(db, parent);
   obj.addOwnField('test2', 'value2');
 
   expect(obj.fields['test1']!.get(obj)).toEqual('value1');
@@ -34,14 +34,14 @@ test('can have a parent', () => {
 });
 
 test('can have a chain of parents', () => {
-  const grandparent = new DataObject(project);
+  const grandparent = new DataObject(db);
   grandparent.addOwnField('test1', 'value1');
   grandparent.addOwnField('test2', 'hidden value');
 
-  const parent = new DataObject(project, grandparent);
+  const parent = new DataObject(db, grandparent);
   parent.addOwnField('test2', 'value2');
 
-  const obj = new DataObject(project, parent);
+  const obj = new DataObject(db, parent);
   obj.addOwnField('test3', 'value3');
 
   expect(obj.fields['test1']!.get(obj)).toEqual('value1');
@@ -50,12 +50,12 @@ test('can have a chain of parents', () => {
 });
 
 describe('has methods to fetch fields', () => {
-  const parent = new DataObject(project);
+  const parent = new DataObject(db);
   parent.addOwnField('test', 'value1');
   parent.addOwnField('test.parent.1', 'value2');
   parent.addOwnField('test.parent.2', 'value3');
 
-  const obj = new DataObject(project, parent);
+  const obj = new DataObject(db, parent);
   obj.addOwnField('test', 'value4');
   obj.addOwnField('test.scope.1', 'value5');
   obj.addOwnField('test.scope.2', 'value6');
@@ -109,7 +109,7 @@ describe('has methods to fetch fields', () => {
 
 describe('can listen for field addition / removal', () => {
   test('on an object with no parent', () => {
-    const obj = project.makeObject();
+    const obj = db.makeObject();
     const add = jest.fn();
     const remove = jest.fn();
     const change = jest.fn();

@@ -1,20 +1,20 @@
-import Project from '../data/Project';
+import ObjectDB from '../data/db/ObjectDB';
 import Link from '../data/Link';
 
-const project = new Project();
+const db = new ObjectDB();
 
 describe('can listen for field changes', () => {
-  const parent = project.makeObject();
+  const parent = db.makeObject();
   parent.addOwnField('test', 'value1');
   parent.addOwnField('test.parent.1', 'value2');
   parent.addOwnField('test.parent.2', 'value3');
 
-  const obj = project.makeObject(parent);
+  const obj = db.makeObject(parent);
   obj.addOwnField('test', 'value4');
   obj.addOwnField('test.scope.1', 'value5');
   obj.addOwnField('test.scope.2', 'value6');
 
-  const obj2 = project.makeObject(parent);
+  const obj2 = db.makeObject(parent);
   obj2.addOwnField('test', 'value7');
 
   test('can listen on specific fields', () => {
@@ -96,10 +96,10 @@ describe('can listen for field changes', () => {
   test('handles parent field visibility changes', () => {
     const mock = jest.fn();
 
-    const parent = project.makeObject();
+    const parent = db.makeObject();
     parent.addOwnField('test.1', 'value1');
 
-    const obj = project.makeObject(parent);
+    const obj = db.makeObject(parent);
     obj.addOwnField('test.1', 'value2');
 
     Link.to(obj, 'test.*').observe().content(true).on('update', mock);
@@ -171,8 +171,8 @@ describe('can listen for field changes', () => {
     const mock1 = jest.fn();
     const mock2 = jest.fn();
 
-    const parent = project.makeObject();
-    const obj = project.makeObject(parent);
+    const parent = db.makeObject();
+    const obj = db.makeObject(parent);
 
     parent.addOwnField('test.1', '');
     parent.addOwnField('test.2', '');

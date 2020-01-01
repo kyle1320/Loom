@@ -1,4 +1,4 @@
-import Project from '../Project';
+import ObjectDB from '../db/ObjectDB';
 import LObject, { IllegalFieldKeyError } from './LObject';
 import ComputedField from '../fields/ComputedField';
 
@@ -6,7 +6,7 @@ export default class ClassObject implements LObject {
   public readonly fields: LObject.Fields<ComputedField> = {};
 
   public constructor(
-    public readonly project: Project,
+    public readonly db: ObjectDB,
     fields: { [id: string]: ComputedField },
     public readonly id: string,
     public readonly parent: ClassObject | null = null,

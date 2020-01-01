@@ -1,7 +1,7 @@
-import Project from '../data/Project';
+import ObjectDB from '../data/db/ObjectDB';
 import Link from '../data/Link';
 
-const project = new Project();
+const db = new ObjectDB();
 
 function mocks(link: Link): [jest.Mock, jest.Mock, jest.Mock] {
   const add = jest.fn();
@@ -23,7 +23,7 @@ function count(): string {
 
 describe('can listen for field changes on a single field', () => {
   test('additions', () => {
-    const obj = project.makeObject();
+    const obj = db.makeObject();
     const add = mocks(Link.to(obj, 'test'))[0];
 
     obj.addOwnField('test', count());
@@ -34,7 +34,7 @@ describe('can listen for field changes on a single field', () => {
   });
 
   test('removals', () => {
-    const obj = project.makeObject();
+    const obj = db.makeObject();
     const remove = mocks(Link.to(obj, 'test'))[1];
 
     obj.addOwnField('test', count());
@@ -48,8 +48,8 @@ describe('can listen for field changes on a single field', () => {
   });
 
   test('changes', () => {
-    const parent = project.makeObject();
-    const obj = project.makeObject(parent);
+    const parent = db.makeObject();
+    const obj = db.makeObject(parent);
     const change = mocks(Link.to(obj, 'test'))[2];
 
     obj.addOwnField('test', count());
@@ -70,7 +70,7 @@ describe('can listen for field changes on a single field', () => {
 
 describe('can listen for field changes on multiple fields', () => {
   test('additions', () => {
-    const obj = project.makeObject();
+    const obj = db.makeObject();
     const add = mocks(Link.to(obj, 'test.*'))[0];
 
     obj.addOwnField('test', count());
@@ -84,7 +84,7 @@ describe('can listen for field changes on multiple fields', () => {
   });
 
   test('removals', () => {
-    const obj = project.makeObject();
+    const obj = db.makeObject();
     const remove = mocks(Link.to(obj, 'test.*'))[1];
 
     obj.addOwnField('test', count());
@@ -105,8 +105,8 @@ describe('can listen for field changes on multiple fields', () => {
   });
 
   test('changes', () => {
-    const parent = project.makeObject();
-    const obj = project.makeObject(parent);
+    const parent = db.makeObject();
+    const obj = db.makeObject(parent);
     const change = mocks(Link.to(obj, 'test.*'))[2];
 
     obj.addOwnField('test', count());
