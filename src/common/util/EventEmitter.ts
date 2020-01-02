@@ -1,10 +1,10 @@
-type Callback<T> = T extends void ? () => void : (arg: T) => void;
+type Callback<T> = (arg: T) => unknown;
 
 type VoidTypes<T, K extends keyof T = keyof T> =
   K extends (T[K] extends void ? K : never) ? K : never;
 type NonVoidTypes<T, K extends keyof T = keyof T> =
   T[K] extends void ? never : K;
-type Listeners<T> = {[K in keyof T]?: ((arg: T) => void)[]};
+type Listeners<T> = {[K in keyof T]?: ((arg: T[K]) => void)[]};
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default class EventEmitter<T extends {[name: string]: any}> {
@@ -33,7 +33,7 @@ export default class EventEmitter<T extends {[name: string]: any}> {
     const registered = this._listeners[type];
 
     if (registered) {
-      registered.forEach((cb: (arg: T) => void) => cb.call(this, arg!));
+      registered.forEach((cb: (arg: T[K]) => void) => cb.call(this, arg!));
     }
 
     return this;
