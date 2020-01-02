@@ -1,7 +1,8 @@
 import React from 'react';
 import { useProject } from '../WorkspaceContext';
-import ObjectItem from './ObjectItem';
+import NavItem from './NavItem';
 import DataObject from '../../../common/data/objects/DataObject';
+import DBNode from '../../../common/data/db/DBNode';
 
 import './Navigator.scss';
 
@@ -15,14 +16,14 @@ const Navigator: React.FC<Props> = (props: Props) => {
 
   return <div className="navigator">
     {
-      [...project.db.getDataObjects()]
-        .map(o => <ObjectItem
-          key={o.id}
-          object={o}
-          onSelect={
-            React.useCallback(() => props.onSelect(o), [props.onSelect])
-          }
-          selected={o == props.context} /> )
+      <NavItem
+        node={project.db.getNodeAtPath('')!}
+        onSelect={
+          React.useCallback(
+            (n: DBNode) => props.onSelect(n.item || null),
+            [props.onSelect]
+          )
+        } />
     }
   </div>;
 }

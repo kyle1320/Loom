@@ -4,6 +4,7 @@ import Field from '../../../common/data/fields/Field';
 import Link from '../../../common/data/Link';
 import LinkObserver from '../../../common/events/LinkObserver';
 import ContentObserver from '../../../common/events/ContentObserver';
+import EventEmitter from '../../../common/util/EventEmitter';
 
 export function useForceUpdate(): [object, () => void] {
   const [value, set] = React.useState({});
@@ -54,6 +55,17 @@ export function useWatchLink(link: Link, recursive?: boolean): Link {
     return () => observer.destroy();
   }, [link, recursive]);
   return link;
+}
+
+export function useWatchEvent<T, E extends keyof T>(
+  obj: EventEmitter<T>,
+  evt: E
+): void {
+  const [, forceUpdate] = useForceUpdate();
+  React.useEffect(() => {
+    obj.on(evt, forceUpdate);
+    return () => void obj.removeListener(evt, forceUpdate);
+  }, [obj, evt]);
 }
 
 export function useWatchPaths(context: LObject, paths: string[]): void {

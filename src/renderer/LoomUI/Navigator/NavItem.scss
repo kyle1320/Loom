@@ -1,0 +1,13 @@
+@import "../LoomUI";
+
+.nav-object {
+  position: relative;
+  font-size: 14px;
+  line-height: 20px;
+
+  &__children {
+    .nav-object {
+      margin-left: 15px;
+    }
+  }
+}
