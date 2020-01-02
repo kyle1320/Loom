@@ -1,13 +1,20 @@
 import DataObject from '../objects/DataObject';
+import EventEmitter from '../../util/EventEmitter';
 
-class DBNode {
+class DBNode extends EventEmitter<{ update: void }> {
   public readonly children: { [S in string]?: DBNode } = {};
 
   public constructor(
     public parent: DBNode | undefined,
     public name: string,
     public item?: DataObject
-  ) {}
+  ) {
+    super();
+  }
+
+  public notify(): void {
+    this.emit('update');
+  }
 
   public getPath(): string {
     return this.parent

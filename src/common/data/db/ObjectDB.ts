@@ -21,16 +21,13 @@ function insert(parent: DBNode, node: DBNode, path: string): void {
 
       if (!next) {
         next = parent.children[dir] = new DBNode(parent, dir);
+        parent.notify();
       }
 
       parent = next;
     }
 
     if (parent.children[name]) throw new ItemAlreadyExistsError();
-
-    parent.children[name] = node;
-    node.name = name;
-    node.parent = parent;
 
   // if an exception occurs, undo changes
   } catch (e) {
@@ -40,6 +37,15 @@ function insert(parent: DBNode, node: DBNode, path: string): void {
 
     throw e;
   }
+
+  if (node.parent) {
+    node.parent.notify();
+  }
+
+  parent.children[name] = node;
+  node.name = name;
+  node.parent = parent;
+  parent.notify();
 }
 
 // TODO: add ability to listen for changes on a path, or to an object
