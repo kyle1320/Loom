@@ -6,6 +6,10 @@ import LinkObserver from '../../../common/events/LinkObserver';
 import ContentObserver from '../../../common/events/ContentObserver';
 import EventEmitter from '../../../common/util/EventEmitter';
 
+export function useToggle(def: boolean): [boolean, () => void] {
+  return React.useReducer(b => !b, def) as [boolean, () => void];
+}
+
 export function useForceUpdate(): [object, () => void] {
   const [value, set] = React.useState({});
   return [value, React.useCallback(() => set({}), [])];

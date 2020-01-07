@@ -1,4 +1,4 @@
-import IObject from '../objects/LObject';
+import LObject from '../objects/LObject';
 import Field from './Field';
 import Link, { HeadlessLink } from '../Link';
 import EventEmitter from '../../util/EventEmitter';
@@ -11,7 +11,7 @@ class MutableFieldObserver extends FieldObserver {
 
   public constructor (
     field: MutableField,
-    context: IObject,
+    context: LObject,
     recursive: boolean
   ) {
     super();
@@ -103,7 +103,7 @@ export default class MutableField
     this.emit('update');
   }
 
-  public raw(context: IObject): (string | Link)[] {
+  public raw(context: LObject): (string | Link)[] {
     return this.rawValue
       .map(part => {
         if (typeof part === 'string') return part;
@@ -111,7 +111,7 @@ export default class MutableField
       });
   }
 
-  public get(context: IObject): string {
+  public get(context: LObject): string {
     return this.raw(context)
       .map(part => {
         if (typeof part === 'string') return part;
@@ -124,12 +124,12 @@ export default class MutableField
     return this.rawValue.map(String).join('');
   }
 
-  public dependencies(context: IObject): Link[] {
+  public dependencies(context: LObject): Link[] {
     return this.raw(context)
       .filter((part): part is Link => typeof part !== 'string');
   }
 
-  public observe(context: IObject, recursive: boolean): MutableFieldObserver {
+  public observe(context: LObject, recursive: boolean): MutableFieldObserver {
     return new MutableFieldObserver(this, context, recursive);
   }
 
