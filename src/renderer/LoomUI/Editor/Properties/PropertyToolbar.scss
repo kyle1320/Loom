@@ -6,10 +6,39 @@
   .icon-btn {
     padding: 3px 8px;
     border-right: 1px solid #ccc;
-    color: $primary-5;
+    position: relative;
 
-    &.active {
-      color: $accent;
+    &:hover {
+      background-color: $primary-hl-0;
+    }
+
+    &.dialog {
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        border: 3px solid currentColor;
+        border-top-color: transparent;
+        border-left-color: transparent;
+      }
+    }
+
+    &.toggle {
+      color: $primary-7;
+
+      &.active {
+        color: $accent;
+
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: 2px;
+          right: 2px;
+          border: 2px solid currentColor;
+          border-radius: 50%;
+        }
+      }
     }
   }
 }

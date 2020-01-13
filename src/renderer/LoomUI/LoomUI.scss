@@ -4,11 +4,15 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 
 $primary-0: #ffffff;
-$primary-1: #f5f5f5;
-$primary-2: #ebebeb;
-$primary-3: #e0e0e0;
-$primary-4: #d6d6d6;
-$primary-5: #cccccc;
+$primary-1: darken($primary-0, 5%);
+$primary-2: darken($primary-0, 10%);
+$primary-3: darken($primary-0, 15%);
+$primary-4: darken($primary-0, 20%);
+$primary-5: darken($primary-0, 25%);
+$primary-6: darken($primary-0, 30%);
+$primary-7: darken($primary-0, 35%);
+$primary-8: darken($primary-0, 40%);
+$primary-9: darken($primary-0, 45%);
 
 $primary-hl-0: #d8d8ff;
 $primary-hl-1: #cfcff5;
@@ -16,6 +20,7 @@ $primary-hl-2: #c7c7eb;
 $primary-hl-3: #bebee0;
 
 $accent: #266eff;
+$text: #404040;
 
 html, body {
   margin: 0;
@@ -27,7 +32,7 @@ html, body {
 
 body {
   background-color: $primary-0;
-  color: #404040;
+  color: $text;
   font-family: arial;
   font-size: 14px;
 }

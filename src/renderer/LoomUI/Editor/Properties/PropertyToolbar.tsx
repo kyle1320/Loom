@@ -15,7 +15,8 @@ const PropertyToolbar: React.FC<Props> = (props: Props) => {
       fa="fas"
       icon="fa-layer-group"
       onClick={props.toggleShowInherited}
-      className={props.showInherited ? 'active' : ''} />
+      title={`${props.showInherited ? 'Hide' : 'Show'} inherited fields`}
+      className={props.showInherited ? 'active toggle' : 'toggle'} />
   </div>;
 }
 
