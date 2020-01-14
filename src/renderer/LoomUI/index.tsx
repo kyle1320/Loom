@@ -7,6 +7,7 @@ import WorkspaceContext from './WorkspaceContext';
 import Workspace from '../Workspace';
 import DataObject from '../../common/data/objects/DataObject';
 import * as color from './util/color';
+import { ModalProvider } from './util/Modal';
 
 import './LoomUI.scss';
 
@@ -16,14 +17,16 @@ const LoomUI: React.FC<Props> = (props: Props) => {
   const [selected, select] = useState<DataObject | null>(null);
 
   return <WorkspaceContext.Provider value={props.workspace}>
-    <SplitPane
-      split="vertical"
-      minSize={100}
-      defaultSize={200}
-      pane1Style={{ backgroundColor: color.primary1 }} >
-      <Navigator context={selected} onSelect={select} />
-      <Editor context={selected} />
-    </SplitPane>
+    <ModalProvider>
+      <SplitPane
+        split="vertical"
+        minSize={100}
+        defaultSize={200}
+        pane1Style={{ backgroundColor: color.primary1 }} >
+        <Navigator context={selected} onSelect={select} />
+        <Editor context={selected} />
+      </SplitPane>
+    </ModalProvider>
   </WorkspaceContext.Provider>;
 }
 
