@@ -1,4 +1,5 @@
 import React from 'react';
+import Fuse from 'fuse.js';
 
 import LObject from '../../common/data/objects/LObject';
 import FieldEditor from './FieldEditor';
@@ -99,6 +100,21 @@ class UIRegistry {
 
   public getFieldName(key: string): string | undefined {
     return this.getFieldInfo(key)?.friendlyName;
+  }
+
+  public getFields(search = ''): UIRegistry.FieldInfo[] {
+    const fields = [...this.fieldInfo.values()];
+
+    if (!search) return fields;
+
+    return new Fuse(fields, {
+      keys: [
+        { name: 'key', weight: 0.2 },
+        { name: 'friendlyName', weight: 0.5 },
+        { name: 'helpText', weight: 0.3 }
+      ],
+      threshold: 0.2
+    }).search(search);
   }
 }
 

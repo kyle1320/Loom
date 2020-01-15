@@ -13,7 +13,8 @@ const Properties: ObjectEditor = (props: ObjectEditor.Props) => {
   return <div className="properties">
     <PropertyToolbar
       showInherited={showInherited}
-      toggleShowInherited={toggleShowInherited} />
+      toggleShowInherited={toggleShowInherited}
+      context={props.object} />
     <FieldList
       showInherited={showInherited}
       context={props.object} />

@@ -1,0 +1,83 @@
+@import "../../LoomUI.scss";
+
+.add-field-dialog {
+  padding: 5px;
+
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-content: flex-end;
+    margin-bottom: 2px;
+
+    input {
+      border: none;
+      font-size: 20px;
+      flex-grow: 1;
+      outline: none;
+      border-bottom: 1px solid $primary-3;
+      padding: 3px 1px;
+
+      &:focus {
+        border-bottom-color: $accent;
+      }
+    }
+
+    button {
+      background-color: $accent;
+      color: white;
+      border: none;
+      font-size: 14px;
+
+      &:disabled {
+        background-color: $primary-3;
+      }
+    }
+  }
+}
+
+.field-search {
+  width: 400px;
+  height: 200px;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+
+  &__result {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $primary-hl-0;
+    }
+
+    &--exists {
+      cursor: default;
+      color: $primary-9;
+      pointer-events: none;
+      background-color: $primary-1;
+    }
+  }
+
+  &__name {
+    font-weight: bold;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+
+  &__key {
+    font-weight: normal;
+    margin-left: 20px;
+    font-size: 10px;
+    color: $primary-7;
+
+    &:before { content: '('; }
+    &:after { content: ')'; }
+  }
+
+  &__category {
+    padding-top: 2px;
+    font-size: 10px;
+  }
+}

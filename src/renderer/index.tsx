@@ -16,8 +16,6 @@ window.addEventListener('load', function () {
   obj1.addOwnField('html.innerContent', 'Click Me');
   obj1.addOwnField('html.attr.onclick', 'alert(\'Base\')');
   obj1.addOwnField('style.color', 'red');
-  obj1.addOwnField('style.font-weight', '');
-  obj1.addOwnField('style.border', '');
 
   const obj2 = project.db.makeObject('button/customButton', obj1);
   obj2.addOwnField('html.innerContent', 'Custom Text');
