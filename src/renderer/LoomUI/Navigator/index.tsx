@@ -1,8 +1,7 @@
 import React from 'react';
-import { useProject } from '../WorkspaceContext';
-import NavItem from './NavItem';
 import DataObject from '../../../common/data/objects/DataObject';
-import DBNode from '../../../common/data/db/DBNode';
+import NavTree from './NavTree';
+import NavigatorToolbar from './NavigatorToolbar';
 
 import './Navigator.scss';
 
@@ -11,20 +10,10 @@ interface Props {
   onSelect: (obj: DataObject | null) => void;
 }
 
-const Navigator: React.FC<Props> = (props: Props) => {
-  const project = useProject()!;
-
+const Navigator: React.FC<Props> = ({ context, onSelect }: Props) => {
   return <div className="navigator">
-    {
-      <NavItem
-        node={project.db.getNodeAtPath('')!}
-        onSelect={
-          React.useCallback(
-            (n: DBNode) => props.onSelect(n.item || null),
-            [props.onSelect]
-          )
-        } />
-    }
+    <NavigatorToolbar></NavigatorToolbar>
+    <NavTree context={context} onSelect={onSelect}></NavTree>
   </div>;
 }
 
