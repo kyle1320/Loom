@@ -1,9 +1,9 @@
 import React from 'react';
 
 import LObject from '../../common/data/objects/LObject';
-
 import FieldEditor from './FieldEditor';
 import ObjectEditor from './ObjectEditor';
+import { HeadlessLink } from '../../common/data/Link';
 
 export interface Category {
   name: string;
@@ -15,13 +15,21 @@ const defaultCategory = {
   paths: ['*']
 };
 
-export default class UIRegistry {
+namespace UIRegistry {
+  export interface FieldInfo {
+    key: string;
+    friendlyName?: string;
+    helpText?: string;
+    defaultValue?: string;
+  }
+}
+
+class UIRegistry {
   private fieldEditors: Map<string, FieldEditor> = new Map();
   private objectEditors: Map<string, ObjectEditor> = new Map();
 
   private fieldCategories: Category[] = [];
-  /** Map from field keys to user-friendly names */
-  private fieldNames: Map<string, string> = new Map();
+  private fieldInfo: Map<string, UIRegistry.FieldInfo> = new Map();
 
   /** Field Editors **/
 
@@ -54,17 +62,44 @@ export default class UIRegistry {
     this.fieldCategories.push(category);
   }
 
+  public registerCategories(...categories: Category[]): void {
+    categories.forEach(c => this.registerCategory(c));
+  }
+
   public getCategories(): Category[] {
     return this.fieldCategories.concat([ defaultCategory ]);
   }
 
+  public getCategory(key: string): string {
+    for (const cat of this.fieldCategories) {
+      for (const path of cat.paths) {
+        if (new HeadlessLink('', path).matchesKey(key)) {
+          return cat.name;
+        }
+      }
+    }
+    return '';
+  }
+
   /** FIELD NAMES **/
 
-  public registerFieldName(key: string, name: string): void {
-    this.fieldNames.set(key.toLowerCase(), name);
+  public registerField(info: UIRegistry.FieldInfo): void {
+    info.key = info.key.toLowerCase();
+
+    this.fieldInfo.set(info.key, info);
+  }
+
+  public registerFields(...infos: UIRegistry.FieldInfo[]): void {
+    infos.forEach(i => this.registerField(i));
+  }
+
+  public getFieldInfo(key: string): UIRegistry.FieldInfo | undefined {
+    return this.fieldInfo.get(key.toLowerCase());
   }
 
   public getFieldName(key: string): string | undefined {
-    return this.fieldNames.get(key.toLowerCase());
+    return this.getFieldInfo(key)?.friendlyName;
   }
 }
+
+export default UIRegistry;

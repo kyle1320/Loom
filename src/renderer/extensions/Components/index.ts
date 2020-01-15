@@ -7,18 +7,34 @@ import ColorPicker from './ColorPicker';
 import UIRegistry from '../../registry/UIRegistry';
 
 function registerStyles(registry: UIRegistry): void {
-  registry.registerFieldName('style.border', 'Border');
-  registry.registerFieldName('style.background', 'Background');
-  registry.registerFieldName('style.color', 'Font Color');
-  registry.registerFieldName('style.font-size', 'Font Size');
-  registry.registerFieldName('style.font-weight', 'Font Weight');
+  registry.registerFields({
+    key: 'style.border',
+    friendlyName: 'Border'
+  }, {
+    key: 'style.background',
+    friendlyName: 'Background'
+  }, {
+    key: 'style.color',
+    friendlyName: 'Font Color'
+  }, {
+    key: 'style.font-size',
+    friendlyName: 'Font Size'
+  }, {
+    key: 'style.font-weight',
+    friendlyName: 'Font Weight'
+  });
 
   registry.registerFieldEditor('style.color', ColorPicker);
 }
 
 function registerAttributes(registry: UIRegistry): void {
-  registry.registerFieldName('html.attr.style', 'Style');
-  registry.registerFieldName('html.attr.onclick', 'Click Handler');
+  registry.registerFields({
+    key: 'html.attr.style',
+    friendlyName: 'Style'
+  }, {
+    key: 'html.attr.onclick',
+    friendlyName: 'Click Handler'
+  });
 }
 
 const ext: Extension = {
@@ -30,27 +46,30 @@ const ext: Extension = {
   initWorkspace(workspace: Workspace) {
     const registry = workspace.registry;
 
-    registry.registerCategory({
+    registry.registerCategories({
       name: 'HTML',
       paths: [
         'html.tag',
         'html.innercontent'
       ]
-    });
-    registry.registerCategory({
+    }, {
       name: 'Attributes',
       paths: ['html.attr.*']
-    });
-    registry.registerCategory({
+    }, {
       name: 'Styles',
       paths: ['style.*'],
     });
 
     registry.registerObjectEditor('component', ComponentEditor);
 
-    registry.registerFieldName('html.outercontent()', 'HTML');
-    registry.registerFieldName('html.innercontent', 'Contents');
-    registry.registerFieldName('html.tag', 'Tag');
+    registry.registerFields({
+      key: 'html.innercontent',
+      friendlyName: 'Contents'
+    }, {
+      key: 'html.tag',
+      friendlyName: 'Tag',
+      defaultValue: 'div'
+    });
 
     registerAttributes(registry);
     registerStyles(registry);
