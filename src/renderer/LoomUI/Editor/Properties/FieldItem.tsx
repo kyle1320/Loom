@@ -55,6 +55,7 @@ const FieldItem: React.FC<Props> = ({ context, field, name }: Props) => {
       </div>
       { hasEditor &&
         <IconButton
+          title={raw ? 'Hide Raw' : 'Show Raw'}
           onClick={toggleRaw as () => void}
           icon={raw ? 'fa-image' : 'fa-code'} /> }
       { canClone &&

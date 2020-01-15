@@ -20,7 +20,7 @@ const LoomUI: React.FC<Props> = (props: Props) => {
     <ModalProvider>
       <SplitPane
         split="vertical"
-        minSize={100}
+        minSize={150}
         defaultSize={200}
         pane1Style={{ backgroundColor: color.primary1 }} >
         <Navigator context={selected} onSelect={select} />
