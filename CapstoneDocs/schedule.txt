@@ -3,8 +3,8 @@ Week 4:
   * Project scope
 
 Week 8:
-  * "Core" features are done or close to done
   * Many UI features still in-progress
+    * But core features are testable
   * Adequate progress is being made
 
 Week 12:
