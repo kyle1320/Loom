@@ -1,0 +1,14 @@
+Week 4:
+  * Design document
+  * Project scope
+
+Week 8:
+  * "Core" features are done or close to done
+  * Many UI features still in-progress
+  * Adequate progress is being made
+
+Week 12:
+  * Software practically done
+  * Rough draft of project report
+
+Focus on last few weeks will be on report.
