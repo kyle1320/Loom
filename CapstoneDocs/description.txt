@@ -1,4 +1,5 @@
-Loom
+Loom: Static Website Development / Design UI
+Advised by Dr. James Heliotis
 
 A desktop application designed to help make web development more accessible to beginning web developers, designers, and even non-technical persons, while also providing the tools to give experienced web developers the power they desire, using the languages they already know. It provides a "What You See Is What You Get" web page editor that can be used by non-technical authors, a code-free interface for styling web components geared toward designers, an optional code editor for custom scripting or styling and an extension API intended for developers. Features within the application are designed to mirror standard web technologies, such as CSS properties, to help facilitate the learning of these technologies by novice users. After designing one or more web pages within the application, users can export the pages to static files ready for serving on the web.
 
