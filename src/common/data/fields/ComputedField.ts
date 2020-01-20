@@ -9,7 +9,7 @@ class ComputedFieldObserver extends FieldObserver {
   private observers: (ContentObserver | LinkObserver)[];
 
   public constructor (
-    field: Field,
+    field: ComputedField,
     context: LObject,
     recursive: boolean
   ) {
