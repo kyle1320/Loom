@@ -1,0 +1,97 @@
+Target user:
+  - A semi-technical person who does not know web development
+
+Goals:
+  - UI logic is "close" to raw / generated code
+    - Knowledge gained by users can carry over to code
+  - Easy to use
+    - Novice user can figure it out quickly
+    - Advanced user has adequate power to change things
+    - High velocity
+  - Foundation can be extended via plugins
+
+------------
+HTML Elements
+  - Tag
+  - Attributes
+    - Class, ID
+  - Children
+
+Pages
+  - Location
+  - Head elements
+    - Title
+    - Meta
+    - Scripts
+    - Extras
+  - Body elements
+
+CSS Rules
+  - Selectors
+    - Pseudo-elements
+  - Rules
+    - Variables
+  - Media Queries
+  - Auto-linked via UI when an element triggers a rule
+
+JS
+  - Event Handlers
+
+Media
+  - Images, Fonts, etc.
+
+Values
+  - Colors, Measurements, Text, Images, etc.
+  - Strings
+  - Types: suggest editors / usage, but can be set manually
+  - Interpreted in a scope: can use variables
+
+Variables
+  - Mapping from a name to a Value
+  - Has a preferred Type
+  - Global: available everywhere
+  - Scoped: available "under" their declaration / within nested components
+    - Where can they be used? Attributes? Styles?
+
+Custom Attributes
+  - Can be defined on an element / component
+  - Processed into custom styles / Scripts
+  - e.g. custom animation fields
+  - How are these enacted in the live view?
+
+Reusable Components
+  - Have slots for required & optional scoped variables
+    - A la React props
+    - always includes children
+      - perhaps multiple slots for children?
+  - Should be made clear to the user that they are an abstraction
+  - Can be designed (by advanced / perhaps novice users?)
+  - User can make changes to base template, "clone", or "disconnect" from it.
+
+Future Work
+  - Custom attributes for e.g. animation
+    - Can generate styles, scripts, etc.
+  - Optimization; e.g. shortening class names
+
+-------------
+No inclusion of one field in another -- use variables.
+No inheritance -- if you want something reusable, make a component.
+  - Even among these, for modification you must use a wrapper component.
+CSS rule auto-created when element style is changed
+
+Use JSX syntax
+  - native elements use lower-case
+  - upper-case names are components
+
+Organization:
+  - Components
+    - Name.xml file for each component definition
+  - Pages
+    - Page.xml file for each page
+  - Styles
+  - Scripts
+  - Media
+  - project.json
+    - contains global variables, etc.
+
+To export, pages, styles, scripts, etc. are simply written to disk

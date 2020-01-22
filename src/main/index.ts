@@ -1,7 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import { format as formatUrl } from 'url';
 import path from 'path';
-import os from 'os';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -17,9 +16,6 @@ function createWindow(): void {
 
   if (isDevelopment) {
     win.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
-    BrowserWindow.addDevToolsExtension(
-      path.join(os.homedir(), '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.2.1_0')
-    );
   }
   else {
     win.loadURL(formatUrl({
