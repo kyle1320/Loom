@@ -1,55 +1,29 @@
 {
-  "name": "loom-ui",
+  "name": "loom",
   "version": "1.0.0",
-  "description": "",
+  "repository": "https://github.com/kyle1320/loom",
+  "author": "Kyle Cutler <kyle1320@gmail.com>",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "devDependencies": {
+    "@types/jest": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.17.0",
+    "@typescript-eslint/parser": "^2.17.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.18.0",
+    "jest": "^25.1.0",
+    "lerna": "^3.20.2",
+    "ts-jest": "^25.0.0",
+    "typescript": "^3.7.5"
+  },
   "scripts": {
-    "dev": "electron-webpack dev",
-    "dist": "electron-webpack && electron-builder",
-    "lint": "eslint src --ext js,ts,jsx,tsx",
+    "lint": "eslint packages --ext js,ts,jsx,tsx",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run lint",
-    "test": "jest"
+    "test": "jest",
+    "ui": "cd packages/loom-ui && yarn run dev"
   },
-  "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "@babel/core": "^7.7.2",
-    "@babel/preset-env": "^7.7.1",
-    "@fortawesome/fontawesome-free": "^5.11.2",
-    "@fortawesome/free-solid-svg-icons": "^5.11.2",
-    "@types/jest": "^24.0.22",
-    "@types/node": "^12.12.6",
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.9.4",
-    "@types/react-measure": "^2.0.5",
-    "@typescript-eslint/eslint-plugin": "^2.6.1",
-    "@typescript-eslint/parser": "^2.6.1",
-    "electron": "^7.1.1",
-    "electron-builder": "^22.1.0",
-    "electron-webpack": "^2.7.4",
-    "electron-webpack-ts": "^3.2.0",
-    "eslint": "^6.6.0",
-    "eslint-plugin-react": "^7.16.0",
-    "jest": "^24.9.0",
-    "node-sass": "^4.13.0",
-    "sass-loader": "^8.0.0",
-    "ts-jest": "^24.1.0",
-    "typescript": "^3.7.2",
-    "webpack": "^4.41.2"
-  },
-  "dependencies": {
-    "fuse.js": "^3.4.6",
-    "html-react-parser": "^0.9.2",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-measure": "^2.3.0",
-    "react-split-pane": "^0.1.89",
-    "source-map-support": "^0.5.16"
-  },
-  "build": {
-    "productName": "Loom",
-    "appId": "com.kylecutler.loom",
-    "mac": {
-      "identity": false
-    }
-  }
+  "workspaces": [
+    "packages/*"
+  ]
 }
