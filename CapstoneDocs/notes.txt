@@ -8,7 +8,14 @@ Goals:
     - Novice user can figure it out quickly
     - Advanced user has adequate power to change things
     - High velocity
-  - Foundation can be extended via plugins
+
+Scope for Capstone:
+  - HTML / CSS only (no scripts or media files)
+  - Basic editing of content, attributes, styles
+    - Tree view (for elements / components & children, and pages)
+    - Properties view (for attributes & styles)
+  - Variables, scoping
+  - Custom Components
 
 ------------
 HTML Elements
@@ -53,14 +60,8 @@ Variables
   - Scoped: available "under" their declaration / within nested components
     - Where can they be used? Attributes? Styles?
 
-Custom Attributes
-  - Can be defined on an element / component
-  - Processed into custom styles / Scripts
-  - e.g. custom animation fields
-  - How are these enacted in the live view?
-
 Reusable Components
-  - Have slots for required & optional scoped variables
+  - Have slots for scoped variables
     - A la React props
     - always includes children
       - perhaps multiple slots for children?
@@ -68,10 +69,18 @@ Reusable Components
   - Can be designed (by advanced / perhaps novice users?)
   - User can make changes to base template, "clone", or "disconnect" from it.
 
+???????:
+  - How to handle additional attributes / styles
+
 Future Work
-  - Custom attributes for e.g. animation
+  - Custom attributes
     - Can generate styles, scripts, etc.
+    - Can be defined on an element / component
+    - Processed into custom styles / Scripts
+    - e.g. custom animation fields
   - Optimization; e.g. shortening class names
+  - Scripts, media
+  - Multiple children / children as variables
 
 -------------
 No inclusion of one field in another -- use variables.
