@@ -3,6 +3,12 @@
         "browser": true
     },
     "extends": [
+        "plugin:react/recommended",
         "../../.eslintrc.json"
-    ]
+    ],
+    "settings": {
+        "react": {
+          "version": "detect"
+        }
+      }
 }

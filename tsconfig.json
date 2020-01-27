@@ -26,8 +26,11 @@
       "loom-core": ["loom-core/src"]
     }
   },
+  "include": [
+    "packages/**/*"
+  ],
   "exclude": [
-    "node_modules",
-    "dist"
+    "**/dist",
+    "**/node_modules"
   ]
 }
