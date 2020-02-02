@@ -1,20 +1,59 @@
-import { BuildResult, InterpolatedStringMap } from '.';
+import { BuildResult, InterpolatedStringMap, InterpolatedString } from '.';
 import {
-  SheetDef,
   RuleDef,
   StyleRuleDef,
-  StyleDeclarationDef } from '../definitions/CSS';
+  StyleDeclarationDef,
+  RuleListDef,
+  SheetDef } from '../definitions/CSS';
 import { Sources } from '../Definitions';
 import { ComputedList } from '../data/List';
 
 export class Sheet extends BuildResult<SheetDef, {
+  'locationChanged': string;
+}> {
+  private _location: InterpolatedString;
+  public readonly rules: RuleList;
+
+  public constructor(
+    public readonly source: SheetDef,
+    public readonly sources: Sources
+  ) {
+    super(source, sources);
+
+    this._location = new InterpolatedString(source.location, this.sources.vars);
+    this.rules = source.rules.build(this.sources);
+
+    this.listen(this._location, 'change', x => this.emit('locationChanged', x));
+    this.listen(source, 'locationChanged', this.updateLocation);
+  }
+
+  private updateLocation = (loc: string): void => {
+    this._location.value = loc;
+  }
+
+  public get location(): string {
+    return this._location.value;
+  }
+
+  public serialize(): string {
+    return this.rules.serialize();
+  }
+
+  public destroy(): void {
+    this._location.destroy();
+    this.rules.destroy();
+    super.destroy();
+  }
+}
+
+export class RuleList extends BuildResult<RuleListDef, {
   'add': { index: number; value: Rule };
   'remove': number;
 }> {
   private readonly data: ComputedList<Rule>;
 
   public constructor(
-    public readonly source: SheetDef,
+    public readonly source: RuleListDef,
     public readonly sources: Sources
   ) {
     super(source, sources);

@@ -1,11 +1,34 @@
 import {
   SheetDef,
   StyleRuleDef,
-  StyleDeclarationDef } from '../definitions/CSS';
+  StyleDeclarationDef,
+  RuleListDef } from '../definitions/CSS';
 import { Sources } from '../definitions';
 
 it('Sheet', () => {
-  const sheet = new SheetDef([
+  const el = new SheetDef('index.css', [
+    new StyleRuleDef('.test', {})
+  ]);
+  const sources = new Sources({ root: 'home' });
+  const out = el.build(sources);
+
+  const cb = jest.fn();
+  out.on('locationChanged', cb);
+
+  expect(out.location).toBe('index.css');
+  expect(out.serialize()).toBe('.test{}');
+
+  el.location = '{{root}}/index.css';
+  expect(cb).toHaveBeenLastCalledWith('home/index.css', 'locationChanged');
+  expect(out.location).toBe('home/index.css');
+
+  sources.vars.set('root', 'test');
+  expect(cb).toHaveBeenLastCalledWith('test/index.css', 'locationChanged');
+  expect(out.location).toBe('test/index.css');
+});
+
+it('RuleList', () => {
+  const sheet = new RuleListDef([
     new StyleRuleDef('.test1', {}),
     new StyleRuleDef('.test2', {})
   ]);

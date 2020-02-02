@@ -1,15 +1,53 @@
 import { Definition, Sources } from '../definitions';
-import { Sheet, Rule, StyleRule, StyleDeclaration } from '../build/CSS';
+import {
+  Sheet,
+  Rule,
+  StyleRule,
+  StyleDeclaration,
+  RuleList } from '../build/CSS';
 import { WritableList } from '../data/List';
 import { EventEmitter } from '../util/EventEmitter';
 import { WritableStringMap } from '../data/StringMap';
 
 export class SheetDef
-  extends WritableList<RuleDef>
-  implements Definition {
+  extends EventEmitter<{
+    'locationChanged': string;
+  }> implements Definition {
+
+  public readonly rules: RuleListDef;
+
+  public constructor(
+    private _location: string,
+    rules: RuleListDef | RuleDef[]
+  ) {
+    super();
+
+    this.rules = rules instanceof RuleListDef
+      ? rules : new RuleListDef(rules);
+  }
+
+  public get location(): string {
+    return this._location;
+  }
+
+  public set location(val: string) {
+    if (this._location !== val) {
+      this._location = val;
+      this.emit('locationChanged', val);
+    }
+  }
 
   public build(sources: Sources): Sheet {
     return new Sheet(this, sources);
+  }
+}
+
+export class RuleListDef
+  extends WritableList<RuleDef>
+  implements Definition {
+
+  public build(sources: Sources): RuleList {
+    return new RuleList(this, sources);
   }
 }
 
