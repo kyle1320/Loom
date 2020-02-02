@@ -1,7 +1,7 @@
-import { Destroyable, mapRecord } from '../util';
+import { Destroyable } from '../util';
 import { Definition, Sources } from '../definitions';
 import { EventEmitter } from '../util/EventEmitter';
-import { StringMap, WritableStringMap } from '../data/StringMap';
+import { StringMap, ComputedStringMap } from '../data/StringMap';
 
 export abstract class BuildResult<D extends Definition, E = unknown>
   extends EventEmitter<E>
@@ -46,7 +46,7 @@ export abstract class InterpolatedStringMap<
     'delete': string;
   }> {
 
-  protected readonly data: WritableStringMap<InterpolatedString>;
+  protected readonly data: ComputedStringMap<InterpolatedString>;
 
   public constructor(
     public readonly source: D,
@@ -54,27 +54,18 @@ export abstract class InterpolatedStringMap<
   ) {
     super(source, sources);
 
-    this.data = new WritableStringMap(
-      mapRecord(source.asRecord(), (v: string, k: string) =>
-        new InterpolatedString(v, sources.vars)
-          .on('change', v => this.emit('set', { key: k, value: v })))
-    );
-
-    this.listen(this.data, 'set', ({ key, value }) => {
-      this.emit('set', { key, value: value.value })
-    });
-    this.listen(this.data, 'delete', key => this.emit('delete', key));
-
-    this.listen(source, 'set', ({ key, value }) => {
-      const itp = this.data.get(key);
-      if (itp) {
-        itp.value = value;
-      } else {
-        this.data.set(key, new InterpolatedString(value, this.sources.vars)
-          .on('change', value => this.emit('set', { key, value })));
-      }
-    });
-    this.listen(source, 'delete', key => this.data.delete(key).destroy());
+    this.data = source.map(
+      (value, key, old?: InterpolatedString) => {
+        if (old) {
+          old.value = value
+          return old;
+        }
+        return new InterpolatedString(value, sources.vars)
+          .on('change', value => this.emit('set', { key, value }));
+      },
+      val => val.destroy()
+    ).on('set', ({key, value}) => this.emit('set', {key, value: value.value}))
+      .on('delete', key => this.emit('delete', key));
   }
 
   public get(key: string): string | undefined {
@@ -88,10 +79,7 @@ export abstract class InterpolatedStringMap<
   public abstract serialize(): string;
 
   public destroy(): void {
-    const attrs = this.data.asRecord();
-    for (const key in attrs) {
-      attrs[key].destroy();
-    }
+    this.data.destroy();
     super.destroy();
   }
 }

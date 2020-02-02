@@ -7,7 +7,7 @@ import {
   ChildrenDef,
   ElementDef,
   ComponentDef} from '../definitions/HTML';
-import { WritableList } from '../data/List';
+import { ComputedList } from '../data/List';
 
 export type Node = TextNode | Element | EmptyComponent;
 
@@ -59,8 +59,7 @@ export class Children extends BuildResult<ChildrenDef, {
   'update': { index: number; value: Node };
   'remove': number;
 }> {
-  private readonly data: WritableList<Node | Component>;
-  private readonly listeners: Map<Component, () => void> = new Map();
+  private readonly data: ComputedList<TextNode | Element | Component>;
 
   public constructor(
     public readonly source: ChildrenDef,
@@ -68,34 +67,19 @@ export class Children extends BuildResult<ChildrenDef, {
   ) {
     super(source, sources);
 
-    this.data = new WritableList<Node | Component>()
-      .on('add', ({ index, value }) => {
-        if (value instanceof Component) {
-          const cleanup = this.listen(value, 'elementChanged', el => {
-            this.emit('update', {
-              index: this.data.asArray().indexOf(value),
-              value: el
-            });
-          });
-          this.listeners.set(value, cleanup);
-        }
-        this.emit('add', { index, value: this.get(index) });
-      }).on('remove', ({ index, value }) => {
-        if (value instanceof Component) {
-          const cleanup = this.listeners.get(value);
-          cleanup && cleanup();
-        }
-        this.emit('remove', index);
-      });
-
-    for (const value of source) {
-      this.data.add(value.build(sources));
-    }
-
-    source.on('add', ({ value, index }) => {
-      this.data.add(value.build(sources), index);
-    });
-    source.on('remove', ({ index }) => this.data.remove(index));
+    this.data = source.map(def => {
+      const built = def.build(sources);
+      if (built instanceof Component) {
+        built.on('elementChanged', el => this.emit('update', {
+          index: this.data.asArray().indexOf(built),
+          value: el
+        }));
+      }
+      return built;
+    }, value => value.destroy())
+      .on('add', ({ index }) =>
+        this.emit('add', { index, value: this.get(index) }))
+      .on('remove', ({ index }) => this.emit('remove', index));
   }
 
   public get(index: number): Node {
@@ -117,9 +101,7 @@ export class Children extends BuildResult<ChildrenDef, {
   }
 
   public destroy(): void {
-    for (const obj of this.data) {
-      obj.destroy();
-    }
+    this.data.destroy();
     super.destroy();
   }
 }

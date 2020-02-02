@@ -5,13 +5,13 @@ import {
   StyleRuleDef,
   StyleDeclarationDef } from '../definitions/CSS';
 import { Sources } from '../Definitions';
-import { WritableList } from '../data/List';
+import { ComputedList } from '../data/List';
 
 export class Sheet extends BuildResult<SheetDef, {
   'add': { index: number; value: Rule };
   'remove': number;
 }> {
-  private readonly data: WritableList<Rule>;
+  private readonly data: ComputedList<Rule>;
 
   public constructor(
     public readonly source: SheetDef,
@@ -19,15 +19,9 @@ export class Sheet extends BuildResult<SheetDef, {
   ) {
     super(source, sources);
 
-    this.data =
-      new WritableList<Rule>(source.asArray().map(v => v.build(sources)))
-        .on('add', data => this.emit('add', data))
-        .on('remove', ({ index }) => this.emit('remove', index));
-
-    source.on('add', ({ value, index }) => {
-      this.data.add(value.build(sources), index);
-    });
-    source.on('remove', ({ index }) => this.data.remove(index));
+    this.data = source.map(x => x.build(sources), x => x.destroy())
+      .on('add', data => this.emit('add', data))
+      .on('remove', ({ index }) => this.emit('remove', index));
   }
 
   public get(index: number): Rule {
@@ -43,9 +37,7 @@ export class Sheet extends BuildResult<SheetDef, {
   }
 
   public destroy(): void {
-    for (const obj of this.data) {
-      obj.destroy();
-    }
+    this.data.destroy();
     super.destroy();
   }
 }

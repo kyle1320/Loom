@@ -1,4 +1,5 @@
 import { EventEmitter, PlainEmitter } from '../util/EventEmitter';
+import { Destroyable, mapRecord } from '../util';
 
 export namespace StringMap {
   export type Events<T> = {
@@ -61,6 +62,13 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     this.keyListeners.off(key, callback);
     return this;
   }
+
+  public map<U>(
+    transform: (val: T, key: string, oldValue?: U) => U,
+    cleanup?: (val: U) => void
+  ): ComputedStringMap<U> {
+    return new MappedStringMap(this, transform, cleanup);
+  }
 }
 
 export class WritableStringMap<T> extends StringMap<T> {
@@ -70,5 +78,54 @@ export class WritableStringMap<T> extends StringMap<T> {
 
   public delete(key: string): T {
     return super.delete(key);
+  }
+}
+
+export abstract class ComputedStringMap<T>
+  extends StringMap<T>
+  implements Destroyable {
+
+  public abstract destroy(): void;
+}
+
+class MappedStringMap<T, U> extends ComputedStringMap<U> {
+  public constructor(
+    private readonly source: StringMap<T>,
+    private readonly transform: (val: T, key: string, oldValue?: U) => U,
+    private readonly cleanup?: (val: U) => void
+  ) {
+    super(mapRecord(source.asRecord(), transform));
+
+    source.on('set', this.sourceSet);
+    source.on('delete', this.sourceDelete);
+  }
+
+  private sourceSet = (
+    { key, value }: { key: string; value: T }
+  ): void => {
+    const oldValue = this.get(key);
+    const newValue = this.transform(value, key, this.data[key]);
+    if (this.cleanup && oldValue && newValue !== oldValue) {
+      this.cleanup(oldValue);
+    }
+    this.set(key, newValue);
+  }
+
+  private sourceDelete = (key: string): void => {
+    if (key in this.data) {
+      this.cleanup && this.cleanup(this.data[key]);
+    }
+    this.delete(key);
+  }
+
+  public destroy(): void {
+    this.source.off('set', this.sourceSet);
+    this.source.off('delete', this.sourceDelete);
+    if (this.cleanup) {
+      for (const key in this.data) {
+        this.cleanup(this.data[key]);
+      }
+    }
+    this.allOff();
   }
 }
