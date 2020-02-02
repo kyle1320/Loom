@@ -3,9 +3,34 @@ import {
   TextNodeDef,
   AttributesDef,
   ComponentDef,
-  ChildrenDef } from '../definitions/HTML';
+  ChildrenDef,
+  PageDef } from '../definitions/HTML';
 import { Sources } from '../definitions';
 import { EmptyComponent } from '../build/HTML';
+
+it('Page', () => {
+  const el = new PageDef('index.html',
+    new ElementDef('head', {}, []),
+    new ElementDef('body', {}, [])
+  );
+  const sources = new Sources({ root: 'home' });
+  const out = el.build(sources);
+
+  const cb = jest.fn();
+  out.on('locationChanged', cb);
+
+  expect(out.location).toBe('index.html');
+  expect(out.serialize())
+    .toBe('<!doctype HTML><html><head></head><body></body></html>');
+
+  el.location = '{{root}}/index.html';
+  expect(cb).toHaveBeenLastCalledWith('home/index.html', 'locationChanged');
+  expect(out.location).toBe('home/index.html');
+
+  sources.vars.set('root', 'test');
+  expect(cb).toHaveBeenLastCalledWith('test/index.html', 'locationChanged');
+  expect(out.location).toBe('test/index.html');
+});
 
 it('Element', () => {
   const el = new ElementDef('div', { title: 'test'}, [
