@@ -1,4 +1,4 @@
-import { BuildResult, InterpolatedString } from '.';
+import { BuildResult, InterpolatedString, InterpolatedStringMap } from '.';
 import { Sources } from '../definitions';
 import {
   TextNodeDef,
@@ -8,8 +8,6 @@ import {
   ElementDef,
   ComponentDef} from '../definitions/HTML';
 import { WritableList } from '../data/List';
-import { WritableStringMap } from '../data/StringMap';
-import { mapRecord } from '../util';
 
 export type Node = TextNode | Element | EmptyComponent;
 
@@ -44,49 +42,7 @@ export class TextNode extends BuildResult<TextNodeDef, {
   }
 }
 
-export class Attributes extends BuildResult<AttributesDef, {
-  'set': { key: string; value: string };
-  'delete': string;
-}> {
-  private readonly data: WritableStringMap<InterpolatedString>;
-
-  public constructor(
-    public readonly source: AttributesDef,
-    public readonly sources: Sources
-  ) {
-    super(source, sources);
-
-    this.data = new WritableStringMap(
-      mapRecord(source.asRecord(), (v, k) =>
-        new InterpolatedString(v, sources.vars)
-          .on('change', v => this.emit('set', { key: k, value: v })))
-    );
-
-    this.listen(this.data, 'set', ({ key, value }) => {
-      this.emit('set', { key, value: value.value })
-    });
-    this.listen(this.data, 'delete', key => this.emit('delete', key));
-
-    this.listen(source, 'set', ({ key, value }) => {
-      const itp = this.data.get(key);
-      if (itp) {
-        itp.value = value;
-      } else {
-        this.data.set(key, new InterpolatedString(value, this.sources.vars)
-          .on('change', value => this.emit('set', { key, value })));
-      }
-    });
-    this.listen(source, 'delete', key => this.data.delete(key).destroy());
-  }
-
-  public get(key: string): string | undefined {
-    return this.data.get(key)?.value;
-  }
-
-  public keys(): IterableIterator<string> {
-    return this.data.keys();
-  }
-
+export class Attributes extends InterpolatedStringMap<AttributesDef> {
   public serialize(): string {
     const attrs = this.data.asRecord();
     let res = '';
@@ -95,14 +51,6 @@ export class Attributes extends BuildResult<AttributesDef, {
       res += ' ' + key + '="' + attrs[key].value + '"';
     }
     return res;
-  }
-
-  public destroy(): void {
-    const attrs = this.data.asRecord();
-    for (const key in attrs) {
-      attrs[key].destroy();
-    }
-    super.destroy();
   }
 }
 
