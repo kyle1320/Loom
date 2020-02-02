@@ -2,6 +2,24 @@ import { Destroyable } from '../util';
 import { Definition, Sources } from '../definitions';
 import { EventEmitter } from '../util/EventEmitter';
 import { StringMap, ComputedStringMap } from '../data/StringMap';
+import { ComputedList } from '../data/List';
+import { Page } from './HTML';
+import { Sheet } from './CSS';
+
+export class Results implements Destroyable {
+  public readonly pages: ComputedList<Page>;
+  public readonly stylesheets: ComputedList<Sheet>;
+
+  public constructor(sources: Sources) {
+    this.pages = sources.pages.map(page => page.build(sources));
+    this.stylesheets = sources.stylesheets.map(sheet => sheet.build(sources));
+  }
+
+  public destroy(): void {
+    this.pages.destroy();
+    this.stylesheets.destroy();
+  }
+}
 
 export abstract class BuildResult<D extends Definition, E = unknown>
   extends EventEmitter<E>

@@ -1,5 +1,5 @@
 import { ElementDef, PageDef } from './HTML';
-import { BuildResult } from '../build';
+import { BuildResult, Results } from '../build';
 import { WritableStringMap } from '../data/StringMap';
 import { WritableList } from '../data/List';
 import { SheetDef } from './CSS';
@@ -29,5 +29,9 @@ export class Sources {
       ? pages : new WritableList(pages)
     this.stylesheets = stylesheets instanceof WritableList
       ? stylesheets : new WritableList(stylesheets);
+  }
+
+  public build(): Results {
+    return new Results(this);
   }
 }
