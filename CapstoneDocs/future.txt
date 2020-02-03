@@ -1,0 +1,14 @@
+Future Work
+
+* Custom attributes
+  * Can generate styles, scripts, etc.
+  * Can be defined on an element / component
+  * Processed into custom styles / Scripts
+  * e.g. custom animation fields
+* Component variables / children
+  * Can be used inside of component definition
+  * Multiple children / children as variables
+* Optimization; e.g. shortening class names
+* Scripts, media
+* Building one page / stylesheet at a time
+* Automatic linking of file locations
