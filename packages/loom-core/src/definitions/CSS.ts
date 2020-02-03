@@ -40,6 +40,10 @@ export class SheetDef
   public build(sources: Sources): Sheet {
     return new Sheet(this, sources);
   }
+
+  public serialize(): string {
+    return this.rules.serialize();
+  }
 }
 
 export class RuleListDef
@@ -49,10 +53,15 @@ export class RuleListDef
   public build(sources: Sources): RuleList {
     return new RuleList(this, sources);
   }
+
+  public serialize(): string {
+    return this.asArray().map(obj => obj.serialize()).join('\n');
+  }
 }
 
 export abstract class RuleDef implements Definition {
   public abstract build(sources: Sources): Rule;
+  public abstract serialize(): string;
 }
 
 export class StyleRuleDef
@@ -86,6 +95,10 @@ export class StyleRuleDef
   public build(sources: Sources): StyleRule {
     return new StyleRule(this, sources);
   }
+
+  public serialize(): string {
+    return this.selectorText + '{' + this.style.serialize() + '}';
+  }
 }
 
 export class StyleDeclarationDef
@@ -94,5 +107,14 @@ export class StyleDeclarationDef
 
   public build(sources: Sources): StyleDeclaration {
     return new StyleDeclaration(this, sources);
+  }
+
+  public serialize(): string {
+    const data = this.asRecord();
+    let res = '';
+    for (const key in data) {
+      res += key + ':' + data[key] + ';';
+    }
+    return res;
   }
 }

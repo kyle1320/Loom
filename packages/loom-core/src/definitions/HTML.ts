@@ -37,6 +37,10 @@ export class TextNodeDef
   public build(sources: Sources): TextNode {
     return new TextNode(this, sources);
   }
+
+  public serialize(): string {
+    return this.content;
+  }
 }
 
 export class AttributesDef
@@ -46,6 +50,16 @@ export class AttributesDef
   public build(sources: Sources): Attributes {
     return new Attributes(this, sources);
   }
+
+  public serialize(): string {
+    const attrs = this.asRecord();
+    let res = '';
+    for (const key in attrs) {
+      // TODO: escape
+      res += ' ' + key + '="' + attrs[key] + '"';
+    }
+    return res;
+  }
 }
 
 export class ChildrenDef
@@ -54,6 +68,10 @@ export class ChildrenDef
 
   public build(sources: Sources): Children {
     return new Children(this, sources);
+  }
+
+  public serialize(): string {
+    return this.asArray().map(obj => obj.serialize()).join('');
   }
 }
 
@@ -81,6 +99,10 @@ export class ComponentDef
 
   public build(sources: Sources): Component {
     return new Component(this, sources);
+  }
+
+  public serialize(): string {
+    return `<${this.name} />`;
   }
 }
 
@@ -119,6 +141,13 @@ export class ElementDef
   public build(sources: Sources): Element {
     return new Element(this, sources);
   }
+
+  public serialize(): string {
+    const tag = this.tag;
+    const attrs = this.attrs.serialize();
+    const content = this.children.serialize();
+    return `<${tag}${attrs}>${content}</${tag}>`;
+  }
 }
 
 export class PageDef
@@ -146,5 +175,12 @@ export class PageDef
 
   public build(sources: Sources): Page {
     return new Page(this, sources);
+  }
+
+  public serialize(): string {
+    return '<!doctype HTML><html>' +
+      this.head.serialize() +
+      this.body.serialize() +
+      '</html>';
   }
 }

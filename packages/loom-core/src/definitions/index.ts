@@ -5,6 +5,7 @@ import { WritableList } from '../data/List';
 import { SheetDef } from './CSS';
 
 export interface Definition {
+  serialize(): string;
   build(sources: Sources): BuildResult<Definition>;
 }
 
