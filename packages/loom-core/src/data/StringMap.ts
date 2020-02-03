@@ -25,6 +25,10 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     return this.data[key];
   }
 
+  public has(key: string): boolean {
+    return key in this.data;
+  }
+
   public *keys(): IterableIterator<string> {
     for (const key in this.data) {
       yield key;
