@@ -69,18 +69,13 @@ Reusable Components
   - Can be designed (by advanced / perhaps novice users?)
   - User can make changes to base template, "clone", or "disconnect" from it.
 
-???????:
-  - How to handle additional attributes / styles
-
-Future Work
-  - Custom attributes
-    - Can generate styles, scripts, etc.
-    - Can be defined on an element / component
-    - Processed into custom styles / Scripts
-    - e.g. custom animation fields
-  - Optimization; e.g. shortening class names
-  - Scripts, media
-  - Multiple children / children as variables
+Separate definitions into "Content" and "Data"
+  - Content is everything that will directly turn into files when exported
+    - Pages, Stylesheets, Scripts, Media files, etc.
+    - Stored in a tree structure corresponding to their location
+  - Data is everything else
+    - Components, Variables, etc.
+    - Stored in any useful format; e.g. maps
 
 -------------
 No inclusion of one field in another -- use variables.
