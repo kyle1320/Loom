@@ -150,28 +150,11 @@ export class ElementDef
   }
 }
 
-export class PageDef
-  extends EventEmitter<{
-    'locationChanged': string;
-  }> implements Definition {
+export class PageDef implements Definition {
   public constructor(
-    private _location: string,
     public readonly head: ElementDef,
     public readonly body: ElementDef,
-  ) {
-    super();
-  }
-
-  public get location(): string {
-    return this._location;
-  }
-
-  public set location(val: string) {
-    if (this._location !== val) {
-      this._location = val;
-      this.emit('locationChanged', val);
-    }
-  }
+  ) { }
 
   public build(sources: Sources): Page {
     return new Page(this, sources);

@@ -6,25 +6,13 @@ import {
 import { Sources } from '../definitions';
 
 it('Sheet', () => {
-  const el = new SheetDef('index.css', [
+  const el = new SheetDef([
     new StyleRuleDef('.test', {})
   ]);
   const sources = new Sources({ root: 'home' });
   const out = el.build(sources);
 
-  const cb = jest.fn();
-  out.on('locationChanged', cb);
-
-  expect(out.location).toBe('index.css');
   expect(out.serialize()).toBe('.test{}');
-
-  el.location = '{{root}}/index.css';
-  expect(cb).toHaveBeenLastCalledWith('home/index.css', 'locationChanged');
-  expect(out.location).toBe('home/index.css');
-
-  sources.vars.set('root', 'test');
-  expect(cb).toHaveBeenLastCalledWith('test/index.css', 'locationChanged');
-  expect(out.location).toBe('test/index.css');
 });
 
 it('RuleList', () => {

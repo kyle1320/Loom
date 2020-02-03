@@ -1,7 +1,6 @@
 import { ElementDef, PageDef } from './HTML';
 import { BuildResult, Results } from '../build';
 import { WritableStringMap } from '../data/StringMap';
-import { WritableList } from '../data/List';
 import { SheetDef } from './CSS';
 
 export interface Definition {
@@ -9,27 +8,24 @@ export interface Definition {
   build(sources: Sources): BuildResult<Definition>;
 }
 
+export type ContentDef = PageDef | SheetDef;
+
 export class Sources {
   public readonly vars: WritableStringMap<string>;
   public readonly components: WritableStringMap<ElementDef>;
-
-  public readonly pages: WritableList<PageDef>;
-  public readonly stylesheets: WritableList<SheetDef>;
+  public readonly content: WritableStringMap<ContentDef>;
 
   public constructor(
     vars: WritableStringMap<string> | Record<string, string> = {},
     components: WritableStringMap<ElementDef> | Record<string, ElementDef> = {},
-    pages: WritableList<PageDef> | PageDef[] = [],
-    stylesheets: WritableList<SheetDef> | SheetDef[] = []
+    content: WritableStringMap<ContentDef> | Record<string, ContentDef> = {}
   ) {
     this.vars = vars instanceof WritableStringMap
       ? vars : new WritableStringMap(vars);
     this.components = components instanceof WritableStringMap
       ? components : new WritableStringMap(components);
-    this.pages = pages instanceof WritableList
-      ? pages : new WritableList(pages)
-    this.stylesheets = stylesheets instanceof WritableList
-      ? stylesheets : new WritableList(stylesheets);
+    this.content = content instanceof WritableStringMap
+      ? content : new WritableStringMap(content);
   }
 
   public build(): Results {

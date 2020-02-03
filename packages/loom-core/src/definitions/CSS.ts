@@ -9,32 +9,14 @@ import { WritableList } from '../data/List';
 import { EventEmitter } from '../util/EventEmitter';
 import { WritableStringMap } from '../data/StringMap';
 
-export class SheetDef
-  extends EventEmitter<{
-    'locationChanged': string;
-  }> implements Definition {
-
+export class SheetDef implements Definition {
   public readonly rules: RuleListDef;
 
   public constructor(
-    private _location: string,
     rules: RuleListDef | RuleDef[]
   ) {
-    super();
-
     this.rules = rules instanceof RuleListDef
       ? rules : new RuleListDef(rules);
-  }
-
-  public get location(): string {
-    return this._location;
-  }
-
-  public set location(val: string) {
-    if (this._location !== val) {
-      this._location = val;
-      this.emit('locationChanged', val);
-    }
   }
 
   public build(sources: Sources): Sheet {

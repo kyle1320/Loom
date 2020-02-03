@@ -210,10 +210,7 @@ export class Component extends BuildResult<ComponentDef, {
   }
 }
 
-export class Page extends BuildResult<PageDef, {
-  'locationChanged': string;
-}> {
-  private _location: InterpolatedString;
+export class Page extends BuildResult<PageDef> {
   public readonly head: Element;
   public readonly body: Element;
 
@@ -223,20 +220,8 @@ export class Page extends BuildResult<PageDef, {
   ) {
     super(source, sources);
 
-    this._location = new InterpolatedString(source.location, this.sources.vars);
     this.head = source.head.build(this.sources);
     this.body = source.body.build(this.sources);
-
-    this.listen(this._location, 'change', x => this.emit('locationChanged', x));
-    this.listen(source, 'locationChanged', this.updateLocation);
-  }
-
-  private updateLocation = (loc: string): void => {
-    this._location.value = loc;
-  }
-
-  public get location(): string {
-    return this._location.value;
   }
 
   public serialize(): string {
@@ -247,7 +232,6 @@ export class Page extends BuildResult<PageDef, {
   }
 
   public destroy(): void {
-    this._location.destroy();
     this.head.destroy();
     this.body.destroy();
     super.destroy();

@@ -1,4 +1,4 @@
-import { BuildResult, InterpolatedStringMap, InterpolatedString } from '.';
+import { BuildResult, InterpolatedStringMap } from '.';
 import {
   RuleDef,
   StyleRuleDef,
@@ -8,10 +8,7 @@ import {
 import { Sources } from '../Definitions';
 import { ComputedList } from '../data/List';
 
-export class Sheet extends BuildResult<SheetDef, {
-  'locationChanged': string;
-}> {
-  private _location: InterpolatedString;
+export class Sheet extends BuildResult<SheetDef> {
   public readonly rules: RuleList;
 
   public constructor(
@@ -20,19 +17,7 @@ export class Sheet extends BuildResult<SheetDef, {
   ) {
     super(source, sources);
 
-    this._location = new InterpolatedString(source.location, this.sources.vars);
     this.rules = source.rules.build(this.sources);
-
-    this.listen(this._location, 'change', x => this.emit('locationChanged', x));
-    this.listen(source, 'locationChanged', this.updateLocation);
-  }
-
-  private updateLocation = (loc: string): void => {
-    this._location.value = loc;
-  }
-
-  public get location(): string {
-    return this._location.value;
   }
 
   public serialize(): string {
@@ -40,7 +25,6 @@ export class Sheet extends BuildResult<SheetDef, {
   }
 
   public destroy(): void {
-    this._location.destroy();
     this.rules.destroy();
     super.destroy();
   }
