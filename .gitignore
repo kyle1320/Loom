@@ -66,5 +66,5 @@ dist/
 # Notes file
 notes.md
 
-#tsbuildinfo
-tsconfig.tsbuildinfo
+# TypeScript build info
+*.tsbuildinfo
