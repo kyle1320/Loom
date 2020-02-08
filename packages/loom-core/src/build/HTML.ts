@@ -92,6 +92,12 @@ export class Children extends BuildResult<ChildrenDef, {
     }
   }
 
+  public *[Symbol.iterator](): IterableIterator<Node> {
+    for (let i = 0; i < this.size(); i++) {
+      yield this.get(i);
+    }
+  }
+
   public size(): number {
     return this.data.size();
   }

@@ -80,8 +80,8 @@ class ElementChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    for (let i = 0; i < node.children.size(); i++) {
-      this.insertChild(new NodeNavigator(ui, node.children.get(i), depth + 1));
+    for (const child of node.children) {
+      this.insertChild(new NodeNavigator(ui, child, depth + 1));
     }
 
     this.listen(node.children, 'add', ({ index, value }) =>
