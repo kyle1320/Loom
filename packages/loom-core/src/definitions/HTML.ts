@@ -102,7 +102,7 @@ export class ComponentDef
   }
 
   public serialize(): string {
-    return `<${this.name} />`;
+    return `<loom:${this.name} />`;
   }
 }
 
