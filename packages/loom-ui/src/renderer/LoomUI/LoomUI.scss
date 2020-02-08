@@ -41,6 +41,15 @@ body {
   font-size: 14px;
 }
 
+input {
+  border: 1px solid $primary-5;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
 #app {
   width: 100%;
   height: 100%;

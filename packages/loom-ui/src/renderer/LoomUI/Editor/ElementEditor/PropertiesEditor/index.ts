@@ -19,6 +19,7 @@ export default class PropertiesEditor extends UIComponent {
         this.appendChild(new ContentField(data.source));
       } else if (data instanceof loom.Element) {
         this.appendChild(new TagField(data.source));
+        this.appendChild(new IdField(data.source));
         this.appendChild(new KeyValueList('Attributes', data.source.attrs));
       }
     });
@@ -59,3 +60,20 @@ class TagField extends PropertyField {
     this.listen(node, 'tagChanged', this.set);
   }
 }
+
+class IdField extends PropertyField {
+  public constructor(node: loom.ElementDef) {
+    super('Id',
+      new Input(node.attrs.get('id') || '')
+        .on('change', val => val
+          ? node.attrs.set('id', val)
+          : node.attrs.delete('id'))
+    );
+
+    this.autoCleanup(this.set,
+      cb => node.attrs.onKey('id', cb),
+      cb => node.attrs.offKey('id', cb),
+    );
+  }
+}
+

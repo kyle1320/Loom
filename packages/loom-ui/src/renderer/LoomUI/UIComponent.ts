@@ -38,10 +38,21 @@ export class UIComponent<
     event: K,
     cb: (data: E[K], event: K) => void
   ): () => void {
-    data.on(event, cb)
+    return this.autoCleanup(cb,
+      cb => data.on(event, cb),
+      cb => data.off(event, cb)
+    );
+  }
+
+  protected autoCleanup<T>(
+    value: T,
+    init: (value: T) => void,
+    cleanup: (value: T) => void
+  ): () => void {
+    init(value);
     const remove = (): void => {
       if (this.unlisteners.delete(remove)) {
-        data.off(event, cb);
+        cleanup(value);
       }
     }
     this.unlisteners.add(remove);
