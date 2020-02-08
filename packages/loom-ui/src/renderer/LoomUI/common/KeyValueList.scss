@@ -1,0 +1,46 @@
+@import "../LoomUI";
+
+.keyvaluelist {
+  overflow: hidden;
+  padding: 1px 0 0 1px;
+
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  &__title {
+    flex-grow: 1;
+  }
+
+  &__content {
+    background-color: $primary-0;
+    box-shadow: 0 0 2px inset rgba(0, 0, 0, 0.2);
+    height: 100px;
+    overflow-y: auto;
+  }
+
+  &__row {
+    padding: 0;
+    position: relative;
+
+    &.selected {
+      background-color: $accent;
+      color: white;
+    }
+
+    input {
+      border: 1px solid $primary-2;
+      background: none;
+      color: inherit;
+      padding: 2px 5px;
+      width: 50%;
+
+      &:focus {
+        outline: none;
+        border-color: $accent;
+        z-index: 1;
+      }
+    }
+  }
+}
