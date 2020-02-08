@@ -1,7 +1,6 @@
 import { Definition, Sources } from '../definitions';
 import {
   Sheet,
-  Rule,
   StyleRule,
   StyleDeclaration,
   RuleList } from '../build/CSS';
@@ -41,10 +40,7 @@ export class RuleListDef
   }
 }
 
-export abstract class RuleDef implements Definition {
-  public abstract build(sources: Sources): Rule;
-  public abstract serialize(): string;
-}
+export type RuleDef = StyleRuleDef;
 
 export class StyleRuleDef
   extends EventEmitter<{

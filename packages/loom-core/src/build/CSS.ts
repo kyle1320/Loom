@@ -1,6 +1,5 @@
 import { BuildResult, InterpolatedStringMap } from '.';
 import {
-  RuleDef,
   StyleRuleDef,
   StyleDeclarationDef,
   RuleListDef,
@@ -65,9 +64,7 @@ export class RuleList extends BuildResult<RuleListDef, {
   }
 }
 
-export abstract class Rule extends BuildResult<RuleDef> {
-  public abstract serialize(): string;
-}
+export type Rule = StyleRule;
 
 export class StyleRule extends BuildResult<StyleRuleDef, {
   'selectorChanged': string;
