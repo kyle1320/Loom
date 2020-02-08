@@ -1,0 +1,14 @@
+@import "../LoomUI";
+
+.node-nav {
+  padding: 5px 10px;
+  border-bottom: 1px solid $primary-1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.selected {
+    background-color: $accent;
+    color: white;
+  }
+}

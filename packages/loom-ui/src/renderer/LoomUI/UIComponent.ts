@@ -56,12 +56,29 @@ export class UIComponent<
     this.el.appendChild(comp.el);
   }
 
-  protected removeChild(comp: UIComponent, destroy = true): void {
-    const index = this.children.indexOf(comp);
+  protected insertChild(comp: UIComponent, index = this.children.length): void {
+    if (index === this.children.length) {
+      this.appendChild(comp);
+    } else {
+      comp.parent = this;
+      this.el.insertBefore(comp.el, this.children[index].el);
+      this.children.splice(index, 0, comp);
+    }
+  }
 
-    if (index > -1) {
-      comp = this.children.splice(index, 0)[0];
+  protected removeChild(comp: UIComponent | number, destroy = true): void {
+    if (typeof comp !== 'number') {
+      comp = this.children.indexOf(comp);
+    }
+
+    if (comp > -1) {
+      comp = this.children.splice(comp, 0)[0];
       destroy && comp.destroy();
     }
+  }
+
+  protected setChild(child: UIComponent, index: number): void {
+    this.removeChild(index);
+    this.insertChild(child, index);
   }
 }
