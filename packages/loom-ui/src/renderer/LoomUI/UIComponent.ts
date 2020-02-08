@@ -29,6 +29,10 @@ export class UIComponent<
     }
   }
 
+  public addTo(node: Node): void {
+    node.appendChild(this.el);
+  }
+
   protected listen<E, K extends keyof E>(
     data: loom.EventEmitter<E>,
     event: K,
@@ -48,6 +52,19 @@ export class UIComponent<
     for (const child of this.children) {
       child.destroy();
     }
+  }
+
+  protected changeEl(el: H): void {
+    if (this.el instanceof HTMLElement) {
+      this.el.replaceWith(el);
+    } else {
+      this.el.parentNode?.insertBefore(this.el, el);
+      this.el.parentNode?.removeChild(this.el);
+    }
+
+    this.el = el;
+
+    this.children.forEach(child => child.addTo(el));
   }
 
   protected appendChild(comp: UIComponent): void {
