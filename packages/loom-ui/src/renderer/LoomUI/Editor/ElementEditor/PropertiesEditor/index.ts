@@ -4,6 +4,7 @@ import LoomUI from '../../..';
 import { UIComponent } from '../../../UIComponent';
 import { makeElement } from '../../../util/dom';
 import Input from '../../../common/Input';
+import KeyValueList from '../../../common/KeyValueList';
 
 import './PropertiesEditor.scss';
 
@@ -18,6 +19,7 @@ export default class PropertiesEditor extends UIComponent {
         this.appendChild(new ContentField(data.source));
       } else if (data instanceof loom.Element) {
         this.appendChild(new TagField(data.source));
+        this.appendChild(new KeyValueList('Attributes', data.source.attrs));
       }
     });
   }
