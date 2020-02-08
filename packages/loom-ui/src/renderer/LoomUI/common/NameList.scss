@@ -1,0 +1,29 @@
+@import "../LoomUI";
+
+.namelist {
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  &__title {
+    flex-grow: 1;
+    padding-left: 2px;
+  }
+
+  &__content {
+    background-color: $primary-0;
+    box-shadow: 0 0 2px inset rgba(0, 0, 0, 0.2);
+    height: 100px;
+  }
+
+  &__row {
+    padding: 1px 5px;
+    border-bottom: 1px solid $primary-1;
+
+    &.selected {
+      background-color: $accent;
+      color: white;
+    }
+  }
+}
