@@ -9,9 +9,12 @@ export class UIComponent<
   protected children: UIComponent[] = [];
 
   public constructor(
-    protected el: H = null!
+    protected el: H = null!,
+    ...children: UIComponent[]
   ) {
     super();
+
+    children.forEach(comp => this.appendChild(comp));
   }
 
   public destroy(): void {
@@ -39,6 +42,12 @@ export class UIComponent<
     }
     this.unlisteners.add(remove);
     return remove;
+  }
+
+  protected empty(): void {
+    for (const child of this.children) {
+      child.destroy();
+    }
   }
 
   protected appendChild(comp: UIComponent): void {

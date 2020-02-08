@@ -1,0 +1,47 @@
+import LoomUI from '..';
+import { makeElement } from '../util/dom';
+import { UIComponent } from '../UIComponent';
+
+import './Editor.scss';
+
+class NoSelection extends UIComponent {
+  public constructor() {
+    super(makeElement('div', { className: 'no-data-editor '},
+      makeElement('div', { className: 'heading' },
+        'No data selected'
+      ),
+      makeElement('div', { className: 'subtitle' },
+        'Select an object on the left to view / edit'
+      )
+    ));
+  }
+}
+
+class UnknownSelection extends UIComponent {
+  public constructor() {
+    super(makeElement('div', { className: 'no-data-editor '},
+      makeElement('div', { className: 'heading' },
+        'Unexpected Selection!'
+      )
+    ));
+  }
+}
+
+function getEditor(ui: LoomUI, content = ui.getSelectedContent()): UIComponent {
+  if (content) {
+    return new UnknownSelection();
+  } else {
+    return new NoSelection();
+  }
+}
+
+export default class Editor extends UIComponent {
+  public constructor(ui: LoomUI) {
+    super(makeElement('div', { className: 'editor' }), getEditor(ui));
+
+    this.listen(ui, 'updateContent', content => {
+      this.empty();
+      this.appendChild(getEditor(ui, content));
+    });
+  }
+}

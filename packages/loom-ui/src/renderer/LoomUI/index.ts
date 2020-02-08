@@ -1,5 +1,7 @@
 import * as loom from 'loom-core';
 
+import Editor from './Editor';
+import Navigator from './Navigator';
 import { UIComponent } from './UIComponent';
 
 import './LoomUI.scss';
@@ -21,6 +23,9 @@ export default class LoomUI extends UIComponent<{
     public readonly sources: loom.Sources
   ) {
     super(document.getElementById('app')!);
+
+    this.appendChild(new Navigator(this));
+    this.appendChild(new Editor(this));
   }
 
   public selectContentDef(def: ContentDefTypes | null): void {
