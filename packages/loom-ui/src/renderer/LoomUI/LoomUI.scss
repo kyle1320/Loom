@@ -1,0 +1,51 @@
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+
+$primary-0: #ffffff;
+$primary-1: darken($primary-0, 5%);
+$primary-2: darken($primary-0, 10%);
+$primary-3: darken($primary-0, 15%);
+$primary-4: darken($primary-0, 20%);
+$primary-5: darken($primary-0, 25%);
+$primary-6: darken($primary-0, 30%);
+$primary-7: darken($primary-0, 35%);
+$primary-8: darken($primary-0, 40%);
+$primary-9: darken($primary-0, 45%);
+
+$primary-hl-0: #d8d8ff;
+$primary-hl-1: #cfcff5;
+$primary-hl-2: #c7c7eb;
+$primary-hl-3: #bebee0;
+
+$accent: #266eff;
+$text: #404040;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: $primary-0;
+  color: $text;
+  font-family: arial;
+  font-size: 14px;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  justify-content: stretch;
+}
