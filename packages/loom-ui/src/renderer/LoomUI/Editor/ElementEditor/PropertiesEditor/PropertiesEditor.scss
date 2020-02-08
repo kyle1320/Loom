@@ -1,0 +1,17 @@
+@import "../../../LoomUI";
+
+.properties-editor {
+  background-color: $primary-1;
+  width: 200px;
+  border-left: 1px solid $primary-5;
+}
+
+.property {
+  margin: 5px 2px;
+  display: flex;
+  flex-flow: row nowrap;
+
+  input {
+    margin-left: auto;
+  }
+}
