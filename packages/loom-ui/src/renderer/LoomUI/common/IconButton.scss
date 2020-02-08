@@ -1,0 +1,15 @@
+.icon-btn {
+  padding: 3px;
+  opacity: 0.9;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: initial;
+  }
+}
