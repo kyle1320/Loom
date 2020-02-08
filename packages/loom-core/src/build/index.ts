@@ -4,6 +4,7 @@ import { EventEmitter } from '../util/EventEmitter';
 import { StringMap, ComputedStringMap } from '../data/StringMap';
 import { Page } from './HTML';
 import { Sheet } from './CSS';
+import { exportResults } from '../serialization/out';
 
 export type Content = Page | Sheet;
 
@@ -17,6 +18,10 @@ export class Results implements Destroyable {
 
   public destroy(): void {
     this.content.destroy();
+  }
+
+  public exportTo(dir: string): void {
+    exportResults(this, dir);
   }
 }
 

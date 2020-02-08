@@ -14,7 +14,12 @@
     "watch": "tsc --watch"
   },
   "devDependencies": {
+    "@types/css": "^0.0.31",
     "@types/node": "^12.12.25",
     "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "css": "^2.2.4",
+    "htmlparser2": "^4.0.0"
   }
 }

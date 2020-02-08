@@ -9,7 +9,7 @@ it('Sheet', () => {
   const el = new SheetDef([
     new StyleRuleDef('.test', {})
   ]);
-  const sources = new Sources({ root: 'home' });
+  const sources = new Sources(null, { root: 'home' });
   const out = el.build(sources);
 
   expect(out.serialize()).toBe('.test{}');
@@ -20,7 +20,7 @@ it('RuleList', () => {
     new StyleRuleDef('.test1', {}),
     new StyleRuleDef('.test2', {})
   ]);
-  const sources = new Sources();
+  const sources = new Sources(null);
   const out = sheet.build(sources);
 
   const cb = jest.fn();
@@ -41,7 +41,7 @@ it('RuleList', () => {
 
 it('StyleRule', () => {
   const rule = new StyleRuleDef('.test', {});
-  const sources = new Sources();
+  const sources = new Sources(null);
   const out = rule.build(sources);
 
   const cb = jest.fn();
@@ -58,7 +58,7 @@ it('StyleDeclaration', () => {
   const rule = new StyleDeclarationDef({
     'color': 'red'
   });
-  const sources = new Sources({
+  const sources = new Sources(null, {
     primary: 'red'
   });
   const out = rule.build(sources);

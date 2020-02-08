@@ -13,7 +13,7 @@ it('Page', () => {
     new ElementDef('head', {}, []),
     new ElementDef('body', {}, [])
   );
-  const sources = new Sources({ root: 'home' });
+  const sources = new Sources(null, { root: 'home' });
   const out = el.build(sources);
 
   expect(out.serialize())
@@ -24,7 +24,7 @@ it('Element', () => {
   const el = new ElementDef('div', { title: 'test'}, [
     new TextNodeDef('testing')
   ]);
-  const out = el.build(new Sources());
+  const out = el.build(new Sources(null));
 
   const cb = jest.fn();
   out.on('tagChanged', cb);
@@ -37,7 +37,7 @@ it('Element', () => {
 });
 
 it('TextNode', () => {
-  const sources = new Sources({ val: 'abc' });
+  const sources = new Sources(null, { val: 'abc' });
   const el = new TextNodeDef('testing');
   const out = el.build(sources);
 
@@ -61,7 +61,7 @@ it('TextNode', () => {
 
 it('Component', () => {
   const def = new ElementDef('div', {}, [new TextNodeDef('{{val}}')]);
-  const sources = new Sources({ val: 'abc' }, { 'Test': def });
+  const sources = new Sources(null, { val: 'abc' }, { 'Test': def });
   const el = new ComponentDef('Test');
   const out = el.build(sources);
 
@@ -80,7 +80,7 @@ it('Component', () => {
 });
 
 it('Attributes', () => {
-  const sources = new Sources({ val: 'abc' });
+  const sources = new Sources(null, { val: 'abc' });
   const attrs = new AttributesDef({ title: 'test' });
   const out = attrs.build(sources);
 
@@ -108,7 +108,7 @@ it('Attributes', () => {
 
 it('Children', () => {
   const def = new ElementDef('div', {}, [new TextNodeDef('{{val}}')]);
-  const sources = new Sources({ val: 'abc' }, { 'Test': def });
+  const sources = new Sources(null, { val: 'abc' }, { 'Test': def });
   const el = new ElementDef('div', {}, []);
   const comp = new ComponentDef('Test');
   const text = new TextNodeDef('testing {{val}}');
