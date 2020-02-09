@@ -38,27 +38,36 @@ class KeyValueListContent extends UIComponent<{ select: string | null }> {
   }
 
   private addNewRow = (key: string): void => {
-    this.insertChild(this.rows[key] = this.newRow
-      .off('changeKey', this.addNewRow)
-      .on('changeValue', value => this.data.set(key, value))
-      .on('changeKey', newKey => this.changeKey(key, newKey))
+    if (this.data.has(key)) {
+      this.newRow.setKey('');
+      return;
+    }
+
+    const row = this.newRow;
+    key = this.data.normalizeKey(key);
+    row.setKey(key);
+    this.rows[key] = this.listenRow(
+      row.off('changeKey', this.addNewRow), key);
+    this.data.set(key, row.getValue());
+    this.appendChild(
+      this.newRow = new KeyValueListRow('', '')
+        .on('changeKey', this.addNewRow)
+    );
+  }
+
+  private listenRow(row: KeyValueListRow, key: string): KeyValueListRow {
+    return row
+      .on('changeValue', value => row.setKey(this.data.set(key, value)))
+      .on('changeKey', newKey => this.changeKey(row, key, newKey))
       .on('select', () => this.emit('select', key))
-      .on('deselect', () => this.emit('select', null)),
-    this.children.length - 1);
-    this.appendChild(this.newRow = new KeyValueListRow('', '')
-      .on('changeKey', this.addNewRow)
-    )
+      .on('deselect', () => this.emit('select', null));
   }
 
   private setRow(key: string, value: string): void {
     if (key in this.rows) {
       this.rows[key].setValue(value);
     } else {
-      const row = new KeyValueListRow(key, value)
-        .on('changeValue', value => this.data.set(key, value))
-        .on('changeKey', newKey => this.changeKey(key, newKey))
-        .on('select', () => this.emit('select', key))
-        .on('deselect', () => this.emit('select', null));
+      const row = this.listenRow(new KeyValueListRow(key, value), key);
       this.rows[key] = row;
       this.insertChild(row, this.children.length - 1);
     }
@@ -70,10 +79,18 @@ class KeyValueListContent extends UIComponent<{ select: string | null }> {
     row.destroy();
   }
 
-  private changeKey(oldKey: string, newKey: string): void {
+  private changeKey(
+    row: KeyValueListRow,
+    oldKey: string,
+    newKey: string
+  ): void {
+    if (this.data.has(newKey)) {
+      row.setKey(oldKey);
+      return;
+    }
     const value = this.data.get(oldKey) || '';
     this.data.delete(oldKey);
-    if (newKey) this.data.set(newKey, value);
+    if (newKey) row.setKey(this.data.set(newKey, value));
   }
 }
 
@@ -114,6 +131,10 @@ class KeyValueListRow extends UIComponent<{
 
   public setValue(value: string): void {
     this.valueInput.value = value;
+  }
+
+  public getValue(): string {
+    return this.valueInput.value;
   }
 }
 

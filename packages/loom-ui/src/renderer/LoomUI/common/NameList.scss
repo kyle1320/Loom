@@ -15,6 +15,7 @@
     background-color: $primary-0;
     box-shadow: 0 0 2px inset rgba(0, 0, 0, 0.2);
     height: 100px;
+    overflow-y: auto;
   }
 
   &__row {
