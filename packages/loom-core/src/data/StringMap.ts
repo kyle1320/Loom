@@ -1,5 +1,5 @@
 import { EventEmitter, PlainEmitter } from '../util/EventEmitter';
-import { Destroyable, mapRecord } from '../util';
+import { Destroyable, mapRecord, mapRecordKeys } from '../util';
 
 export namespace StringMap {
   export type Events<T> = {
@@ -12,20 +12,28 @@ type KeyCallback<T, K extends string> =
   (value: T | undefined, key: K) => void;
 
 export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
+  protected readonly data: Record<string, T> = {};
   private readonly keyListeners:
   PlainEmitter<Record<string, T | undefined>> = new PlainEmitter();
 
   public constructor(
-    protected readonly data: Record<string, T> = {}
+    data?: Record<string, T>,
+    public readonly normalizeKey = (key: string) => key.toLowerCase()
   ) {
     super();
+
+    if (data) this.data = mapRecordKeys(data, normalizeKey);
   }
 
   public get(key: string): T | undefined {
+    key = this.normalizeKey(key);
+
     return this.data[key];
   }
 
   public has(key: string): boolean {
+    key = this.normalizeKey(key);
+
     return key in this.data;
   }
 
@@ -35,15 +43,21 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     }
   }
 
-  protected set(key: string, value: T): void {
+  protected set(key: string, value: T): string {
+    key = this.normalizeKey(key);
+
     if (this.data[key] !== value) {
       this.data[key] = value;
       this.emit('set', { key, value });
       this.keyListeners.emit(key, value);
     }
+
+    return key;
   }
 
   protected delete(key: string): T {
+    key = this.normalizeKey(key);
+
     const value = this.data[key];
     if (key in this.data) {
       delete this.data[key];
@@ -58,11 +72,15 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   }
 
   public onKey(key: string, callback: KeyCallback<T, typeof key>): this {
+    key = this.normalizeKey(key);
+
     this.keyListeners.on(key, callback);
     return this;
   }
 
   public offKey(key: string, callback: KeyCallback<T, typeof key>): this {
+    key = this.normalizeKey(key);
+
     this.keyListeners.off(key, callback);
     return this;
   }
@@ -76,8 +94,8 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
 }
 
 export class WritableStringMap<T> extends StringMap<T> {
-  public set(key: string, value: T): void {
-    super.set(key, value);
+  public set(key: string, value: T): string {
+    return super.set(key, value);
   }
 
   public delete(key: string): T {
