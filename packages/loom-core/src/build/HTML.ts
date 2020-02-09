@@ -189,8 +189,9 @@ export class Component extends BuildResult<ComponentDef, {
       }
       this.sources.components.onKey(name, this.componentUpdated);
     }
+    this.name = name;
 
-    const component = this.sources.components.get(name);
+    const component = name && this.sources.components.get(name);
 
     if (this._element) this._element.destroy();
 
@@ -206,11 +207,13 @@ export class Component extends BuildResult<ComponentDef, {
   }
 
   public serialize(): string {
-    return this._element ? this._element.serialize() : '';
+    return this._element.serialize();
   }
 
   public destroy(): void {
-    this.sources.components.offKey(this.name, this.componentUpdated);
+    if (this.name) {
+      this.sources.components.offKey(this.name, this.componentUpdated);
+    }
     this._element && this._element.destroy();
     super.destroy();
   }
