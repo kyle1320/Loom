@@ -157,6 +157,14 @@ export class Element extends BuildResult<ElementDef, {
   }
 }
 
+export class HeadElement extends Element {
+  // TODO: inject styles
+}
+
+export class BodyElement extends Element {
+
+}
+
 export class EmptyComponent extends BuildResult<ComponentDef> {
   public serialize(): string {
     return '';
@@ -220,8 +228,8 @@ export class Component extends BuildResult<ComponentDef, {
 }
 
 export class Page extends BuildResult<PageDef> {
-  public readonly head: Element;
-  public readonly body: Element;
+  public readonly head: HeadElement;
+  public readonly body: BodyElement;
 
   public constructor(
     public readonly source: PageDef,

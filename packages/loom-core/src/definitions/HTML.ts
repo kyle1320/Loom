@@ -6,7 +6,9 @@ import {
   Component,
   Element,
   Attributes,
-  Children } from '../build/HTML';
+  Children,
+  HeadElement,
+  BodyElement } from '../build/HTML';
 import { WritableList } from '../data/List';
 import { WritableStringMap } from '../data/StringMap';
 
@@ -156,10 +158,52 @@ export class ElementDef
   }
 }
 
+export class HeadDef extends ElementDef {
+  public constructor(
+    attrs: AttributesDef | Record<string, string>,
+    children: ChildrenDef | NodeDef[],
+  ) {
+    super('head', attrs, children);
+  }
+
+  public get tag(): string {
+    return 'head';
+  }
+
+  public set tag(val: string) {
+    // Tag can't be changed
+  }
+
+  public build(sources: Sources): HeadElement {
+    return new HeadElement(this, sources);
+  }
+}
+
+export class BodyDef extends ElementDef {
+  public constructor(
+    attrs: AttributesDef | Record<string, string>,
+    children: ChildrenDef | NodeDef[],
+  ) {
+    super('body', attrs, children);
+  }
+
+  public get tag(): string {
+    return 'body';
+  }
+
+  public set tag(val: string) {
+    // Tag can't be changed
+  }
+
+  public build(sources: Sources): BodyElement {
+    return new BodyElement(this, sources);
+  }
+}
+
 export class PageDef implements Definition {
   public constructor(
-    public readonly head: ElementDef,
-    public readonly body: ElementDef,
+    public readonly head: HeadDef,
+    public readonly body: BodyDef,
   ) { }
 
   public build(sources: Sources): Page {
