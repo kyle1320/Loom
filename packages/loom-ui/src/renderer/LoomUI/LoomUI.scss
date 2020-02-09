@@ -48,6 +48,10 @@ input {
     outline: none;
     border-color: $accent;
   }
+
+  &:disabled {
+    background-color: $primary-1;
+  }
 }
 
 #app {

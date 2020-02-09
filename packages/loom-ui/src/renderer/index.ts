@@ -3,7 +3,7 @@ import * as loom from 'loom-core';
 import LoomUI from './LoomUI';
 
 window.addEventListener('load', function () {
-  const sources = new loom.Sources({
+  const sources = new loom.Sources(null, {
     title: 'test',
     color: '#F0F0FF'
   });
@@ -14,9 +14,9 @@ window.addEventListener('load', function () {
     ])
   );
 
-  sources.content.set('index.html', new loom.PageDef(
-    new loom.ElementDef('head', {}, []),
-    new loom.ElementDef('body', {}, [
+  sources.pages.set('index.html', new loom.PageDef(
+    new loom.HeadDef({}, []),
+    new loom.BodyDef({}, [
       new loom.ComponentDef('Header'),
       new loom.ElementDef('p', {}, [
         new loom.TextNodeDef('this is the test site')
@@ -24,9 +24,9 @@ window.addEventListener('load', function () {
     ])
   ));
 
-  sources.content.set('about.html', new loom.PageDef(
-    new loom.ElementDef('head', {}, []),
-    new loom.ElementDef('body', {}, [
+  sources.pages.set('about.html', new loom.PageDef(
+    new loom.HeadDef({}, []),
+    new loom.BodyDef({}, [
       new loom.ComponentDef('Header'),
       new loom.ElementDef('p', {}, [
         new loom.TextNodeDef('this is the about page')

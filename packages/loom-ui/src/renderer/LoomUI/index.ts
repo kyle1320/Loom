@@ -7,8 +7,8 @@ import { UIComponent } from './UIComponent';
 import './LoomUI.scss';
 
 export type DataTypes = loom.Node | loom.Rule;
-export type ContentTypes = loom.Content | loom.Element;
-export type ContentDefTypes = loom.ContentDef | loom.ElementDef;
+export type ContentTypes = loom.Page | loom.Element;
+export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent<{
   'updateContentDef': ContentDefTypes | null;

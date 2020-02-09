@@ -54,7 +54,10 @@ class ContentField extends PropertyField {
 class TagField extends PropertyField {
   public constructor(node: loom.ElementDef) {
     super('Tag',
-      new Input(node.tag).on('change', val => node.tag = val)
+      new Input(
+        node.tag,
+        node instanceof loom.HeadDef || node instanceof loom.BodyDef
+      ).on('change', val => node.tag = val)
     );
 
     this.listen(node, 'tagChanged', this.set);

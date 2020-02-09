@@ -1,6 +1,5 @@
 import * as loom from 'loom-core';
 
-import StyleEditor from './StyleEditor';
 import ElementEditor from './ElementEditor';
 import LoomUI from '..';
 import { makeElement } from '../util/dom';
@@ -32,9 +31,7 @@ class UnknownSelection extends UIComponent {
 }
 
 function getEditor(ui: LoomUI, content = ui.getSelectedContent()): UIComponent {
-  if (content instanceof loom.Sheet) {
-    return new StyleEditor(ui);
-  } else if (content instanceof loom.Page) {
+  if (content instanceof loom.Page) {
     return new ElementEditor(ui);
   } else if (content instanceof loom.Element) {
     return new ElementEditor(ui);

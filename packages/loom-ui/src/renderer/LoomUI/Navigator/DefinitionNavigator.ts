@@ -11,7 +11,7 @@ export default class DefinitionNavigator extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'definition-nav' }));
 
-    const contentList = new NameList('Files', ui.sources.content)
+    const contentList = new NameList('Pages', ui.sources.pages)
       .on('select', data => ui.selectContentDef(data.value));
     const componentList = new NameList('Components', ui.sources.components)
       .on('select', data => ui.selectContentDef(data.value));
