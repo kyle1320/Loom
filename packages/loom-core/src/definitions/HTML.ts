@@ -47,6 +47,12 @@ export class AttributesDef
   extends WritableStringMap<string>
   implements Definition {
 
+  public constructor(
+    data?: Record<string, string>,
+  ) {
+    super(data, k => k.toLowerCase().replace(/ /g, '-'));
+  }
+
   public build(sources: Sources): Attributes {
     return new Attributes(this, sources);
   }
