@@ -2,25 +2,22 @@ import fs = require('fs');
 import path = require('path');
 import cssparser = require('css');
 
-import { SheetDef, RuleDef, StyleRuleDef } from '../definitions/CSS';
+import { SheetDef, StyleRuleDef } from '../definitions/CSS';
 
 export function importStylesheet(
   root: string,
-  file: string
-): SheetDef {
+  file: string,
+  def: SheetDef
+): void {
   const sheet = cssparser.parse(
     fs.readFileSync(path.join(root, file)).toString()
   );
 
-  const rules: RuleDef[] = [];
-
   sheet.stylesheet?.rules.forEach(rule => {
     if (rule.type === 'rule') {
-      rules.push(parseStyleRule(rule as cssparser.Rule))
+      def.rules.add(parseStyleRule(rule as cssparser.Rule))
     }
   });
-
-  return new SheetDef(rules);
 }
 
 function parseStyleRule(rule: cssparser.Rule): StyleRuleDef {

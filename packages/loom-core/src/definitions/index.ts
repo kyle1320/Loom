@@ -16,25 +16,25 @@ export interface SourcesConfig {
   componentsRoot: string;
 }
 
-export type ContentDef = PageDef | SheetDef;
-
 export class Sources {
   public readonly vars: WritableStringMap<string>;
   public readonly components: WritableStringMap<ElementDef>;
-  public readonly content: WritableStringMap<ContentDef>;
+  public readonly pages: WritableStringMap<PageDef>;
+  public readonly styles: SheetDef;
 
   public constructor(
     public config: SourcesConfig | null,
     vars: WritableStringMap<string> | Record<string, string> = {},
     components: WritableStringMap<ElementDef> | Record<string, ElementDef> = {},
-    content: WritableStringMap<ContentDef> | Record<string, ContentDef> = {}
+    pages: WritableStringMap<PageDef> | Record<string, PageDef> = {}
   ) {
     this.vars = vars instanceof WritableStringMap
       ? vars : new WritableStringMap(vars);
     this.components = components instanceof WritableStringMap
       ? components : new WritableStringMap(components);
-    this.content = content instanceof WritableStringMap
-      ? content : new WritableStringMap(content);
+    this.pages = pages instanceof WritableStringMap
+      ? pages : new WritableStringMap(pages);
+    this.styles = new SheetDef([]);
   }
 
   public build(): Results {

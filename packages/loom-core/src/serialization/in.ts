@@ -20,14 +20,13 @@ export function importSources(rootDir: string): Sources {
 
   importComponents(componentsRoot, res);
 
+  importStylesheet(sourcesRoot, 'site.css', res.styles);
+
   walkDir(sourcesRoot, rel => {
     switch (path.parse(rel).ext) {
       case '.html':
       case '.htm':
-        res.content.set(rel, importPage(sourcesRoot, rel));
-        break;
-      case '.css':
-        res.content.set(rel, importStylesheet(sourcesRoot, rel));
+        res.pages.set(rel, importPage(sourcesRoot, rel));
         break;
     }
   });

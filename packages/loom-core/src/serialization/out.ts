@@ -5,10 +5,10 @@ import { writeSync, LoomConfig } from '.';
 import { Results } from '../build';
 
 export function saveSources(sources: Sources, config: SourcesConfig): void {
-  for (const file of sources.content.keys()) {
+  for (const file of sources.pages.keys()) {
     writeSync(
       path.join(config.rootDir, config.sourcesRoot, file),
-      sources.content.get(file)!.serialize()
+      sources.pages.get(file)!.serialize()
     );
   }
   for (const name of sources.components.keys()) {
@@ -17,6 +17,10 @@ export function saveSources(sources: Sources, config: SourcesConfig): void {
       sources.components.get(name)!.serialize()
     );
   }
+  writeSync(
+    path.join(config.rootDir, 'site.css'),
+    sources.styles.serialize()
+  );
   writeSync(path.join(config.rootDir, 'loom.json'), JSON.stringify({
     sourcesRoot: config.sourcesRoot,
     componentsRoot: config.componentsRoot,
@@ -25,7 +29,8 @@ export function saveSources(sources: Sources, config: SourcesConfig): void {
 }
 
 export function exportResults(results: Results, dir: string): void {
-  for (const file of results.content.keys()) {
-    writeSync(path.join(dir, file), results.content.get(file)!.serialize());
+  for (const file of results.pages.keys()) {
+    writeSync(path.join(dir, file), results.pages.get(file)!.serialize());
   }
+  writeSync(path.join(dir, 'site.css'), results.styles.serialize());
 }

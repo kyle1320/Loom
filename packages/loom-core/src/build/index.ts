@@ -6,18 +6,19 @@ import { Page } from './HTML';
 import { Sheet } from './CSS';
 import { exportResults } from '../serialization/out';
 
-export type Content = Page | Sheet;
-
 export class Results implements Destroyable {
-  public readonly content: ComputedStringMap<Content>;
+  public readonly pages: ComputedStringMap<Page>;
+  public readonly styles: Sheet;
 
   public constructor(sources: Sources) {
-    this.content = sources.content
+    this.pages = sources.pages
       .map(x => x.build(sources), x => x.destroy());
+    this.styles = sources.styles.build(sources);
   }
 
   public destroy(): void {
-    this.content.destroy();
+    this.pages.destroy();
+    this.styles.destroy();
   }
 
   public exportTo(dir: string): void {
