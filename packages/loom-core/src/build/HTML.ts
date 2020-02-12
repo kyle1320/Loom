@@ -56,6 +56,7 @@ export class Attributes extends InterpolatedStringMap<AttributesDef> {
 
 export class Children extends BuildResult<ChildrenDef, {
   'add': { index: number; value: Node };
+  'addRaw': { index: number; value: TextNode | Element | Component };
   'update': { index: number; value: Node };
   'remove': number;
 }> {
@@ -77,8 +78,10 @@ export class Children extends BuildResult<ChildrenDef, {
       }
       return built;
     }, value => value.destroy())
-      .on('add', ({ index }) =>
-        this.emit('add', { index, value: this.get(index) }))
+      .on('add', ({ index }) => {
+        this.emit('add', { index, value: this.get(index) });
+        this.emit('addRaw', { index, value: this.data.get(index) });
+      })
       .on('remove', ({ index }) => this.emit('remove', index));
   }
 
@@ -96,6 +99,10 @@ export class Children extends BuildResult<ChildrenDef, {
     for (let i = 0; i < this.size(); i++) {
       yield this.get(i);
     }
+  }
+
+  public raw(): Readonly<(TextNode | Element | Component)[]> {
+    return this.data.asArray();
   }
 
   public size(): number {

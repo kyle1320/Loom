@@ -6,10 +6,12 @@ import { makeElement, toggleClass } from '../util/dom';
 
 import './NodeNavigator.scss';
 
+type Node = loom.Element | loom.TextNode | loom.Component;
+
 export default class NodeNavigator extends UIComponent {
   public constructor(
     ui: LoomUI,
-    node: loom.Node,
+    node: Node,
     depth = 1
   ) {
     super(makeElement('div', { className: 'node-nav__container' }));
@@ -19,8 +21,9 @@ export default class NodeNavigator extends UIComponent {
       this.appendChild(new ElementChildrenNavigator(ui, node, depth));
     } else if (node instanceof loom.TextNode) {
       this.appendChild(new TextNodeNavigator(ui, node, depth));
-    } else {
-      //
+    } else if (node instanceof loom.Component) {
+      this.appendChild(new ComponentNavigator(ui, node, depth));
+      this.appendChild(new ComponentChildrenNavigator(ui, node, depth));
     }
   }
 }
@@ -28,7 +31,7 @@ export default class NodeNavigator extends UIComponent {
 class SingleNodeNavigator extends UIComponent<{}, HTMLElement> {
   public constructor(
     ui: LoomUI,
-    private readonly node: loom.Node,
+    private readonly node: Node,
     type: string,
     title: string,
     depth = 1
@@ -80,15 +83,46 @@ class ElementChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    for (const child of node.children) {
+    for (const child of node.children.raw()) {
       this.insertChild(new NodeNavigator(ui, child, depth + 1));
     }
 
-    this.listen(node.children, 'add', ({ index, value }) =>
+    this.listen(node.children, 'addRaw', ({ index, value }) =>
       this.insertChild(new NodeNavigator(ui, value, depth + 1), index));
     this.listen(node.children, 'remove',
       index => this.removeChild(index));
-    this.listen(node.children, 'update', ({ index, value }) =>
-      this.setChild(new NodeNavigator(ui, value, depth + 1), index));
+  }
+}
+
+class ComponentNavigator extends SingleNodeNavigator {
+  public constructor(
+    ui: LoomUI,
+    node: loom.Component,
+    depth = 1
+  ) {
+    super(ui, node, 'element', node.source.name, depth);
+
+    this.listen(node.source, 'nameChanged', val => this.el.textContent = val);
+  }
+}
+
+class ComponentChildrenNavigator extends UIComponent {
+  public constructor(
+    ui: LoomUI,
+    node: loom.Component,
+    depth = 1
+  ) {
+    super(makeElement('div', { className: 'node-nav__children' }));
+
+    if (!(node.element instanceof loom.EmptyComponent)) {
+      this.insertChild(new NodeNavigator(ui, node.element, depth + 1));
+    }
+
+    this.listen(node, 'elementChanged', el => {
+      this.empty();
+      if (!(el instanceof loom.EmptyComponent)) {
+        this.insertChild(new NodeNavigator(ui, el, depth + 1));
+      }
+    });
   }
 }
