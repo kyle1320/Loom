@@ -60,8 +60,8 @@ export class UIComponent<
   }
 
   protected empty(): void {
-    for (const child of this.children) {
-      child.destroy();
+    while (this.children.length) {
+      this.children[0].destroy();
     }
   }
 
@@ -100,7 +100,7 @@ export class UIComponent<
     }
 
     if (comp > -1) {
-      comp = this.children.splice(comp, 0)[0];
+      comp = this.children.splice(comp, 1)[0];
       destroy && comp.destroy();
     }
   }
