@@ -6,8 +6,8 @@ import {
   AttributesDef,
   ChildrenDef,
   ElementDef,
-  ComponentDef} from '../definitions/HTML';
-import { ComputedList } from '../data/List';
+  ComponentDef,
+  NodeDef} from '../definitions/HTML';
 
 export type Node = TextNode | Element | EmptyComponent;
 
@@ -60,7 +60,7 @@ export class Children extends BuildResult<ChildrenDef, {
   'update': { index: number; value: Node };
   'remove': number;
 }> {
-  private readonly data: ComputedList<TextNode | Element | Component>;
+  private readonly data: (TextNode | Element | Component)[];
 
   public constructor(
     public readonly source: ChildrenDef,
@@ -68,25 +68,14 @@ export class Children extends BuildResult<ChildrenDef, {
   ) {
     super(source, sources);
 
-    this.data = source.map(def => {
-      const built = def.build(sources);
-      if (built instanceof Component) {
-        built.on('elementChanged', el => this.emit('update', {
-          index: this.data.asArray().indexOf(built),
-          value: el
-        }));
-      }
-      return built;
-    }, value => value.destroy())
-      .on('add', ({ index }) => {
-        this.emit('add', { index, value: this.get(index) });
-        this.emit('addRaw', { index, value: this.data.get(index) });
-      })
-      .on('remove', ({ index }) => this.emit('remove', index));
+    this.data = source.asArray().map(this.buildChild);
+
+    this.listen(source, 'add', this.sourceAdd);
+    this.listen(source, 'remove', this.sourceRemove);
   }
 
   public get(index: number): Node {
-    const res = this.data.get(index);
+    const res = this.data[index];
 
     if (res instanceof Component) {
       return res.element;
@@ -102,20 +91,44 @@ export class Children extends BuildResult<ChildrenDef, {
   }
 
   public raw(): Readonly<(TextNode | Element | Component)[]> {
-    return this.data.asArray();
+    return this.data;
   }
 
   public size(): number {
-    return this.data.size();
+    return this.data.length;
   }
 
   public serialize(): string {
-    return this.data.asArray().map(obj => obj.serialize()).join('');
+    return this.data.map(obj => obj.serialize()).join('');
   }
 
   public destroy(): void {
-    this.data.destroy();
+    this.data.forEach(d => d.destroy());
     super.destroy();
+  }
+
+  private buildChild = (def: NodeDef): TextNode | Element | Component => {
+    const built = def.build(this.sources);
+    if (built instanceof Component) {
+      built.on('elementChanged', el => this.emit('update', {
+        index: this.data.indexOf(built),
+        value: el
+      }));
+    }
+    return built;
+  }
+
+  private sourceAdd = (
+    { index, value }: { index: number; value: NodeDef }
+  ): void => {
+    this.data.splice(index, 0, this.buildChild(value));
+    this.emit('add', { index, value: this.get(index) });
+    this.emit('addRaw', { index, value: this.data[index] });
+  }
+
+  private sourceRemove = ({ index }: { index: number }): void => {
+    this.data.splice(index, 1)[0].destroy();
+    this.emit('remove', index);
   }
 }
 

@@ -3,9 +3,9 @@ import {
   StyleRuleDef,
   StyleDeclarationDef,
   RuleListDef,
-  SheetDef } from '../definitions/CSS';
+  SheetDef,
+  RuleDef} from '../definitions/CSS';
 import { Sources } from '../Definitions';
-import { ComputedList } from '../data/List';
 
 export class Sheet extends BuildResult<SheetDef> {
   public readonly rules: RuleList;
@@ -33,7 +33,7 @@ export class RuleList extends BuildResult<RuleListDef, {
   'add': { index: number; value: Rule };
   'remove': number;
 }> {
-  private readonly data: ComputedList<Rule>;
+  private readonly data: Rule[];
 
   public constructor(
     public readonly source: RuleListDef,
@@ -41,26 +41,39 @@ export class RuleList extends BuildResult<RuleListDef, {
   ) {
     super(source, sources);
 
-    this.data = source.map(x => x.build(sources), x => x.destroy())
-      .on('add', data => this.emit('add', data))
-      .on('remove', ({ index }) => this.emit('remove', index));
+    this.data = source.asArray().map(x => x.build(sources));
+
+    this.listen(source, 'add', this.sourceAdd)
+    this.listen(source, 'remove', this.sourceRemove);
   }
 
   public get(index: number): Rule {
-    return this.data.get(index);
+    return this.data[index];
   }
 
   public size(): number {
-    return this.data.size();
+    return this.data.length;
   }
 
   public serialize(): string {
-    return this.data.asArray().map(obj => obj.serialize()).join('\n');
+    return this.data.map(obj => obj.serialize()).join('\n');
   }
 
   public destroy(): void {
-    this.data.destroy();
+    this.data.forEach(d => d.destroy());
     super.destroy();
+  }
+
+  private sourceAdd = (
+    { index, value }: { index: number; value: RuleDef }
+  ): void => {
+    this.data.splice(index, 0, value.build(this.sources));
+    this.emit('add', { index, value: this.get(index) });
+  }
+
+  private sourceRemove = ({ index }: { index: number }): void => {
+    this.data.splice(index, 1)[0].destroy();
+    this.emit('remove', index);
   }
 }
 
