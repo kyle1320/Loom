@@ -4,7 +4,7 @@ import {
   StyleRule,
   StyleDeclaration,
   RuleList } from '../build/CSS';
-import { WritableList } from '../data/List';
+import { List } from '../data/List';
 import { EventEmitter } from '../util/EventEmitter';
 import { WritableStringMap } from '../data/StringMap';
 
@@ -28,7 +28,7 @@ export class SheetDef implements Definition {
 }
 
 export class RuleListDef
-  extends WritableList<RuleDef>
+  extends List<RuleDef>
   implements Definition {
 
   public build(sources: Sources): RuleList {

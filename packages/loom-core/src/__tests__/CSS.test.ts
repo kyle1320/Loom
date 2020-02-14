@@ -34,7 +34,7 @@ it('RuleList', () => {
     { index: 2, value: out.get(2) }, 'add');
   expect(out.serialize()).toBe('.test1{}\n.test2{}\n.test3{}');
 
-  sheet.remove(0);
+  sheet.removeIndex(0);
   expect(cb).toHaveBeenLastCalledWith(0, 'remove');
   expect(out.serialize()).toBe('.test2{}\n.test3{}');
 });

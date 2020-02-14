@@ -9,7 +9,7 @@ import {
   Children,
   HeadElement,
   BodyElement } from '../build/HTML';
-import { WritableList } from '../data/List';
+import { List } from '../data/List';
 import { WritableStringMap } from '../data/StringMap';
 
 export type NodeDef =
@@ -71,7 +71,7 @@ export class AttributesDef
 }
 
 export class ChildrenDef
-  extends WritableList<NodeDef>
+  extends List<NodeDef>
   implements Definition {
 
   public build(sources: Sources): Children {

@@ -128,7 +128,7 @@ it('Children', () => {
   expect(out.serialize()).toBe('<div></div>testing abc');
   expect(out.get(1)).toBeInstanceOf(EmptyComponent);
 
-  children.remove(1);
+  children.removeIndex(1);
   expect(cb).toHaveBeenLastCalledWith(1, 'remove');
 
   comp.name = 'Test';
