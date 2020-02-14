@@ -61,6 +61,7 @@ export class Children extends BuildResult<ChildrenDef, {
   'remove': number;
 }> {
   private readonly data: (TextNode | Element | Component)[];
+  private ignoreEvents = false;
 
   public constructor(
     public readonly source: ChildrenDef,
@@ -72,6 +73,33 @@ export class Children extends BuildResult<ChildrenDef, {
 
     this.listen(source, 'add', this.sourceAdd);
     this.listen(source, 'remove', this.sourceRemove);
+  }
+
+  public addDef(
+    def: TextNodeDef | ElementDef,
+    index: number = this.data.length
+  ): TextNode | Element {
+    const built = this.buildChild(def);
+
+    this.ignoreEvents = true;
+    this.source.add(def, index);
+    this.data.splice(index, 0, built);
+    this.emit('add', { index, value: this.get(index) });
+    this.emit('addRaw', { index, value: this.data[index] });
+    this.ignoreEvents = false;
+
+    return built as TextNode | Element;
+  }
+
+  public addDefBefore(
+    def: TextNodeDef | ElementDef,
+    reference: TextNode | Element
+  ): TextNode | Element | null {
+    const index = this.data.indexOf(reference);
+    if (index > -1) {
+      return this.addDef(def, index);
+    }
+    return null;
   }
 
   public get(index: number): Node {
@@ -121,12 +149,16 @@ export class Children extends BuildResult<ChildrenDef, {
   private sourceAdd = (
     { index, value }: { index: number; value: NodeDef }
   ): void => {
+    if (this.ignoreEvents) return;
+
     this.data.splice(index, 0, this.buildChild(value));
     this.emit('add', { index, value: this.get(index) });
     this.emit('addRaw', { index, value: this.data[index] });
   }
 
   private sourceRemove = ({ index }: { index: number }): void => {
+    if (this.ignoreEvents) return;
+
     this.data.splice(index, 1)[0].destroy();
     this.emit('remove', index);
   }
