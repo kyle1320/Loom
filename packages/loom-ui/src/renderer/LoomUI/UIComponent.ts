@@ -18,7 +18,6 @@ export class UIComponent<
   }
 
   public destroy(): void {
-    this.el.parentNode?.removeChild(this.el);
     for (const child of this.children) {
       child.destroy();
     }
@@ -31,6 +30,10 @@ export class UIComponent<
 
   public addTo(node: Node): void {
     node.appendChild(this.el);
+  }
+
+  public getEl(): H {
+    return this.el;
   }
 
   protected listen<E, K extends keyof E>(
@@ -69,7 +72,7 @@ export class UIComponent<
     if (this.el instanceof HTMLElement) {
       this.el.replaceWith(el);
     } else {
-      this.el.parentNode?.insertBefore(this.el, el);
+      this.el.parentNode?.insertBefore(el, this.el);
       this.el.parentNode?.removeChild(this.el);
     }
 
@@ -101,6 +104,7 @@ export class UIComponent<
 
     if (comp > -1) {
       comp = this.children.splice(comp, 1)[0];
+      try { this.el.removeChild(comp.el); } catch (e) { /**/ }
       destroy && comp.destroy();
     }
   }
