@@ -6,9 +6,32 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  height: 27px;
+
+  &__text i      { color: #CCCCCC; }
+  &__element i   { color: #60A060; }
+  &__component i { color: #FFA060; }
+
+  &__container--component .node-nav {
+    background-color: #FFE8D0;
+  }
+
+  i {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    font-size: 10px;
+    line-height: 10px;
+  }
 
   &.selected {
     background-color: $accent;
     color: white;
+
+    i {
+      color: white;
+    }
   }
 }
