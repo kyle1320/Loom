@@ -3,6 +3,7 @@ import * as loom from 'loom-core';
 import LoomUI from '../../..';
 import Floating from '../../../common/Floating';
 import Frame from '../../../common/Frame';
+import { addStyles } from '../../../util/css';
 import { makeElement } from '../../../util/dom';
 import { UIComponent } from '../../../UIComponent';
 
@@ -190,6 +191,8 @@ export default class WYSIWYGEditor extends UIComponent {
           body = makeComponent(this, content);
           body.addTo(doc.body);
         }
+
+        addStyles(doc, ui.globalStyles);
 
         doc.addEventListener('selectionchange', () => {
           const selection = doc.getSelection() || null;

@@ -23,10 +23,14 @@ export default class LoomUI extends UIComponent<{
   private selectedContent: ContentTypes | null = null;
   private selectedData: DataTypes | null = null;
 
+  public readonly globalStyles: loom.Sheet
+
   public constructor(
     public readonly sources: loom.Sources
   ) {
     super(document.getElementById('app')!);
+
+    this.globalStyles = sources.styles.build(sources);
 
     this.appendChild(new Navigator(this));
     this.appendChild(new Editor(this));

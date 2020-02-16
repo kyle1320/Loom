@@ -34,5 +34,17 @@ window.addEventListener('load', function () {
     ])
   ));
 
-  new LoomUI(sources);
+  sources.styles.rules.add(new loom.StyleRuleDef(
+    'body', {
+      'white-space': 'pre-wrap',
+      'color': '#222'
+    }
+  ));
+  sources.styles.rules.add(new loom.StyleRuleDef(
+    '.header', {
+      'font-size': '2em',
+      'color': 'red',
+      'border-bottom': '3px solid #222'
+    }
+  ));
 });
