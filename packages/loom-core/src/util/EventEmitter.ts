@@ -20,6 +20,16 @@ export class EventEmitter<T extends {}> {
     return this;
   }
 
+  public onOff<K extends keyof T>(
+    type: K,
+    callback: Callback<T, K>
+  ): () => void {
+    this.on(type, callback);
+
+    // return a cleanup function to remove the listener
+    return () => this.off(type, callback);
+  }
+
   protected emit<K extends VoidKeys<T>>(type: K): this;
   protected emit<K extends keyof T>(type: K, arg: T[K]): this;
   protected emit<K extends keyof T>(type: K, arg?: T[K]): this {
