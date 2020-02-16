@@ -87,8 +87,12 @@ export abstract class InterpolatedStringMap<
           .on('change', value => this.emit('set', { key, value }));
       },
       val => val.destroy()
-    ).on('set', ({key, value}) => this.emit('set', {key, value: value.value}))
-      .on('delete', key => this.emit('delete', key));
+    );
+
+    this.listen(this.data, 'set',
+      ({key, value}) => this.emit('set', {key, value: value.value}))
+    this.listen(this.data, 'delete',
+      key => this.emit('delete', key));
   }
 
   public get(key: string): string | undefined {
