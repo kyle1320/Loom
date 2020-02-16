@@ -12,7 +12,7 @@ export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
   public constructor(
     ui: LoomUI,
     node: Node,
-    depth = 1
+    depth = 0
   ) {
     super(makeElement('div', { className: 'node-nav__container' }));
 
@@ -40,11 +40,11 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     protected readonly node: N,
     type: string,
     title: string,
-    depth = 1
+    depth = 0
   ) {
     super(makeElement('div', {
       className: 'node-nav node-nav__' + type,
-      style: { paddingLeft: (depth*10 + 15) + 'px' },
+      style: { paddingLeft: (depth*10) + 'px' },
       onclick: () => ui.selectData(node)
     }));
 
@@ -76,7 +76,7 @@ class TextNodeNavigator extends SingleNodeNavigator<loom.TextNode> {
   public constructor(
     ui: LoomUI,
     node: loom.TextNode,
-    depth = 1
+    depth = 0
   ) {
     super(ui, node, 'text', node.content, depth);
 
@@ -92,7 +92,7 @@ class ElementNavigator extends SingleNodeNavigator<loom.Element> {
   public constructor(
     ui: LoomUI,
     node: loom.Element,
-    depth = 1
+    depth = 0
   ) {
     super(ui, node, 'element', node.tag, depth);
 
@@ -134,7 +134,7 @@ class ElementChildrenNavigator extends UIComponent {
   public constructor(
     ui: LoomUI,
     node: loom.Element,
-    depth = 1
+    depth = 0
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
@@ -153,7 +153,7 @@ class ComponentNavigator extends SingleNodeNavigator<loom.Component> {
   public constructor(
     ui: LoomUI,
     node: loom.Component,
-    depth = 1
+    depth = 0
   ) {
     super(ui, node, 'component', node.source.name, depth);
 
@@ -175,7 +175,7 @@ class ComponentChildrenNavigator extends UIComponent {
   public constructor(
     ui: LoomUI,
     node: loom.Component,
-    depth = 1
+    depth = 0
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
