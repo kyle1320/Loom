@@ -45,12 +45,18 @@ function makeComponent(
     return new WYSIWYGElement(editor, node, attach as HTMLElement);
   } else if (node instanceof loom.TextNode) {
     return new WYSIWYGTextNode(editor, node, attach as Text);
+  } else if (node instanceof loom.Component) {
+    return new WYSIWYGComponent(editor, node);
   } else {
     return new WYSIWYGUnknown(editor);
   }
 }
 
-type WYSIWYGNode = WYSIWYGElement | WYSIWYGTextNode | WYSIWYGUnknown;
+type WYSIWYGNode
+  = WYSIWYGElement
+  | WYSIWYGTextNode
+  | WYSIWYGComponent
+  | WYSIWYGUnknown;
 
 class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
   private ignoreEvents = false;
@@ -63,34 +69,27 @@ class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
     super();
     this.el = this.makeEl(el);
 
-    for (const node of this.data.children) {
-      const child = makeComponent(this.editor, node);
-      this.appendChild(child);
-    }
-
-    this.listen(data, 'tagChanged', () => {
+    this.autoCleanup(data.tag.onOff('change', () => {
       editor.removeNode(this);
       this.changeEl(this.makeEl());
       editor.addNode(this);
-    });
+    }));
 
-    this.listen(data.attrs, 'set',
-      ({ key, value }) => this.el.setAttribute(key, value));
-    this.listen(data.attrs, 'delete', (key) => this.el.removeAttribute(key));
+    this.autoCleanup(data.attrs.watch(
+      (key, value) => this.el.setAttribute(key, value),
+      key => this.el.removeAttribute(key)
+    ));
 
-    this.listen(data.children, 'add', ({ index, value }) =>
-      !this.ignoreEvents &&
-      this.insertChild(makeComponent(editor, value), index));
-    this.listen(data.children, 'remove', index =>
-      !this.ignoreEvents &&
-      this.removeChild(index));
-    this.listen(data.children, 'update', ({ index, value }) =>
-      this.setChild(makeComponent(editor, value), index));
+    this.autoCleanup(data.children.watch(
+      (index, value) => !this.ignoreEvents &&
+        this.insertChild(makeComponent(editor, value), index),
+      index => !this.ignoreEvents && this.removeChild(index)
+    ));
 
     editor.addNode(this);
   }
 
-  public makeAndInsertAfter(
+  public makeAndInsertBefore(
     node: Node,
     comp: WYSIWYGNode | null
   ): WYSIWYGNode | null {
@@ -130,7 +129,7 @@ class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
   }
 
   private makeEl(el?: HTMLElement): HTMLElement {
-    el = el || document.createElement(this.data.tag || 'div');
+    el = el || document.createElement(this.data.tag.get() || 'div');
 
     for (const key of this.data.attrs.keys()) {
       el.setAttribute(key, this.data.attrs.get(key)!);
@@ -151,17 +150,42 @@ class WYSIWYGTextNode extends UIComponent {
     public readonly data: loom.TextNode,
     el?: Text
   ) {
-    super(el || document.createTextNode(data.content));
+    super(el || document.createTextNode(data.content.get()));
 
-    this.listen(data, 'contentChanged', content => {
+    this.autoCleanup(data.content.onOff('change', content => {
       if (content !== this.el.textContent) this.el.textContent = content;
-    });
+    }));
 
     editor.addNode(this);
   }
 
   public destroy(): void {
     this.editor.removeNode(this);
+    super.destroy();
+  }
+}
+
+class WYSIWYGComponent extends UIComponent {
+  private node!: WYSIWYGNode;
+
+  public constructor(
+    private readonly editor: WYSIWYGEditor,
+    public readonly data: loom.Component
+  ) {
+    super(null!);
+
+    this.autoCleanup(data.element.watch(this.update));
+  }
+
+  private update = (node: loom.Node): void => {
+    this.el = this.node && this.node.getEl();
+    this.node = makeComponent(this.editor, node);
+    if (this.el) this.changeEl(this.node.getEl());
+    else this.el = this.node.getEl();
+  }
+
+  public destroy(): void {
+    this.node.destroy();
     super.destroy();
   }
 }
@@ -188,6 +212,7 @@ export default class WYSIWYGEditor extends UIComponent {
           head = makeComponent(this, content.head, doc.head);
           body = makeComponent(this, content.body, doc.body);
         } else {
+          head = new UIComponent(doc.head);
           body = makeComponent(this, content);
           body.addTo(doc.body);
         }
@@ -255,7 +280,7 @@ export default class WYSIWYGEditor extends UIComponent {
           break;
         case 'characterData':
           if (comp instanceof WYSIWYGTextNode) {
-            comp.data.source.content = node.textContent || '';
+            comp.data.source.content.set(node.textContent || '');
           }
           break;
         case 'childList':
@@ -264,7 +289,7 @@ export default class WYSIWYGEditor extends UIComponent {
             const nextComp = (nextEl && this.nodes.get(nextEl)) || null;
             record.addedNodes.forEach(newNode => {
               if (!this.nodes.has(newNode)) {
-                comp.makeAndInsertAfter(newNode, nextComp);
+                comp.makeAndInsertBefore(newNode, nextComp);
               }
             });
             record.removedNodes.forEach(oldNode => {

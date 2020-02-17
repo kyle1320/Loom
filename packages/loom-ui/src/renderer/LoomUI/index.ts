@@ -15,9 +15,9 @@ export type ContentTypes = loom.Page | loom.Element;
 export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent<{
-  'updateContentDef': ContentDefTypes | null;
-  'updateContent': ContentTypes | null;
-  'updateData': DataTypes | null;
+  'updateContentDef': [ContentDefTypes | null];
+  'updateContent': [ContentTypes | null];
+  'updateData': [DataTypes | null];
 }> {
   private selectedContentDef: ContentDefTypes | null = null;
   private selectedContent: ContentTypes | null = null;

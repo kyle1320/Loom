@@ -11,7 +11,7 @@ export default class DataNavigator extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'data-nav' }));
 
-    this.listen(ui, 'updateContent', content => {
+    this.autoCleanup(ui.onOff('updateContent', content => {
       this.empty();
 
       if (content instanceof loom.Element) {
@@ -20,6 +20,6 @@ export default class DataNavigator extends UIComponent {
         this.appendChild(new NodeNavigator(ui, content.head));
         this.appendChild(new NodeNavigator(ui, content.body));
       }
-    });
+    }));
   }
 }

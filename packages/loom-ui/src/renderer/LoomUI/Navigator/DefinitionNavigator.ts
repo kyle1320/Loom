@@ -12,11 +12,11 @@ export default class DefinitionNavigator extends UIComponent {
     super(makeElement('div', { className: 'definition-nav' }));
 
     const contentList = new NameList('Pages', ui.sources.pages)
-      .on('select', data => ui.selectContentDef(data.value));
+      .on('select', (_, data) => ui.selectContentDef(data));
     const componentList = new NameList('Components', ui.sources.components)
-      .on('select', data => ui.selectContentDef(data.value));
+      .on('select', (_, data) => ui.selectContentDef(data));
 
-    this.listen(ui, 'updateContentDef', data => {
+    this.autoCleanup(ui.onOff('updateContentDef', data => {
       if (data instanceof loom.ElementDef) {
         contentList.select(null);
         componentList.select(data);
@@ -24,7 +24,7 @@ export default class DefinitionNavigator extends UIComponent {
         contentList.select(data);
         componentList.select(null);
       }
-    });
+    }));
 
     this.appendChild(contentList);
     this.appendChild(componentList);

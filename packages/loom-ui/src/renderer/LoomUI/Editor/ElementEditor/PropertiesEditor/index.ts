@@ -12,30 +12,36 @@ export default class PropertiesEditor extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'properties-editor' }));
 
-    this.listen(ui, 'updateData', data => {
+    this.autoCleanup(ui.onOff('updateData', data => {
       this.empty();
 
       if (data instanceof loom.TextNode) {
-        this.appendChild(new ContentField(data.source));
+        this.appendChild(new ValueField('Content', data.source.content));
       } else if (data instanceof loom.Element) {
-        this.appendChild(new TagField(data.source));
-        this.appendChild(new IdField(data.source));
+        this.appendChild(new ValueField('Tag', data.source.tag));
+        this.appendChild(new KeyField('Id', data.source.attrs, 'id'));
         this.appendChild(new KeyValueList('Attributes', data.source.attrs));
       } else if (data instanceof loom.Component) {
-        this.appendChild(new NameField(data.source));
+        this.appendChild(new ValueField('Name', data.source.name));
       }
-    });
+    }));
   }
 }
 
-class PropertyField extends UIComponent {
-  public constructor(
-    name: string,
-    private readonly input: Input
-  ) {
-    super(makeElement('label', { className: 'property' }, name));
+class ValueField extends UIComponent {
+  private readonly input: Input;
 
-    this.appendChild(input);
+  public constructor(
+    title: string,
+    value: loom.WritableValue<string>
+  ) {
+    super(makeElement('label', { className: 'property' }, title));
+
+    this.input = new Input('').on('change', v => value.set(v));
+
+    this.appendChild(this.input);
+
+    this.autoCleanup(value.watch(this.set));
   }
 
   protected set = (value = ''): void => {
@@ -43,51 +49,25 @@ class PropertyField extends UIComponent {
   }
 }
 
-class ContentField extends PropertyField {
-  public constructor(node: loom.TextNodeDef) {
-    super('Content',
-      new Input(node.content).on('change', val => node.content = val)
-    );
+class KeyField extends UIComponent {
+  private readonly input: Input;
 
-    this.listen(node, 'contentChanged', this.set);
+  public constructor(
+    title: string,
+    map: loom.WritableStringMap<string>,
+    key: string
+  ) {
+    super(makeElement('label', { className: 'property' }, title));
+
+    const value = new loom.MapLookupValue(map, key);
+    this.input = new Input('').on('change', v => value.set(v));
+
+    this.appendChild(this.input);
+
+    this.autoCleanup(value.watch(this.set));
   }
-}
 
-class TagField extends PropertyField {
-  public constructor(node: loom.ElementDef) {
-    super('Tag',
-      new Input(
-        node.tag,
-        node instanceof loom.HeadDef || node instanceof loom.BodyDef
-      ).on('change', val => node.tag = val)
-    );
-
-    this.listen(node, 'tagChanged', this.set);
-  }
-}
-
-class IdField extends PropertyField {
-  public constructor(node: loom.ElementDef) {
-    super('Id',
-      new Input(node.attrs.get('id') || '')
-        .on('change', val => val
-          ? node.attrs.set('id', val)
-          : node.attrs.delete('id'))
-    );
-
-    this.autoCleanup(this.set,
-      cb => node.attrs.onKey('id', cb),
-      cb => node.attrs.offKey('id', cb),
-    );
-  }
-}
-
-class NameField extends PropertyField {
-  public constructor(node: loom.ComponentDef) {
-    super('Name',
-      new Input(node.name).on('change', val => node.name = val)
-    );
-
-    this.listen(node, 'nameChanged', this.set);
+  protected set = (value = ''): void => {
+    this.input.set(value);
   }
 }

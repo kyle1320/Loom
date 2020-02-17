@@ -46,9 +46,9 @@ export default class Editor extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'editor' }), getEditor(ui));
 
-    this.listen(ui, 'updateContent', content => {
+    this.autoCleanup(ui.onOff('updateContent', content => {
       this.empty();
       this.appendChild(getEditor(ui, content));
-    });
+    }));
   }
 }

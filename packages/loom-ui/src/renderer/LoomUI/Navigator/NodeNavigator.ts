@@ -39,7 +39,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     ui: LoomUI,
     protected readonly node: N,
     type: string,
-    title: string,
+    private readonly title: loom.Value<string>,
     depth = 0
   ) {
     super(makeElement('div', {
@@ -50,11 +50,13 @@ abstract class SingleNodeNavigator<N extends Node = Node>
 
     this.iconEl = makeElement('i', { className: this.getIcon() });
     this.el.appendChild(this.iconEl);
-    this.titleEl = makeElement('div', { className: 'node-nav__title' }, title);
+    this.titleEl =
+      makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
 
     ui.on('updateData', this.updateSelected)
     this.updateSelected(ui.getSelectedData());
+    title.on('change', this.setTitle);
   }
 
   private updateSelected = (data: DataTypes | null): void => {
@@ -70,6 +72,11 @@ abstract class SingleNodeNavigator<N extends Node = Node>
   protected setIcon(icon: string | null = null): void {
     this.iconEl.className = icon || this.getIcon();
   }
+
+  public destroy(): void {
+    this.title.off('change', this.setTitle);
+    super.destroy();
+  }
 }
 
 class TextNodeNavigator extends SingleNodeNavigator<loom.TextNode> {
@@ -79,8 +86,6 @@ class TextNodeNavigator extends SingleNodeNavigator<loom.TextNode> {
     depth = 0
   ) {
     super(ui, node, 'text', node.content, depth);
-
-    this.listen(node, 'contentChanged', this.setTitle);
   }
 
   protected getIcon(): string {
@@ -95,12 +100,10 @@ class ElementNavigator extends SingleNodeNavigator<loom.Element> {
     depth = 0
   ) {
     super(ui, node, 'element', node.tag, depth);
-
-    this.listen(node, 'tagChanged', this.tagChanged);
   }
 
   protected getIcon(): string {
-    switch (this.node.tag) {
+    switch (this.node.tag.get()) {
       case '': return 'fa fa-exclamation-triangle';
       case 'a': return 'fa fa-link';
       case 'b': return 'fa fa-bold';
@@ -138,14 +141,11 @@ class ElementChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    for (const child of node.children.raw()) {
-      this.insertChild(new NodeNavigator(ui, child, depth + 1));
-    }
-
-    this.listen(node.children, 'addRaw', ({ index, value }) =>
-      this.insertChild(new NodeNavigator(ui, value, depth + 1), index));
-    this.listen(node.children, 'remove',
-      index => this.removeChild(index));
+    this.autoCleanup(node.children.watch(
+      (index, value) =>
+        this.insertChild(new NodeNavigator(ui, value, depth + 1), index),
+      index => this.removeChild(index)
+    ));
   }
 }
 
@@ -156,12 +156,10 @@ class ComponentNavigator extends SingleNodeNavigator<loom.Component> {
     depth = 0
   ) {
     super(ui, node, 'component', node.source.name, depth);
-
-    this.listen(node.source, 'nameChanged', this.nameChanged);
   }
 
   protected getIcon(): string {
-    return this.node.element instanceof loom.EmptyComponent
+    return this.node.element instanceof loom.UnknownComponent
       ? 'fa fa-question' : 'fa fa-clone';
   }
 
@@ -179,15 +177,11 @@ class ComponentChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    if (!(node.element instanceof loom.EmptyComponent)) {
-      this.insertChild(new NodeNavigator(ui, node.element, depth + 1));
-    }
-
-    this.listen(node, 'elementChanged', el => {
+    this.autoCleanup(node.element.watch(el => {
       this.empty();
-      if (!(el instanceof loom.EmptyComponent)) {
+      if (!(el instanceof loom.UnknownComponent)) {
         this.insertChild(new NodeNavigator(ui, el, depth + 1));
       }
-    });
+    }));
   }
 }

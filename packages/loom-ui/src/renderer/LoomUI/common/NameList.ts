@@ -21,7 +21,7 @@ class NameListHeader extends UIComponent<{
 }
 
 class NameListContent<T> extends UIComponent<{
-  'select': { key: string; value: T | null };
+  'select': [string, T | null];
 }> {
   private rows: Record<string, NameListRow<T>> = {};
   private selected: T | null = null;
@@ -33,8 +33,10 @@ class NameListContent<T> extends UIComponent<{
       this.setRow(name, data.get(name)!);
     }
 
-    this.listen(data, 'set', ({ key, value }) => this.setRow(key, value));
-    this.listen(data, 'delete', key => this.deleteRow(key));
+    this.autoCleanup(data.watch(
+      (key, value) => this.setRow(key, value),
+      key => this.deleteRow(key)
+    ));
   }
 
   private setRow(key: string, value: T): void {
@@ -42,7 +44,7 @@ class NameListContent<T> extends UIComponent<{
       this.rows[key].setData(value, this.selected);
     } else {
       const row = new NameListRow(key, value)
-        .on('select', value => this.emit('select', { key, value }));
+        .on('select', value => this.emit('select', key, value));
       this.rows[key] = row;
       this.appendChild(row);
     }
@@ -61,7 +63,8 @@ class NameListContent<T> extends UIComponent<{
   }
 }
 
-class NameListRow<T> extends UIComponent<{ 'select': T | null }, HTMLElement> {
+class NameListRow<T>
+  extends UIComponent<{ 'select': [T | null] }, HTMLElement> {
   private selected = false;
 
   public constructor(
@@ -88,7 +91,7 @@ class NameListRow<T> extends UIComponent<{ 'select': T | null }, HTMLElement> {
 export default class NameList<T> extends UIComponent<{
   'add': void;
   'remove': void;
-  'select': { key: string; value: T | null };
+  'select': [string, T | null];
 }> {
   private content: NameListContent<T>;
 
@@ -103,7 +106,7 @@ export default class NameList<T> extends UIComponent<{
     );
 
     this.content = new NameListContent(data)
-      .on('select', data => this.emit('select', data));
+      .on('select', (key, value) => this.emit('select', key, value));
 
     this.appendChild(this.content);
   }

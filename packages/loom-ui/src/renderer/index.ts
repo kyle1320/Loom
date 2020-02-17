@@ -47,4 +47,6 @@ window.addEventListener('load', function () {
       'border-bottom': '3px solid #222'
     }
   ));
+
+  new LoomUI(sources);
 });

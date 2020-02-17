@@ -36,27 +36,9 @@ export class UIComponent<
     return this.el;
   }
 
-  protected listen<E, K extends keyof E>(
-    data: loom.EventEmitter<E>,
-    event: K,
-    cb: (data: E[K], event: K) => void
-  ): () => void {
-    return this.autoCleanup(cb,
-      cb => data.on(event, cb),
-      cb => data.off(event, cb)
-    );
-  }
-
-  protected autoCleanup<T>(
-    value: T,
-    init: (value: T) => void,
-    cleanup: (value: T) => void
-  ): () => void {
-    init(value);
+  protected autoCleanup(cb: () => void): () => void {
     const remove = (): void => {
-      if (this.unlisteners.delete(remove)) {
-        cleanup(value);
-      }
+      if (this.unlisteners.delete(remove)) cb()
     }
     this.unlisteners.add(remove);
     return remove;

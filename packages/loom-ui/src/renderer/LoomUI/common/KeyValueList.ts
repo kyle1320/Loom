@@ -28,12 +28,10 @@ class KeyValueListContent extends UIComponent {
     );
     this.newRow.isNewRow();
 
-    for (const name of data.keys()) {
-      this.setRow(name, data.get(name)!);
-    }
-
-    this.listen(data, 'set', ({ key, value }) => this.setRow(key, value));
-    this.listen(data, 'delete', key => this.deleteRow(key));
+    this.autoCleanup(data.watch(
+      (key, value) => this.setRow(key, value),
+      key => this.deleteRow(key)
+    ));
   }
 
   private addNewRow = (): void => {
