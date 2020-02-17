@@ -13,7 +13,7 @@ export default class ValueField extends UIComponent {
     title: string,
     value: loom.WritableValue<string>
   ) {
-    super(makeElement('label', { className: 'property' }, title));
+    super(makeElement('label', { className: 'value-field' }, title));
 
     this.input = new Input('').on('change', v => value.set(v));
 
