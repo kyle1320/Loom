@@ -9,20 +9,21 @@
     flex-flow: row nowrap;
   }
 
-  &__title {
-    flex-grow: 1;
+  &__content {
+    margin-top: 2px;
+    max-height: 100px;
+    overflow-y: auto;
   }
 
-  &__content {
-    background-color: $primary-0;
-    box-shadow: 0 0 2px inset rgba(0, 0, 0, 0.2);
-    height: 100px;
-    overflow-y: auto;
+  .icon-btn.disabled {
+    visibility: hidden;
   }
 
   &__row {
     padding: 0;
     position: relative;
+    display: flex;
+    flex-flow: row nowrap;
 
     &.selected {
       background-color: $accent;
@@ -31,15 +32,26 @@
 
     input {
       border: 1px solid $primary-2;
-      background: none;
+      background-color: $primary-0;
       color: inherit;
       padding: 2px 5px;
-      width: 50%;
+      width: 0;
+      flex-basis: 0;
+      flex-grow: 1;
 
       &:focus {
         outline: none;
         border-color: $accent;
         z-index: 1;
+      }
+
+      &.disabled {
+        background-color: $primary-2;
+        pointer-events: none;
+
+        &::placeholder {
+          color: $primary-5;
+        }
       }
     }
   }
