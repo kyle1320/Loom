@@ -36,7 +36,9 @@ export class EventEmitter<T extends {}> {
     const registered = this._listeners[type];
 
     if (registered) {
-      registered.forEach(cb => cb.call(this, arg!, type));
+      // "save" the current listeners so that modifications to the listeners
+      // inside of callbacks does not affect this emit
+      [...registered.values()].forEach(cb => cb.call(this, arg!, type));
     }
 
     return this;
