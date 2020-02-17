@@ -4,16 +4,14 @@ import {
   StyleRule,
   StyleDeclaration,
   RuleList } from '../build/CSS';
-import { List } from '../data/List';
-import { EventEmitter } from '../util/EventEmitter';
+import { WritableList } from '../data/List';
 import { WritableStringMap } from '../data/StringMap';
+import { WritableValue } from '../data/Value';
 
 export class SheetDef implements Definition {
   public readonly rules: RuleListDef;
 
-  public constructor(
-    rules: RuleListDef | RuleDef[]
-  ) {
+  public constructor(rules: RuleListDef | RuleDef[]) {
     this.rules = rules instanceof RuleListDef
       ? rules : new RuleListDef(rules);
   }
@@ -27,10 +25,7 @@ export class SheetDef implements Definition {
   }
 }
 
-export class RuleListDef
-  extends List<RuleDef>
-  implements Definition {
-
+export class RuleListDef extends WritableList<RuleDef> implements Definition {
   public build(sources: Sources): RuleList {
     return new RuleList(this, sources);
   }
@@ -42,32 +37,17 @@ export class RuleListDef
 
 export type RuleDef = StyleRuleDef;
 
-export class StyleRuleDef
-  extends EventEmitter<{
-    'selectorChanged': string;
-  }> implements Definition {
-
+export class StyleRuleDef implements Definition {
+  public readonly selector: WritableValue<string>;
   public readonly style: StyleDeclarationDef;
 
   public constructor(
-    private _selectorText: string,
+    selector: string,
     style: StyleDeclarationDef | Record<string, string>
   ) {
-    super();
-
+    this.selector = new WritableValue(selector);
     this.style = style instanceof StyleDeclarationDef
       ? style : new StyleDeclarationDef(style);
-  }
-
-  public set selectorText(val: string) {
-    if (this._selectorText !== val) {
-      this._selectorText = val;
-      this.emit('selectorChanged', val);
-    }
-  }
-
-  public get selectorText(): string {
-    return this._selectorText;
   }
 
   public build(sources: Sources): StyleRule {
@@ -75,7 +55,7 @@ export class StyleRuleDef
   }
 
   public serialize(): string {
-    return this.selectorText + '{' + this.style.serialize() + '}';
+    return this.selector.get() + '{' + this.style.serialize() + '}';
   }
 }
 

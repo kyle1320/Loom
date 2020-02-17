@@ -1,10 +1,8 @@
-type Callback<T, K extends keyof T> = (arg: T[K], event: K) => unknown;
+type AsArray<T> = T extends unknown[] ? T : [T];
+type Callback<T, K extends keyof T> = (...args: AsArray<T[K]>) => unknown
 type Listeners<T> = { [K in keyof T]?: Set<Callback<T, K>> };
 
-type VoidKeys<T, K extends keyof T = keyof T> =
-  K extends (T[K] extends void ? K : never) ? K : never;
-
-export class EventEmitter<T extends {}> {
+export class EventEmitter<T> {
   private _listeners: Listeners<T> = {};
 
   public on<K extends keyof T>(type: K, callback: Callback<T, K>): this {
@@ -30,15 +28,13 @@ export class EventEmitter<T extends {}> {
     return () => this.off(type, callback);
   }
 
-  protected emit<K extends VoidKeys<T>>(type: K): this;
-  protected emit<K extends keyof T>(type: K, arg: T[K]): this;
-  protected emit<K extends keyof T>(type: K, arg?: T[K]): this {
+  protected emit<K extends keyof T>(type: K, ...args: AsArray<T[K]>): this {
     const registered = this._listeners[type];
 
     if (registered) {
       // "save" the current listeners so that modifications to the listeners
       // inside of callbacks does not affect this emit
-      [...registered.values()].forEach(cb => cb.call(this, arg!, type));
+      [...registered.values()].forEach(cb => cb.apply(this, args));
     }
 
     return this;
@@ -61,11 +57,10 @@ export class EventEmitter<T extends {}> {
   }
 }
 
-export class PlainEmitter<T extends {}> extends EventEmitter<T> {
-  public emit<K extends VoidKeys<T>>(type: K): this;
-  public emit<K extends keyof T>(type: K, arg: T[K]): this;
-  public emit<K extends keyof T>(type: K, arg?: T[K]): this {
-    super.emit(type, arg!);
-    return this;
+export class PlainEmitter<T>
+  extends EventEmitter<T> {
+
+  public emit<K extends keyof T>(type: K, ...args: AsArray<T[K]>): this {
+    return super.emit(type, ...args);
   }
 }

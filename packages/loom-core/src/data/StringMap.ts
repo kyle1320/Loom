@@ -1,20 +1,19 @@
 import { EventEmitter, PlainEmitter } from '../util/EventEmitter';
-import { Destroyable, mapRecord, mapRecordKeys } from '../util';
+import { mapRecordKeys, doAll, Destroyable } from '../util';
 
 export namespace StringMap {
   export type Events<T> = {
-    'set': { key: string; value: T };
-    'delete': string;
+    'set': [string, T, T | undefined];
+    'delete': [string, T];
   }
 }
 
-type KeyCallback<T, K extends string> =
-  (value: T | undefined, key: K) => void;
+type KeyCallback<T> = (value: T | undefined) => void;
 
 export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   protected readonly data: Record<string, T> = {};
   private readonly keyListeners:
-  PlainEmitter<Record<string, T | undefined>> = new PlainEmitter();
+  PlainEmitter<Record<string, [T | undefined]>> = new PlainEmitter();
 
   public constructor(
     data?: Record<string, T>,
@@ -46,9 +45,10 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   protected set(key: string, value: T): string {
     key = this.normalizeKey(key);
 
+    const oldValue = this.data[key];
     if (this.data[key] !== value) {
       this.data[key] = value;
-      this.emit('set', { key, value });
+      this.emit('set', key, value, oldValue);
       this.keyListeners.emit(key, value);
     }
 
@@ -61,7 +61,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     const value = this.data[key];
     if (key in this.data) {
       delete this.data[key];
-      this.emit('delete', key);
+      this.emit('delete', key, value);
       this.keyListeners.emit(key, undefined);
     }
     return value;
@@ -71,25 +71,31 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     return this.data;
   }
 
-  public onKey(key: string, callback: KeyCallback<T, typeof key>): this {
+  public onKey(key: string, callback: KeyCallback<T>): () => void {
     key = this.normalizeKey(key);
 
     this.keyListeners.on(key, callback);
-    return this;
+
+    return () => this.keyListeners.off(key, callback);
   }
 
-  public offKey(key: string, callback: KeyCallback<T, typeof key>): this {
+  public offKey(key: string, callback: KeyCallback<T>): void {
     key = this.normalizeKey(key);
 
     this.keyListeners.off(key, callback);
-    return this;
   }
 
-  public map<U>(
-    transform: (val: T, key: string, oldValue?: U) => U,
-    cleanup?: (val: U) => void
-  ): ComputedStringMap<U> {
-    return new MappedStringMap(this, transform, cleanup);
+  public watch(
+    onSet: (key: string, value: T, oldValue?: T) => void,
+    onDelete: (data: string) => void
+  ): () => void {
+    for (const key in this.data) {
+      onSet(key, this.data[key]);
+    }
+    return doAll(
+      this.onOff('set', onSet),
+      this.onOff('delete', onDelete)
+    );
   }
 }
 
@@ -110,43 +116,36 @@ export abstract class ComputedStringMap<T>
   public abstract destroy(): void;
 }
 
-class MappedStringMap<T, U> extends ComputedStringMap<U> {
+export class MappedStringMap<T, U> extends ComputedStringMap<U> {
   public constructor(
-    private readonly source: StringMap<T>,
-    private readonly transform: (val: T, key: string, oldValue?: U) => U,
-    private readonly cleanup?: (val: U) => void
+    private readonly sourceMap: StringMap<T>,
+    private readonly onUpdate: (val: T, key: string, oldValue?: U) => U,
+    private readonly cleanup: (val: U) => void
   ) {
-    super(mapRecord(source.asRecord(), transform));
+    super();
 
-    source.on('set', this.sourceSet);
-    source.on('delete', this.sourceDelete);
+    sourceMap.watch(this.sourceSet, this.sourceDelete);
   }
 
-  private sourceSet = (
-    { key, value }: { key: string; value: T }
-  ): void => {
+  private sourceSet = (key: string, value: T): void => {
     const oldValue = this.get(key);
-    const newValue = this.transform(value, key, this.data[key]);
-    if (this.cleanup && oldValue && newValue !== oldValue) {
+    const newValue = this.onUpdate(value, key, oldValue);
+    if (oldValue && newValue !== oldValue) {
       this.cleanup(oldValue);
     }
     this.set(key, newValue);
   }
 
   private sourceDelete = (key: string): void => {
-    if (key in this.data) {
-      this.cleanup && this.cleanup(this.data[key]);
-    }
+    this.cleanup(this.data[key]);
     this.delete(key);
   }
 
   public destroy(): void {
-    this.source.off('set', this.sourceSet);
-    this.source.off('delete', this.sourceDelete);
-    if (this.cleanup) {
-      for (const key in this.data) {
-        this.cleanup(this.data[key]);
-      }
+    this.sourceMap.off('set', this.sourceSet);
+    this.sourceMap.off('delete', this.sourceDelete);
+    for (const key in this.data) {
+      this.cleanup(this.data[key]);
     }
     this.allOff();
   }

@@ -6,7 +6,7 @@ import {
   ChildrenDef,
   PageDef } from '../definitions/HTML';
 import { Sources } from '../definitions';
-import { EmptyComponent } from '../build/HTML';
+import { UnknownComponent, Element } from '../build/HTML';
 
 it('Page', () => {
   const el = new PageDef(
@@ -27,12 +27,12 @@ it('Element', () => {
   const out = el.build(new Sources(null));
 
   const cb = jest.fn();
-  out.on('tagChanged', cb);
+  out.tag.watch(cb);
 
   expect(out.serialize()).toBe('<div title="test">testing</div>');
 
-  el.tag = 'span';
-  expect(cb).toHaveBeenLastCalledWith('span', 'tagChanged');
+  el.tag.set('span');
+  expect(cb).toHaveBeenLastCalledWith('span', 'div');
   expect(out.serialize()).toBe('<span title="test">testing</span>');
 });
 
@@ -42,41 +42,47 @@ it('TextNode', () => {
   const out = el.build(sources);
 
   const cb = jest.fn();
-  out.on('contentChanged', cb);
+  out.content.watch(cb);
 
   expect(out.serialize()).toBe('testing');
 
-  el.content = 'testing {{val}}';
-  expect(cb).toHaveBeenLastCalledWith('testing abc', 'contentChanged');
+  el.content.set('testing {{val}}');
+  expect(cb).toHaveBeenLastCalledWith('testing abc', 'testing');
 
   sources.vars.set('val', 'def')
-  expect(cb).toHaveBeenLastCalledWith('testing def', 'contentChanged');
+  expect(cb).toHaveBeenLastCalledWith('testing def', 'testing abc');
 
-  el.content = 'testing';
-  expect(cb).toHaveBeenLastCalledWith('testing', 'contentChanged');
+  el.content.set('testing');
+  expect(cb).toHaveBeenLastCalledWith('testing', 'testing def');
+  expect(cb).toHaveBeenCalledTimes(4);
 
   sources.vars.set('val', 'def')
-  expect(cb).toHaveBeenCalledTimes(3);
+  expect(cb).toHaveBeenCalledTimes(4);
 });
 
 it('Component', () => {
   const def = new ElementDef('div', {}, [new TextNodeDef('{{val}}')]);
-  const sources = new Sources(null, { val: 'abc' }, { 'Test': def });
-  const el = new ComponentDef('Test');
-  const out = el.build(sources);
+  const sources = new Sources(null, { val: 'abc' });
+  const comp = new ComponentDef('Test');
+  const out = comp.build(sources);
 
   const cb = jest.fn();
-  out.on('elementChanged', cb);
+  out.element.watch(cb);
 
-  expect(out.serialize()).toBe('<div>abc</div>');
-
-  def.attrs.set('title', 'test');
-  expect(cb).not.toHaveBeenCalled();
-  expect(out.serialize()).toBe('<div title="test">abc</div>');
-
-  sources.components.delete('Test');
-  expect(cb).toHaveBeenCalled();
   expect(out.serialize()).toBe('');
+  expect(out.element.get()).toBeInstanceOf(UnknownComponent);
+
+  let oldEl = out.element.get();
+  sources.components.set('Test', def);
+  expect(cb).toHaveBeenLastCalledWith(out.element.get(), oldEl);
+  expect(out.serialize()).toBe('<div>abc</div>');
+  expect(out.element.get()).toBeInstanceOf(Element);
+
+  oldEl = out.element.get();
+  comp.name.set('Bad');
+  expect(cb).toHaveBeenLastCalledWith(out.element.get(), oldEl);
+  expect(out.serialize()).toBe('');
+  expect(out.element.get()).toBeInstanceOf(UnknownComponent);
 });
 
 it('Attributes', () => {
@@ -84,26 +90,20 @@ it('Attributes', () => {
   const attrs = new AttributesDef({ title: 'test' });
   const out = attrs.build(sources);
 
-  const cb = jest.fn();
-  out.on('set', cb);
-  out.on('delete', cb);
+  const cbSet = jest.fn();
+  const cbDelete = jest.fn();
+  out.on('set', cbSet);
+  out.on('delete', cbDelete);
 
   expect(out.serialize()).toBe(' title="test"');
 
-  attrs.set('value', '{{val}}');
-  expect(cb).toHaveBeenLastCalledWith({ key: 'value', value: 'abc' }, 'set');
-  expect(out.serialize()).toBe(' title="test" value="abc"');
+  attrs.set('some attr', 'test')
+  expect(cbSet).toHaveBeenLastCalledWith('some-attr', 'test', undefined);
+  expect(out.serialize()).toBe(' title="test" some-attr="test"');
 
-  sources.vars.set('val', 'def');
-  expect(cb).toHaveBeenLastCalledWith({ key: 'value', value: 'def' }, 'set');
-  expect(out.serialize()).toBe(' title="test" value="def"');
-
-  attrs.delete('value');
-  expect(cb).toHaveBeenLastCalledWith('value', 'delete');
+  attrs.delete('some attr');
+  expect(cbDelete).toHaveBeenLastCalledWith('some-attr', 'test');
   expect(out.serialize()).toBe(' title="test"');
-
-  sources.vars.set('val', 'abc');
-  expect(cb).toHaveBeenCalledTimes(3);
 });
 
 it('Children', () => {
@@ -115,22 +115,15 @@ it('Children', () => {
   const children = new ChildrenDef([el, comp, text]);
   const out = children.build(sources);
 
-  const cb = jest.fn();
-  out.on('add', cb);
-  out.on('remove', cb);
-  out.on('update', cb);
+  const cbAdd = jest.fn();
+  const cbRemove = jest.fn();
+  out.on('add', cbAdd);
+  out.on('remove', cbRemove);
 
   expect(out.serialize()).toBe('<div></div><div>abc</div>testing abc');
 
-  comp.name = 'Bad';
-  expect(cb).toHaveBeenLastCalledWith(
-    { index: 1, value: out.get(1) }, 'update');
-  expect(out.serialize()).toBe('<div></div>testing abc');
-  expect(out.get(1)).toBeInstanceOf(EmptyComponent);
-
   children.removeIndex(1);
-  expect(cb).toHaveBeenLastCalledWith(1, 'remove');
+  expect(cbRemove).toHaveBeenCalledTimes(1);
 
-  comp.name = 'Test';
-  expect(cb).toHaveBeenCalledTimes(2);
+  expect(out.serialize()).toBe('<div></div>testing abc');
 });

@@ -1,4 +1,4 @@
-import { BuildResult, InterpolatedStringMap } from '.';
+import { BuildResult } from '.';
 import {
   StyleRuleDef,
   StyleDeclarationDef,
@@ -6,16 +6,17 @@ import {
   SheetDef,
   RuleDef} from '../definitions/CSS';
 import { Sources } from '../Definitions';
+import { MappedList } from '../data/List';
+import { Value } from '../data/Value';
+import { MappedStringMap } from '../data/StringMap';
 
-export class Sheet extends BuildResult<SheetDef> {
+export class Sheet implements BuildResult<SheetDef> {
   public readonly rules: RuleList;
 
   public constructor(
     public readonly source: SheetDef,
     public readonly sources: Sources
   ) {
-    super(source, sources);
-
     this.rules = source.rules.build(this.sources);
   }
 
@@ -25,34 +26,22 @@ export class Sheet extends BuildResult<SheetDef> {
 
   public destroy(): void {
     this.rules.destroy();
-    super.destroy();
   }
 }
 
-export class RuleList extends BuildResult<RuleListDef, {
-  'add': { index: number; value: Rule };
-  'remove': number;
-}> {
-  private readonly data: Rule[];
+export class RuleList
+  extends MappedList<RuleDef, Rule>
+  implements BuildResult<RuleListDef> {
 
   public constructor(
     public readonly source: RuleListDef,
     public readonly sources: Sources
   ) {
-    super(source, sources);
-
-    this.data = source.asArray().map(x => x.build(sources));
-
-    this.listen(source, 'add', this.sourceAdd)
-    this.listen(source, 'remove', this.sourceRemove);
-  }
-
-  public get(index: number): Rule {
-    return this.data[index];
-  }
-
-  public size(): number {
-    return this.data.length;
+    super(
+      source,
+      def => def.build(sources),
+      b => b.destroy()
+    );
   }
 
   public serialize(): string {
@@ -61,66 +50,48 @@ export class RuleList extends BuildResult<RuleListDef, {
 
   public destroy(): void {
     this.data.forEach(d => d.destroy());
-    super.destroy();
-  }
-
-  private sourceAdd = (
-    { index, value }: { index: number; value: RuleDef }
-  ): void => {
-    this.data.splice(index, 0, value.build(this.sources));
-    this.emit('add', { index, value: this.get(index) });
-  }
-
-  private sourceRemove = ({ index }: { index: number }): void => {
-    this.data.splice(index, 1)[0].destroy();
-    this.emit('remove', index);
   }
 }
 
 export type Rule = StyleRule;
 
-export class StyleRule extends BuildResult<StyleRuleDef, {
-  'selectorChanged': string;
-}> {
-  private _selector: string;
+export class StyleRule implements BuildResult<StyleRuleDef> {
+  public readonly selector: Value<string>;
   public readonly style: StyleDeclaration;
 
   public constructor(
     public readonly source: StyleRuleDef,
     public readonly sources: Sources
   ) {
-    super(source, sources);
-
-    this._selector = source.selectorText;
+    this.selector = source.selector;
     this.style = source.style.build(sources);
-
-    this.listen(source, 'selectorChanged', this.updateSelector);
-  }
-
-  private updateSelector = (selector: string): void => {
-    if (this._selector !== selector) {
-      this._selector = selector;
-      this.emit('selectorChanged', selector);
-    }
-  }
-
-  public get selector(): string {
-    return this._selector;
   }
 
   public serialize(): string {
-    return this.selector + '{' + this.style.serialize() + '}';
+    return this.selector.get() + '{' + this.style.serialize() + '}';
+  }
+
+  public destroy(): void {
+    //
   }
 }
 
 export class StyleDeclaration
-  extends InterpolatedStringMap<StyleDeclarationDef> {
+  extends MappedStringMap<string, string>
+  implements BuildResult<StyleDeclarationDef> {
+
+  public constructor(
+    public readonly source: StyleDeclarationDef,
+    public readonly sources: Sources
+  ) {
+    super(source, k => k, () => { /* */ });
+  }
 
   public serialize(): string {
-    const data = this.data.asRecord();
+    const data = this.asRecord();
     let res = '';
     for (const key in data) {
-      res += key + ':' + data[key].value + ';';
+      res += key + ':' + data[key] + ';';
     }
     return res;
   }
