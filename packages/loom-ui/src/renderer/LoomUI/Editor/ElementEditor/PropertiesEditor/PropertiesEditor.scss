@@ -11,7 +11,7 @@
     justify-content: flex-start;
     align-items: stretch;
     height: 30px;
-    background-color: $primary-8;
+    background-color: $primary-5;
   }
 
   &__content {
@@ -36,6 +36,7 @@
 
   &.selected {
     background-color: $primary-1;
+    color: $accent;
   }
 
   &:last-child {

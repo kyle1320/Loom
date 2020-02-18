@@ -9,11 +9,11 @@ import ValueField from '../../../common/ValueField';
 
 import './PropertiesEditor.scss';
 
-type TabName = 'page' | 'element' | 'style';
+type TabName = 'element' | 'style';
 
 function iconForTab(tab: TabName): string {
   switch (tab) {
-    case 'page': return 'fa fa-file';
+    // case 'page': return 'fa fa-file';
     case 'element': return 'fa fa-code';
     case 'style': return 'fa fa-brush';
   }
@@ -72,9 +72,10 @@ class PropertyTabHeader extends UIComponent<{
 }
 
 class PropertyContents extends UIComponent {
-  private selectedTab: TabName = 'page';
-
-  public constructor(private readonly ui: LoomUI) {
+  public constructor(
+    private readonly ui: LoomUI,
+    private selectedTab: TabName
+  ) {
     super(makeElement('div', { className: 'properties-editor__content' }));
 
     this.autoCleanup(ui.onOff('updateData', this.update));
@@ -84,19 +85,19 @@ class PropertyContents extends UIComponent {
   }
 
   public select(name: TabName): void {
-    this.selectedTab = name;
-    this.update();
+    if (this.selectedTab !== name) {
+      this.selectedTab = name;
+      this.update();
+    }
   }
 
   public update = (): void => {
     this.empty();
 
     const data = this.ui.getSelectedData();
-    // const content = this.ui.getSelectedContent();
+    const content = this.ui.getSelectedContent();
 
     switch (this.selectedTab) {
-      case 'page':
-        break;
       case 'element':
         if (data instanceof loom.TextNode) {
           this.appendChild(new ValueField('Content', data.source.content));
@@ -107,6 +108,12 @@ class PropertyContents extends UIComponent {
           this.appendChild(new KeyValueList('Attributes', data.source.attrs));
         } else if (data instanceof loom.Component) {
           this.appendChild(new ValueField('Name', data.source.name));
+        } else if (content instanceof loom.Element) {
+          this.appendChild(new ValueField('Tag', content.source.tag));
+          this.appendChild(new ValueField('Id',
+            new LookupValue(content.source.attrs, 'id')));
+          this.appendChild(
+            new KeyValueList('Attributes', content.source.attrs));
         }
         break;
       case 'style':
@@ -129,7 +136,8 @@ export default class PropertiesEditor extends UIComponent {
 
     this.appendChild(this.tabHeader = new PropertyTabHeader()
       .on('select', name => this.contents.select(name)));
-    this.appendChild(this.contents = new PropertyContents(ui));
+    this.appendChild(
+      this.contents = new PropertyContents(ui, this.selectedTab));
 
     this.autoCleanup(ui.onOff('updateData', this.build));
     this.autoCleanup(ui.onOff('updateContent', this.build));
@@ -142,9 +150,9 @@ export default class PropertiesEditor extends UIComponent {
     const data = this.ui.getSelectedData();
     const allTabs: TabName[] = [];
 
-    if (content instanceof loom.Page) {
-      allTabs.push('page');
-    }
+    // if (content instanceof loom.Page) {
+    //   allTabs.push('page');
+    // }
 
     if (content instanceof loom.Element ||
         data instanceof loom.TextNode ||
@@ -155,9 +163,8 @@ export default class PropertiesEditor extends UIComponent {
 
     allTabs.push('style');
 
-    if (allTabs.indexOf(this.selectedTab) < 0) {
-      this.selectedTab = allTabs[0] || 'page';
-    }
+    this.selectedTab = allTabs[0] || 'element';
+    this.contents.select(this.selectedTab);
     this.tabHeader.update(allTabs, this.selectedTab);
   }
 }
