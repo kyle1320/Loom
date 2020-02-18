@@ -1,6 +1,7 @@
 import * as loom from 'loom-core';
 
-import LoomUI from '../../..';
+import EditFrame from './EditFrame';
+import LoomUI, { DataTypes } from '../../..';
 import Floating from '../../../common/Floating';
 import Frame from '../../../common/Frame';
 import { addStyles } from '../../../util/css';
@@ -52,13 +53,13 @@ function makeComponent(
   }
 }
 
-type WYSIWYGNode
+export type WYSIWYGNode
   = WYSIWYGElement
   | WYSIWYGTextNode
   | WYSIWYGComponent
   | WYSIWYGUnknown;
 
-class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
+export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
   private ignoreEvents = false;
 
   public constructor(
@@ -69,22 +70,20 @@ class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
     super();
     this.el = this.makeEl(el);
 
-    this.autoCleanup(data.tag.onOff('change', () => {
-      editor.removeNode(this);
-      this.changeEl(this.makeEl());
-      editor.addNode(this);
-    }));
-
-    this.autoCleanup(data.attrs.watch(
-      (key, value) => this.el.setAttribute(key, value),
-      key => this.el.removeAttribute(key)
-    ));
-
-    this.autoCleanup(data.children.watch(
-      (index, value) => !this.ignoreEvents &&
-        this.insertChild(makeComponent(editor, value), index),
-      index => !this.ignoreEvents && this.removeChild(index)
-    ));
+    this.autoCleanup(
+      data.tag.onOff('change', () => {
+        editor.removeNode(this);
+        this.changeEl(this.makeEl());
+        editor.addNode(this);
+      }),
+      data.attrs.onOff('set', (key, value) => this.el.setAttribute(key, value)),
+      data.attrs.onOff('delete', key => this.el.removeAttribute(key)),
+      data.children.watch(
+        (index, value) => !this.ignoreEvents &&
+          this.insertChild(makeComponent(editor, value), index),
+        index => !this.ignoreEvents && this.removeChild(index)
+      )
+    );
 
     editor.addNode(this);
   }
@@ -144,7 +143,7 @@ class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
   }
 }
 
-class WYSIWYGTextNode extends UIComponent {
+export class WYSIWYGTextNode extends UIComponent {
   public constructor(
     private readonly editor: WYSIWYGEditor,
     public readonly data: loom.TextNode,
@@ -165,7 +164,7 @@ class WYSIWYGTextNode extends UIComponent {
   }
 }
 
-class WYSIWYGComponent extends UIComponent {
+export class WYSIWYGComponent extends UIComponent {
   private node!: WYSIWYGNode;
 
   public constructor(
@@ -190,7 +189,7 @@ class WYSIWYGComponent extends UIComponent {
   }
 }
 
-class WYSIWYGUnknown extends UIComponent {
+export class WYSIWYGUnknown extends UIComponent {
   public readonly data = null;
 
   public constructor(editor: WYSIWYGEditor) {
@@ -198,58 +197,85 @@ class WYSIWYGUnknown extends UIComponent {
   }
 }
 
-export default class WYSIWYGEditor extends UIComponent {
+export default class WYSIWYGEditor extends UIComponent<{
+  select: [WYSIWYGNode | null];
+}> {
+  private readonly editFrame: EditFrame;
+
+  private data: WeakMap<DataTypes, WYSIWYGNode> = new WeakMap();
   private nodes: WeakMap<Node, WYSIWYGNode> = new WeakMap();
 
   public constructor(private readonly ui: LoomUI) {
-    super(makeElement('div', { className: 'wysiwyg-editor' }),
-      new Floating(new Frame((doc: Document) => {
-        const content = ui.getSelectedContent() as loom.Page | loom.Element;
-        let head: UIComponent | null = null;
-        let body: UIComponent | null = null;
+    super(makeElement('div', { className: 'wysiwyg-editor__container' }));
 
-        if (content instanceof loom.Page) {
-          head = makeComponent(this, content.head, doc.head);
-          body = makeComponent(this, content.body, doc.body);
-        } else {
-          head = new UIComponent(doc.head);
-          body = makeComponent(this, content);
-          body.addTo(doc.body);
-        }
+    this.appendChild(new Floating(
+      new UIComponent(makeElement('div', { className: 'wysiwyg-editor' }),
+        new Frame((doc: Document) => {
+          const content = ui.getSelectedContent() as loom.Page | loom.Element;
+          let head: UIComponent;
+          let body: UIComponent;
 
-        addStyles(doc, ui.globalStyles);
+          if (content instanceof loom.Page) {
+            head = makeComponent(this, content.head, doc.head);
+            body = makeComponent(this, content.body, doc.body);
+          } else {
+            head = new UIComponent(doc.head);
+            body = makeComponent(this, content);
+            body.addTo(doc.body);
+          }
 
-        doc.addEventListener('selectionchange', () => {
-          const selection = doc.getSelection() || null;
-          let node = selection && selection.focusNode;
-          if (node && node.nodeType === 3) node = node.parentNode;
-          const comp = node && this.nodes.get(node);
-          this.select(comp || null);
-        });
+          addStyles(doc, ui.globalStyles);
 
-        doc.designMode = 'on';
-        const observer = new MutationObserver(this.onEdit);
-        observer.observe(doc, {
-          characterData: true,
-          attributes: true,
-          childList: true,
-          subtree: true
-        });
+          doc.addEventListener('selectionchange', () => {
+            const selection = doc.getSelection() || null;
+            let node = selection && selection.focusNode;
+            if (node && node.nodeType === 3) node = node.parentNode;
+            const comp = node && this.nodes.get(node);
+            this.select(comp || null);
+          });
 
-        return () => {
-          if (head) head.destroy();
-          if (body) body.destroy();
-          observer.disconnect();
-        };
-      })));
+          doc.defaultView?.addEventListener('resize', () => {
+            this.editFrame.refresh();
+          });
+          doc.addEventListener('scroll', () => this.editFrame.refresh());
+
+          doc.designMode = 'on';
+          const observer = new MutationObserver(this.onEdit);
+          observer.observe(doc, {
+            characterData: true,
+            attributes: true,
+            childList: true,
+            subtree: true
+          });
+
+          return () => {
+            head.destroy();
+            body.destroy();
+            observer.disconnect();
+          };
+        }),
+        this.editFrame = new EditFrame(this)
+      )
+    ));
+
+    this.autoCleanup(ui.onOff('updateData', data => {
+      const comp = data && this.data.get(data) || null;
+      if (comp) {
+        const el = comp.getEl();
+        if (el instanceof HTMLElement) el.scrollIntoView({ block: 'nearest' });
+      }
+      this.emit('select', comp);
+    }));
   }
 
   public addNode(comp: WYSIWYGNode): void {
     this.nodes.set(comp.getEl(), comp);
+    comp.data && this.data.set(comp.data, comp);
   }
 
   public removeNode(comp: WYSIWYGNode): void {
     this.nodes.delete(comp.getEl());
+    comp.data && this.data.delete(comp.data);
   }
 
   public select(node: WYSIWYGNode | null): void {
@@ -300,5 +326,7 @@ export default class WYSIWYGEditor extends UIComponent {
           break;
       }
     });
+
+    this.editFrame.refresh();
   }
 }

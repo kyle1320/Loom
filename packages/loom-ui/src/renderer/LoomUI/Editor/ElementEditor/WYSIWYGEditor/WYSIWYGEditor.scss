@@ -1,5 +1,10 @@
 .wysiwyg-editor {
-  flex-grow: 1;
+  position: relative;
+  line-height: 0;
+
+  &__container {
+    flex-grow: 1;
+  }
 
   iframe {
     max-width: 100%;

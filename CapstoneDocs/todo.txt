@@ -1,4 +1,3 @@
-Create basic WYSIWYG Edit Frame
 Make styles show only relevant rules
   - Root UI maintains built document?
 Create MapRow Value class for page locations & component names
