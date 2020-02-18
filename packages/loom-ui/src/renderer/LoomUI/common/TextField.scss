@@ -1,0 +1,10 @@
+.text-field {
+  margin: 5px 2px;
+  display: flex;
+  flex-flow: row nowrap;
+
+  textarea {
+    margin-left: 5px;
+    resize: vertical;
+  }
+}

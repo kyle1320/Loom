@@ -6,6 +6,7 @@ import { LookupValue } from '../../../util';
 import { makeElement } from '../../../util/dom';
 import KeyValueList from '../../../common/KeyValueList';
 import ValueField from '../../../common/ValueField';
+import TextField from '../../../common/TextField';
 
 import './PropertiesEditor.scss';
 
@@ -100,7 +101,7 @@ class PropertyContents extends UIComponent {
     switch (this.selectedTab) {
       case 'element':
         if (data instanceof loom.TextNode) {
-          this.appendChild(new ValueField('Content', data.source.content));
+          this.appendChild(new TextField('Content', data.source.content));
         } else if (data instanceof loom.Element) {
           this.appendChild(new ValueField('Tag', data.source.tag));
           this.appendChild(new ValueField('Id',
