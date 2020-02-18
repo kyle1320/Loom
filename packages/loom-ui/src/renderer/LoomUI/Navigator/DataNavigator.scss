@@ -2,7 +2,17 @@
 
 .data-nav {
   height: 100%;
-  background-color: $primary-0;
+  background-color: $primary-1;
   border-top: 1px solid $primary-5;
   overflow-y: auto;
+
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 5px;
+    height: 30px;
+    background-color: $primary-0;
+    border-bottom: 1px solid $primary-3;
+  }
 }

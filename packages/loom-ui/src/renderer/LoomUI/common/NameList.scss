@@ -22,6 +22,10 @@
     padding: 1px 5px;
     border-bottom: 1px solid $primary-1;
 
+    &:hover {
+      background-color: $primary-hl-0;
+    }
+
     &.selected {
       background-color: $accent;
       color: white;

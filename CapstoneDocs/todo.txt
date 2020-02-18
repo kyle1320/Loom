@@ -2,7 +2,6 @@ Make styles show only relevant rules
   - Root UI maintains built document?
 Create MapRow Value class for page locations & component names
   - refactor KeyValueList to use these
-2-step navigation
 Ability to create & delete elements from UI
   - WYSIWYG controls
 Create multi-select field for "classes"
