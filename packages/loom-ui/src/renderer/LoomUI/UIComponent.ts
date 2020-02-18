@@ -36,9 +36,11 @@ export class UIComponent<
     return this.el;
   }
 
-  protected autoCleanup(cb: () => void): () => void {
+  protected autoCleanup(...callbacks: (() => void)[]): () => void {
     const remove = (): void => {
-      if (this.unlisteners.delete(remove)) cb()
+      if (this.unlisteners.delete(remove)) {
+        callbacks.forEach(cb => cb());
+      }
     }
     this.unlisteners.add(remove);
     return remove;
