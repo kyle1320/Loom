@@ -14,13 +14,14 @@ $primary-7: darken($primary-0, 35%);
 $primary-8: darken($primary-0, 40%);
 $primary-9: darken($primary-0, 45%);
 
-$primary-hl-0: #d8d8ff;
-$primary-hl-1: #cfcff5;
-$primary-hl-2: #c7c7eb;
-$primary-hl-3: #bebee0;
-
 $accent: #266eff;
 $text: #404040;
+
+$primary-hl-0: mix($accent, $primary-0, 10%);
+$primary-hl-1: mix($accent, $primary-0, 20%);
+$primary-hl-2: mix($accent, $primary-0, 30%);
+$primary-hl-3: mix($accent, $primary-0, 40%);
+
 
 * {
   box-sizing: border-box;
@@ -39,6 +40,7 @@ body {
   color: $text;
   font-family: arial;
   font-size: 14px;
+  user-select: none;
 }
 
 input {
