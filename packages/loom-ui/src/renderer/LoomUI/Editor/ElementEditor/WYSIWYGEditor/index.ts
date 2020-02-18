@@ -211,7 +211,7 @@ export default class WYSIWYGEditor extends UIComponent<{
     this.appendChild(new Floating(
       new UIComponent(makeElement('div', { className: 'wysiwyg-editor' }),
         new Frame((doc: Document) => {
-          const content = ui.getSelectedContent() as loom.Page | loom.Element;
+          const content = ui.content.get() as loom.Page | loom.Element;
           let head: UIComponent;
           let body: UIComponent;
 
@@ -258,7 +258,7 @@ export default class WYSIWYGEditor extends UIComponent<{
       )
     ));
 
-    this.autoCleanup(ui.onOff('updateData', data => {
+    this.autoCleanup(ui.data.watch(data => {
       const comp = data && this.data.get(data) || null;
       if (comp) {
         const el = comp.getEl();
@@ -279,7 +279,7 @@ export default class WYSIWYGEditor extends UIComponent<{
   }
 
   public select(node: WYSIWYGNode | null): void {
-    this.ui.selectData(node && node.data);
+    this.ui.data.set(node && node.data);
   }
 
   private onEdit = (records: MutationRecord[]): void => {

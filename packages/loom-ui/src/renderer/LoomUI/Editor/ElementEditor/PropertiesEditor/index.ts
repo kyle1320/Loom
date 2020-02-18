@@ -79,8 +79,10 @@ class PropertyContents extends UIComponent {
   ) {
     super(makeElement('div', { className: 'properties-editor__content' }));
 
-    this.autoCleanup(ui.onOff('updateData', this.update));
-    this.autoCleanup(ui.onOff('updateContent', this.update));
+    this.autoCleanup(
+      ui.data.watch(this.update),
+      ui.content.watch(this.update)
+    );
 
     this.update();
   }
@@ -95,8 +97,8 @@ class PropertyContents extends UIComponent {
   public update = (): void => {
     this.empty();
 
-    const data = this.ui.getSelectedData();
-    const content = this.ui.getSelectedContent();
+    const data = this.ui.data.get();
+    const content = this.ui.content.get();
 
     switch (this.selectedTab) {
       case 'element':
@@ -140,15 +142,15 @@ export default class PropertiesEditor extends UIComponent {
     this.appendChild(
       this.contents = new PropertyContents(ui, this.selectedTab));
 
-    this.autoCleanup(ui.onOff('updateData', this.build));
-    this.autoCleanup(ui.onOff('updateContent', this.build));
-
-    this.build();
+    this.autoCleanup(
+      ui.data.watch(this.build),
+      ui.content.onOff('change', this.build)
+    );
   }
 
   private build = (): void => {
-    const content = this.ui.getSelectedContent();
-    const data = this.ui.getSelectedData();
+    const content = this.ui.content.get();
+    const data = this.ui.data.get();
     const allTabs: TabName[] = [];
 
     // if (content instanceof loom.Page) {

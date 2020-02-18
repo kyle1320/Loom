@@ -30,7 +30,7 @@ class UnknownSelection extends UIComponent {
   }
 }
 
-function getEditor(ui: LoomUI, content = ui.getSelectedContent()): UIComponent {
+function getEditor(ui: LoomUI, content = ui.content.get()): UIComponent {
   if (content instanceof loom.Page) {
     return new ElementEditor(ui);
   } else if (content instanceof loom.Element) {
@@ -46,7 +46,7 @@ export default class Editor extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'editor' }), getEditor(ui));
 
-    this.autoCleanup(ui.onOff('updateContent', content => {
+    this.autoCleanup(ui.content.watch(content => {
       this.empty();
       this.appendChild(getEditor(ui, content));
     }));

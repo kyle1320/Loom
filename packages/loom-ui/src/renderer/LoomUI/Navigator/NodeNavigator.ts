@@ -45,7 +45,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     super(makeElement('div', {
       className: 'node-nav node-nav__' + type,
       style: { paddingLeft: (depth*10) + 'px' },
-      onclick: () => ui.selectData(node)
+      onclick: () => ui.data.set(node)
     }));
 
     this.iconEl = makeElement('i', { className: this.getIcon() });
@@ -54,8 +54,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
 
-    ui.on('updateData', this.updateSelected)
-    this.updateSelected(ui.getSelectedData());
+    ui.data.watch(this.updateSelected);
     title.on('change', this.setTitle);
   }
 

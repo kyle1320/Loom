@@ -14,14 +14,10 @@ export type DataTypes
 export type ContentTypes = loom.Page | loom.Element;
 export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
-export default class LoomUI extends UIComponent<{
-  'updateContentDef': [ContentDefTypes | null];
-  'updateContent': [ContentTypes | null];
-  'updateData': [DataTypes | null];
-}> {
-  private selectedContentDef: ContentDefTypes | null = null;
-  private selectedContent: ContentTypes | null = null;
-  private selectedData: DataTypes | null = null;
+export default class LoomUI extends UIComponent {
+  public readonly contentDef: loom.WritableValue<ContentDefTypes | null>;
+  public readonly content: loom.Value<ContentTypes | null>;
+  public readonly data: loom.WritableValue<DataTypes | null>;
 
   public readonly globalStyles: loom.Sheet
 
@@ -32,39 +28,24 @@ export default class LoomUI extends UIComponent<{
 
     this.globalStyles = sources.styles.build(sources);
 
+    this.contentDef = new loom.WritableValue<ContentDefTypes | null>(null);
+    const content = new loom.WritableValue<ContentTypes | null>(null);
+    this.content = content;
+    this.data = new loom.WritableValue<DataTypes | null>(null);
+
+    // when content changes, automatically build it & reset data
+    this.content.watch((_, old) => old && old.destroy());
+    this.contentDef.watch(def => {
+      content.set(def && def.build(this.sources));
+      this.data.set(null);
+    });
+
     this.appendChild(new Navigator(this));
     this.appendChild(new Editor(this));
   }
 
-  public selectContentDef(def: ContentDefTypes | null): void {
-    if (def === this.selectedContentDef) return;
-
-    this.selectedContentDef = def;
-    this.selectedContent?.destroy();
-    this.selectedContent = def && def.build(this.sources);
-
-    this.selectData(null);
-    this.emit('updateContentDef', this.selectedContentDef);
-    this.emit('updateContent', this.selectedContent);
-  }
-
-  public getSelectedContent(): ContentTypes | null {
-    return this.selectedContent;
-  }
-
-  public getSelectedData(): DataTypes | null {
-    return this.selectedData;
-  }
-
-  public selectData(data: DataTypes | null): void {
-    if (data === this.selectedData) return;
-
-    this.selectedData = data;
-    this.emit('updateData', this.selectedData);
-  }
-
   public destroy(): void {
-    this.selectedContent?.destroy();
+    this.contentDef.set(null);
     super.destroy();
   }
 }
