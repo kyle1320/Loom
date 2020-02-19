@@ -49,7 +49,10 @@ function attachStyle(
   style: loom.StyleDeclaration
 ): () => void {
   return style.watch(
-    (key, value) => cssStyle.setProperty(key, value),
+    (key, value) => {
+      cssStyle.setProperty(key, '');
+      cssStyle.setProperty(key, value);
+    },
     key => cssStyle.removeProperty(key)
   );
 }
