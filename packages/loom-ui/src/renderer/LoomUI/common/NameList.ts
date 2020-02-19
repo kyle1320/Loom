@@ -21,69 +21,54 @@ class NameListHeader extends UIComponent<{
 }
 
 class NameListContent<T> extends UIComponent<{
-  'select': [string, T | null];
+  'select': [string | null];
 }> {
-  private rows: Record<string, NameListRow<T>> = {};
-  private selected: T | null = null;
+  private rows: Record<string, NameListRow> = {};
 
   public constructor(data: loom.StringMap<T>) {
     super(makeElement('div', { className: 'namelist__content' }));
 
-    for (const name of data.keys()) {
-      this.setRow(name, data.get(name)!);
-    }
-
-    this.autoCleanup(data.watch(
-      (key, value) => this.setRow(key, value),
-      key => this.deleteRow(key)
-    ));
+    this.autoCleanup(data.watch(this.setRow, this.deleteRow));
   }
 
-  private setRow(key: string, value: T): void {
-    if (key in this.rows) {
-      this.rows[key].setData(value, this.selected);
-    } else {
-      const row = new NameListRow(key, value)
-        .on('select', value => this.emit('select', key, value));
+  private setRow = (key: string): void => {
+    if (!(key in this.rows)) {
+      const row = new NameListRow(key)
+        .on('select', key => this.emit('select', key));
       this.rows[key] = row;
       this.appendChild(row);
     }
   }
 
-  private deleteRow(name: string): void {
+  private deleteRow = (name: string): void => {
     const row = this.rows[name];
     delete this.rows[name];
     row.destroy();
   }
 
-  public select(data: T | null): void {
+  public select(selectedKey: string | null): void {
     for (const key in this.rows) {
-      this.rows[key].select(data);
+      this.rows[key].select(selectedKey);
     }
   }
 }
 
-class NameListRow<T>
-  extends UIComponent<{ 'select': [T | null] }, HTMLElement> {
+class NameListRow extends UIComponent<{
+  select: [string | null];
+}, HTMLElement> {
   private selected = false;
 
   public constructor(
-    name: string,
-    private data: T
+    private readonly key: string
   ) {
     super(makeElement('div', {
       className: 'namelist__row',
-      onclick: () => this.emit('select', this.selected ? null : this.data)
-    }, name));
+      onclick: () => this.emit('select', this.key)
+    }, key));
   }
 
-  public setData(data: T, selected: T | null): void {
-    this.data = data;
-    this.select(selected);
-  }
-
-  public select(data: T | null): void {
-    this.selected = this.data === data;
+  public select(key: string | null): void {
+    this.selected = this.key === key;
     toggleClass(this.el, 'selected', this.selected);
   }
 }
@@ -91,13 +76,13 @@ class NameListRow<T>
 export default class NameList<T> extends UIComponent<{
   'add': void;
   'remove': void;
-  'select': [string, T | null];
+  'select': [loom.MapKey<T> | null];
 }> {
   private content: NameListContent<T>;
 
   public constructor(
     title: string,
-    data: loom.StringMap<T>
+    data: loom.WritableStringMap<T>
   ) {
     super(makeElement('div', { className: 'namelist' }),
       new NameListHeader(title)
@@ -106,12 +91,14 @@ export default class NameList<T> extends UIComponent<{
     );
 
     this.content = new NameListContent(data)
-      .on('select', (key, value) => this.emit('select', key, value));
+      .on('select', key => {
+        this.emit('select', key === null ? key : new loom.MapKey(data, key))
+      });
 
     this.appendChild(this.content);
   }
 
-  public select(data: T | null): void {
-    this.content.select(data);
+  public select(key: string | null): void {
+    this.content.select(key);
   }
 }

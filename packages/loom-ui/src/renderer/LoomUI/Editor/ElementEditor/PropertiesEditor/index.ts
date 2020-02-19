@@ -10,11 +10,11 @@ import TextField from '../../../common/TextField';
 
 import './PropertiesEditor.scss';
 
-type TabName = 'element' | 'style';
+type TabName = 'page' | 'element' | 'style';
 
 function iconForTab(tab: TabName): string {
   switch (tab) {
-    // case 'page': return 'fa fa-file';
+    case 'page': return 'fa fa-file';
     case 'element': return 'fa fa-code';
     case 'style': return 'fa fa-brush';
   }
@@ -101,6 +101,15 @@ class PropertyContents extends UIComponent {
     const content = this.ui.content.get();
 
     switch (this.selectedTab) {
+      case 'page':
+        if (content instanceof loom.Page) {
+          this.appendChild(
+            new ValueField('Location', this.ui.contentDef.get()!));
+        } else if (content instanceof loom.Element) {
+          this.appendChild(
+            new ValueField('Name', this.ui.contentDef.get()!));
+        }
+        break;
       case 'element':
         if (data instanceof loom.TextNode) {
           this.appendChild(new TextField('Content', data.source.content));
@@ -138,7 +147,10 @@ export default class PropertiesEditor extends UIComponent {
     super(makeElement('div', { className: 'properties-editor' }));
 
     this.appendChild(this.tabHeader = new PropertyTabHeader()
-      .on('select', name => this.contents.select(name)));
+      .on('select', name => {
+        this.selectedTab = name;
+        this.contents.select(name);
+      }));
     this.appendChild(
       this.contents = new PropertyContents(ui, this.selectedTab));
 
@@ -153,9 +165,7 @@ export default class PropertiesEditor extends UIComponent {
     const data = this.ui.data.get();
     const allTabs: TabName[] = [];
 
-    // if (content instanceof loom.Page) {
-    //   allTabs.push('page');
-    // }
+    allTabs.push('page');
 
     if (content instanceof loom.Element ||
         data instanceof loom.TextNode ||
@@ -166,7 +176,9 @@ export default class PropertiesEditor extends UIComponent {
 
     allTabs.push('style');
 
-    this.selectedTab = allTabs[0] || 'element';
+    if (allTabs.indexOf(this.selectedTab) < 0) {
+      this.selectedTab = allTabs[0];
+    }
     this.contents.select(this.selectedTab);
     this.tabHeader.update(allTabs, this.selectedTab);
   }
