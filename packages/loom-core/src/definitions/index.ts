@@ -17,19 +17,15 @@ export interface SourcesConfig {
 }
 
 export class Sources {
-  public readonly vars: WritableStringMap<string>;
   public readonly components: WritableStringMap<ElementDef>;
   public readonly pages: WritableStringMap<PageDef>;
   public readonly styles: SheetDef;
 
   public constructor(
     public config: SourcesConfig | null,
-    vars: WritableStringMap<string> | Record<string, string> = {},
     components: WritableStringMap<ElementDef> | Record<string, ElementDef> = {},
     pages: WritableStringMap<PageDef> | Record<string, PageDef> = {}
   ) {
-    this.vars = vars instanceof WritableStringMap
-      ? vars : new WritableStringMap(vars);
     this.components = components instanceof WritableStringMap
       ? components : new WritableStringMap(components);
     this.pages = pages instanceof WritableStringMap

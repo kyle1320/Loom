@@ -4,7 +4,6 @@ import path = require('path');
 export interface LoomConfig {
   sourcesRoot?: string;
   componentsRoot?: string;
-  globalVars?: Record<string, string>;
 }
 
 export function mkdirp(file: string): void {

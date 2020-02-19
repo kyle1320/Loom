@@ -1,4 +1,4 @@
-import { BuildResult, InterpolatedString } from '.';
+import { BuildResult } from '.';
 import { Sources } from '../definitions';
 import {
   TextNodeDef,
@@ -15,15 +15,13 @@ import { MappedStringMap } from '../data/StringMap';
 export type Node = TextNode | Element | UnknownComponent;
 
 export class TextNode implements BuildResult<TextNodeDef> {
-  public readonly content: InterpolatedString;
+  public readonly content: Value<string>;
 
   public constructor(
     public readonly source: TextNodeDef,
     public readonly sources: Sources
   ) {
-    this.content = new InterpolatedString(source.content.get(), sources.vars);
-
-    source.content.on('change', this.content.update);
+    this.content = source.content;
   }
 
   public serialize(): string {
@@ -31,8 +29,7 @@ export class TextNode implements BuildResult<TextNodeDef> {
   }
 
   public destroy(): void {
-    this.content.destroy();
-    this.source.content.off('change', this.content.update);
+    //
   }
 }
 

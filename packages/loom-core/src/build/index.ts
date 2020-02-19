@@ -1,13 +1,9 @@
 import { Destroyable } from '../util';
 import { Definition, Sources } from '../definitions';
-import {
-  StringMap,
-  ComputedStringMap,
-  MappedStringMap } from '../data/StringMap';
+import { ComputedStringMap, MappedStringMap } from '../data/StringMap';
 import { Page } from './HTML';
 import { Sheet } from './CSS';
 import { exportResults } from '../serialization/out';
-import { Value } from '../data/Value';
 
 export class Results implements Destroyable {
   public readonly pages: ComputedStringMap<Page>;
@@ -36,40 +32,4 @@ export interface BuildResult<D extends Definition> {
 
   serialize(): string;
   destroy(): void;
-}
-
-export class InterpolatedString
-  extends Value<string>
-  implements Destroyable {
-
-  private unlisteners: (() => void)[] = [];
-
-  public constructor(
-    value: string,
-    private readonly vars: StringMap<string>
-  ) {
-    super('');
-
-    this.update(value);
-  }
-
-  public update = (value: string): void => {
-    this.destroyValueListeners();
-    this.set(value.replace(/{{(\S+)}}/, (_, s) => {
-      this.unlisteners.push(this.vars.onKey(s, this.update.bind(this, value)));
-      const val = this.vars.get(s);
-      if (val) return val;
-      return s; // TODO: throw error?
-    }));
-  }
-
-  private destroyValueListeners(): void {
-    this.unlisteners.forEach(cb => cb());
-    this.unlisteners = [];
-  }
-
-  public destroy(): void {
-    this.allOff();
-    this.destroyValueListeners();
-  }
 }

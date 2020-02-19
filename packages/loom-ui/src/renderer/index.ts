@@ -3,10 +3,7 @@ import * as loom from 'loom-core';
 import LoomUI from './LoomUI';
 
 window.addEventListener('load', function () {
-  const sources = new loom.Sources(null, {
-    title: 'test',
-    color: '#F0F0FF'
-  });
+  const sources = new loom.Sources(null);
 
   sources.components.set('Header',
     new loom.ElementDef('div', { 'class': 'header' }, [

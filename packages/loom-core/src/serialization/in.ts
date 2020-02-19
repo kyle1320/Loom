@@ -14,7 +14,7 @@ export function importSources(rootDir: string): Sources {
     rootDir,
     sourcesRoot: config.sourcesRoot || 'src',
     componentsRoot: config.componentsRoot || 'components'
-  }, config.globalVars);
+  });
   const componentsRoot = path.join(rootDir, res.config!.componentsRoot);
   const sourcesRoot = path.join(rootDir, res.config!.sourcesRoot);
 

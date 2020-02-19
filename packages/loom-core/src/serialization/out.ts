@@ -23,8 +23,7 @@ export function saveSources(sources: Sources, config: SourcesConfig): void {
   );
   writeSync(path.join(config.rootDir, 'loom.json'), JSON.stringify({
     sourcesRoot: config.sourcesRoot,
-    componentsRoot: config.componentsRoot,
-    globalVars: sources.vars.asRecord()
+    componentsRoot: config.componentsRoot
   } as LoomConfig));
 }
 
