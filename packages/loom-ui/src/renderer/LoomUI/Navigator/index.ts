@@ -14,10 +14,10 @@ export default class Navigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'navigator' }));
 
-    this.autoCleanup(ui.content.watch(content => this.update(!!content)));
+    this.autoCleanup(ui.content.watch(content => this.showData(!!content)));
   }
 
-  private update = (showingData: boolean): void => {
+  public showData = (showingData: boolean): void => {
     if (this.showingData !== showingData) {
       this.showingData = showingData;
 
@@ -25,7 +25,7 @@ export default class Navigator extends UIComponent {
 
       this.appendChild(this.showingData
         ? new DataNavigator(this.ui)
-          .on('back', () => this.ui.contentDef.set(null))
+          .on('back', () => this.showData(false))
         : new DefinitionNavigator(this.ui));
     }
   }
