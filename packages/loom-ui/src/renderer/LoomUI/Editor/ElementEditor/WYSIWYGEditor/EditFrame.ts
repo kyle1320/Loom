@@ -59,7 +59,7 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
         `${values.top} ${values.right} ${values.bottom} ${values.left}`;
     }
 
-    const n = this.node?.getEl();
+    const n = this.node.getEl();
     const el = n
       ? n.nodeType === 3 ? n.parentElement : n as unknown as HTMLElement
       : null;
