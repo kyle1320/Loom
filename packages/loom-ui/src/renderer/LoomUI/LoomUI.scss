@@ -43,7 +43,7 @@ body {
   user-select: none;
 }
 
-input {
+input, textarea {
   border: 1px solid $primary-5;
 
   &:focus {
