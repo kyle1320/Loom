@@ -11,11 +11,12 @@ export default class ValueField extends UIComponent {
 
   public constructor(
     title: string,
-    value: loom.WritableValue<string>
+    value: loom.WritableValue<string>,
+    disabled?: boolean
   ) {
     super(makeElement('label', { className: 'value-field' }, title));
 
-    this.input = new Input('')
+    this.input = new Input('', disabled)
       .on('change', v => {
         value.set(v);
         this.input.set(value.get());

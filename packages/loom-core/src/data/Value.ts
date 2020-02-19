@@ -8,6 +8,8 @@ export namespace Value {
 }
 
 export class Value<T> extends EventEmitter<Value.Events<T>> {
+  private _frozen = false;
+
   public constructor(private _value: T) {
     super();
   }
@@ -17,13 +19,17 @@ export class Value<T> extends EventEmitter<Value.Events<T>> {
   }
 
   protected set(value: T): boolean {
-    if (this._value !== value) {
+    if (!this._frozen && this._value !== value) {
       const oldValue = this._value;
       this._value = value;
       this.emit('change', value, oldValue);
       return true;
     }
     return false;
+  }
+
+  public freeze(): void {
+    this._frozen = true;
   }
 
   public watch(

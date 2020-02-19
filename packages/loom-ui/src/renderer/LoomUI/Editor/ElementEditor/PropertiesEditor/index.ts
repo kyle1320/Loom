@@ -114,7 +114,9 @@ class PropertyContents extends UIComponent {
         if (data instanceof loom.TextNode) {
           this.appendChild(new TextField('Content', data.source.content));
         } else if (data instanceof loom.Element) {
-          this.appendChild(new ValueField('Tag', data.source.tag));
+          this.appendChild(new ValueField('Tag', data.source.tag,
+            data instanceof loom.HeadElement ||
+            data instanceof loom.BodyElement));
           this.appendChild(new ValueField('Id',
             new LookupValue(data.source.attrs, 'id')));
           this.appendChild(new KeyValueList('Attributes', data.source.attrs));

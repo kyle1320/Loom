@@ -114,7 +114,8 @@ export class HeadDef extends ElementDef {
     attrs: AttributesDef | Record<string, string>,
     children: ChildrenDef | NodeDef[],
   ) {
-    super('head', attrs, children); // TODO: make tag read-only
+    super('head', attrs, children);
+    this.tag.freeze();
   }
 
   public build(sources: Sources): HeadElement {
@@ -127,7 +128,8 @@ export class BodyDef extends ElementDef {
     attrs: AttributesDef | Record<string, string>,
     children: ChildrenDef | NodeDef[],
   ) {
-    super('body', attrs, children); // TODO: make tag read-only
+    super('body', attrs, children);
+    this.tag.freeze();
   }
 
   public build(sources: Sources): BodyElement {
