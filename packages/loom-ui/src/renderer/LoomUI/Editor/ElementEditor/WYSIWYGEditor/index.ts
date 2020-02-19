@@ -174,6 +174,8 @@ export class WYSIWYGComponent extends UIComponent {
     super(null!);
 
     this.autoCleanup(data.element.watch(this.update));
+
+    editor.addNode(this);
   }
 
   private update = (node: loom.Node): void => {
