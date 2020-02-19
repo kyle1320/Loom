@@ -15,4 +15,11 @@
     background-color: $primary-0;
     border-bottom: 1px solid $primary-3;
   }
+
+  &__location {
+    padding-right: 20px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+  }
 }
