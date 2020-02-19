@@ -15,7 +15,11 @@ export default class ValueField extends UIComponent {
   ) {
     super(makeElement('label', { className: 'value-field' }, title));
 
-    this.input = new Input('').on('change', v => value.set(v));
+    this.input = new Input('')
+      .on('change', v => {
+        value.set(v);
+        this.input.set(value.get());
+      });
 
     this.appendChild(this.input);
 
