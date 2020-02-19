@@ -200,16 +200,15 @@ export class WYSIWYGUnknown extends UIComponent {
 export default class WYSIWYGEditor extends UIComponent<{
   select: [WYSIWYGNode | null];
 }> {
-  private readonly editFrame: EditFrame;
-
   private data: WeakMap<DataTypes, WYSIWYGNode> = new WeakMap();
   private nodes: WeakMap<Node, WYSIWYGNode> = new WeakMap();
 
   public constructor(private readonly ui: LoomUI) {
     super(makeElement('div', { className: 'wysiwyg-editor__container' }));
 
-    this.appendChild(new Floating(
-      new UIComponent(makeElement('div', { className: 'wysiwyg-editor' }),
+    this.appendChild(
+      new Floating(new UIComponent(
+        makeElement('div', { className: 'wysiwyg-editor' }),
         new Frame((doc: Document) => {
           const content = ui.content.get() as loom.Page | loom.Element;
           let head: UIComponent;
@@ -234,11 +233,6 @@ export default class WYSIWYGEditor extends UIComponent<{
             this.select(comp || null);
           });
 
-          doc.defaultView?.addEventListener('resize', () => {
-            this.editFrame.refresh();
-          });
-          doc.addEventListener('scroll', () => this.editFrame.refresh());
-
           doc.designMode = 'on';
           const observer = new MutationObserver(this.onEdit);
           observer.observe(doc, {
@@ -254,9 +248,8 @@ export default class WYSIWYGEditor extends UIComponent<{
             observer.disconnect();
           };
         }),
-        this.editFrame = new EditFrame(this)
-      )
-    ));
+        new EditFrame(this)
+      )));
 
     this.autoCleanup(ui.data.watch(data => {
       const comp = data && this.data.get(data) || null;
@@ -326,7 +319,5 @@ export default class WYSIWYGEditor extends UIComponent<{
           break;
       }
     });
-
-    this.editFrame.refresh();
   }
 }
