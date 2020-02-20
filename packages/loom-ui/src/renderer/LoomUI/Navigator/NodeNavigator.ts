@@ -1,3 +1,4 @@
+import { Value } from 'loom-data';
 import * as loom from 'loom-core';
 
 import LoomUI, { DataTypes } from '..';
@@ -39,7 +40,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     ui: LoomUI,
     protected readonly node: N,
     type: string,
-    private readonly title: loom.Value<string>,
+    private readonly title: Value<string>,
     depth = 0
   ) {
     super(makeElement('div', {

@@ -1,6 +1,7 @@
+import { WritableStringMap } from 'loom-data';
+
 import { ElementDef, PageDef } from './HTML';
 import { BuildResult, Results } from '../build';
-import { WritableStringMap } from '../data/StringMap';
 import { SheetDef } from './CSS';
 import { saveSources } from '../serialization/out';
 import { importSources } from '../serialization/in';

@@ -1,8 +1,8 @@
-import * as loom from 'loom-core';
+import { EventEmitter } from 'loom-data';
 
 export class UIComponent<
   E = {}, H extends Node = Node
-> extends loom.EventEmitter<E> {
+> extends EventEmitter<E> {
   private unlisteners: Set<() => void> = new Set();
 
   protected parent: UIComponent | null = null;

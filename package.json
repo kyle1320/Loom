@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "verify": "yarn run typecheck && yarn run lint",
     "test": "jest",
+    "build-data": "cd packages/loom-data && yarn run build",
     "build-core": "cd packages/loom-core && yarn run build",
     "ui": "cd packages/loom-ui && yarn run dev"
   },

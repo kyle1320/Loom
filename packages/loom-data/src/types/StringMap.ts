@@ -1,4 +1,4 @@
-import { EventEmitter, PlainEmitter } from '../util/EventEmitter';
+import { EventEmitter, PlainEmitter } from './EventEmitter';
 import { mapRecordKeys, doAll, Destroyable } from '../util';
 import { Value, WritableValue } from './Value';
 

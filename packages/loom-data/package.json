@@ -1,5 +1,5 @@
 {
-  "name": "loom-core",
+  "name": "loom-data",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,17 +10,10 @@
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist ./*.tsbuildinfo",
-    "compile": "tsc -b tsconfig.build.json",
+    "compile": "tsc -p tsconfig.build.json",
     "watch": "tsc --watch"
   },
   "devDependencies": {
-    "@types/css": "^0.0.31",
-    "@types/node": "^12.12.25",
     "typescript": "^3.7.5"
-  },
-  "dependencies": {
-    "css": "^2.2.4",
-    "htmlparser2": "^4.0.0",
-    "loom-data": "^1.0.0"
   }
 }

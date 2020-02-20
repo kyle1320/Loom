@@ -1,4 +1,4 @@
-import * as loom from 'loom-core';
+import { WritableValue } from 'loom-data';
 
 import { UIComponent } from '../UIComponent';
 import TextArea from './TextArea';
@@ -11,7 +11,7 @@ export default class TextField extends UIComponent {
 
   public constructor(
     title: string,
-    value: loom.WritableValue<string>
+    value: WritableValue<string>
   ) {
     super(makeElement('label', { className: 'text-field' }, title));
 

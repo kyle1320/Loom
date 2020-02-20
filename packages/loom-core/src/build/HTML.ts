@@ -1,3 +1,11 @@
+import {
+  ComputedValue,
+  MappedList,
+  MappedStringMap,
+  MappedValue,
+  StringMapValue,
+  Value } from 'loom-data';
+
 import { BuildResult } from '.';
 import { Sources } from '../definitions';
 import {
@@ -8,9 +16,6 @@ import {
   ElementDef,
   ComponentDef,
   NodeDef} from '../definitions/HTML';
-import { Value, MappedValue, ComputedValue } from '../data/Value';
-import { MappedList } from '../data/List';
-import { MappedStringMap, StringMapValue } from '../data/StringMap';
 
 export type Node = TextNode | Element | UnknownComponent;
 

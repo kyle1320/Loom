@@ -1,3 +1,8 @@
+import {
+  WritableList,
+  WritableStringMap,
+  WritableValue } from 'loom-data';
+
 import { Definition, Sources } from '../definitions';
 import {
   TextNode,
@@ -8,9 +13,6 @@ import {
   Children,
   HeadElement,
   BodyElement } from '../build/HTML';
-import { WritableList } from '../data/List';
-import { WritableStringMap } from '../data/StringMap';
-import { WritableValue } from '../data/Value';
 
 export type NodeDef =
   TextNodeDef | ElementDef | ComponentDef;

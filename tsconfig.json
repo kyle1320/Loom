@@ -20,10 +20,10 @@
     "newLine": "lf",
     "noEmitOnError": true,
     "composite": true,
-    "build": true,
 
     "paths": {
-      "loom-core": ["loom-core/src"]
+      "loom-core": ["loom-core/src"],
+      "loom-data": ["loom-data/src"]
     }
   },
   "include": [
@@ -32,6 +32,6 @@
   "exclude": [
     "**/dist",
     "**/__tests__",
-    "**/node_modules",
+    "**/node_modules"
   ]
 }

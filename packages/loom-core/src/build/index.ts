@@ -1,12 +1,14 @@
-import { Destroyable } from '../util';
+import {
+  MappedStringMap,
+  ComputedStringMap } from 'loom-data';
+
 import { Definition, Sources } from '../definitions';
-import { ComputedStringMap, MappedStringMap } from '../data/StringMap';
 import { Page } from './HTML';
 import { Sheet } from './CSS';
 import { exportResults } from '../serialization/out';
 import { PageDef } from '../definitions/HTML';
 
-export class Results implements Destroyable {
+export class Results {
   public readonly pages: ComputedStringMap<Page>;
   public readonly styles: Sheet;
 

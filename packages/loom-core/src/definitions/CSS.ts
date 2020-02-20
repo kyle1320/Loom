@@ -1,12 +1,14 @@
+import {
+  WritableList,
+  WritableStringMap,
+  WritableValue } from 'loom-data';
+
 import { Definition, Sources } from '../definitions';
 import {
   Sheet,
   StyleRule,
   StyleDeclaration,
   RuleList } from '../build/CSS';
-import { WritableList } from '../data/List';
-import { WritableStringMap } from '../data/StringMap';
-import { WritableValue } from '../data/Value';
 
 export class SheetDef implements Definition {
   public readonly rules: RuleListDef;

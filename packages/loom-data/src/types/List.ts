@@ -1,4 +1,4 @@
-import { EventEmitter } from '../util/EventEmitter';
+import { EventEmitter } from './EventEmitter';
 import { doAll, Destroyable } from '../util';
 
 export namespace List {

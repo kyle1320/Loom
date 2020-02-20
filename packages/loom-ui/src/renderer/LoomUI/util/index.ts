@@ -1,8 +1,8 @@
-import * as loom from 'loom-core';
+import { WritableValue, WritableStringMap } from 'loom-data';
 
-export class LookupValue extends loom.WritableValue<string> {
+export class LookupValue extends WritableValue<string> {
   public constructor(
-    private readonly sourceMap: loom.WritableStringMap<string>,
+    private readonly sourceMap: WritableStringMap<string>,
     private readonly key: string
   ) {
     super(sourceMap.get(key) || '');

@@ -6,8 +6,5 @@
     "module": "CommonJS",
     "lib": ["ES7"]
   },
-  "include": ["src/**/*"],
-  "references": [{
-    "path": "../loom-data"
-  }]
+  "include": ["src/**/*"]
 }

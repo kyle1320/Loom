@@ -1,4 +1,4 @@
-import * as loom from 'loom-core';
+import { WritableValue } from 'loom-data';
 
 import { UIComponent } from '../UIComponent';
 import Input from './Input';
@@ -11,7 +11,7 @@ export default class ValueField extends UIComponent {
 
   public constructor(
     title: string,
-    value: loom.WritableValue<string>,
+    value: WritableValue<string>,
     disabled?: boolean
   ) {
     super(makeElement('label', { className: 'value-field' }, title));

@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "loom-core": "^1.0.0",
+    "loom-data": "^1.0.0",
     "source-map-support": "^0.5.16"
   },
   "electronWebpack": {

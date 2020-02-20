@@ -1,10 +1,10 @@
-import * as loom from 'loom-core';
+import { StringMapRow, WritableStringMap } from 'loom-data';
 
 import IconButton from './IconButton';
 import { UIComponent } from '../UIComponent';
+import { makeElement, toggleClass } from '../util/dom';
 
 import './NameList.scss';
-import { makeElement, toggleClass } from '../util/dom';
 
 class NameListHeader extends UIComponent<{
   'add': void;
@@ -25,7 +25,7 @@ class NameListContent<T> extends UIComponent<{
 }> {
   private rows: Record<string, NameListRow> = {};
 
-  public constructor(data: loom.StringMap<T>) {
+  public constructor(data: WritableStringMap<T>) {
     super(makeElement('div', { className: 'namelist__content' }));
 
     this.autoCleanup(data.watch(this.setRow, this.deleteRow));
@@ -76,13 +76,13 @@ class NameListRow extends UIComponent<{
 export default class NameList<T> extends UIComponent<{
   'add': void;
   'remove': void;
-  'select': [loom.StringMapRow<T> | null];
+  'select': [StringMapRow<T> | null];
 }> {
   private content: NameListContent<T>;
 
   public constructor(
     title: string,
-    data: loom.WritableStringMap<T>
+    data: WritableStringMap<T>
   ) {
     super(makeElement('div', { className: 'namelist' }),
       new NameListHeader(title)
@@ -92,7 +92,7 @@ export default class NameList<T> extends UIComponent<{
 
     this.content = new NameListContent<T>(data)
       .on('select', key => this.emit('select',
-        key === null ? key : new loom.StringMapRow(data, key)
+        key === null ? key : new StringMapRow(data, key)
       ));
 
     this.appendChild(this.content);

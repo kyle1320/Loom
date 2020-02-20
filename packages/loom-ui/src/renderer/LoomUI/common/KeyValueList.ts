@@ -1,4 +1,4 @@
-import * as loom from 'loom-core';
+import { WritableStringMap } from 'loom-data';
 
 import { UIComponent } from '../UIComponent';
 import { makeElement, toggleClass } from '../util/dom';
@@ -19,7 +19,7 @@ class KeyValueListContent extends UIComponent {
   private rows: Record<string, KeyValueListRow> = {};
 
   public constructor(
-    private readonly data: loom.WritableStringMap<string>
+    private readonly data: WritableStringMap<string>
   ) {
     super(makeElement('div', { className: 'keyvaluelist__content' }));
 
@@ -179,7 +179,7 @@ class KeyValueListRow extends UIComponent<{
 }
 
 export default class KeyValueList extends UIComponent {
-  public constructor(title: string, data: loom.WritableStringMap<string>) {
+  public constructor(title: string, data: WritableStringMap<string>) {
     super(makeElement('div', { className: 'keyvaluelist' }),
       new KeyValueListHeader(title),
       new KeyValueListContent(data)

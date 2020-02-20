@@ -1,3 +1,8 @@
+import {
+  MappedList,
+  Value,
+  MappedStringMap } from 'loom-data';
+
 import { BuildResult } from '.';
 import {
   StyleRuleDef,
@@ -6,9 +11,6 @@ import {
   SheetDef,
   RuleDef} from '../definitions/CSS';
 import { Sources } from '../Definitions';
-import { MappedList } from '../data/List';
-import { Value } from '../data/Value';
-import { MappedStringMap } from '../data/StringMap';
 
 export class Sheet implements BuildResult<SheetDef> {
   public readonly rules: RuleList;
