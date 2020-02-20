@@ -61,7 +61,8 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
 
     const n = this.node.getEl();
     const el = n
-      ? n.nodeType === 3 ? n.parentElement : n as unknown as HTMLElement
+      ? n.nodeType === 3 ? n.parentElement
+        : n.nodeType === 1 ? n as unknown as HTMLElement : null
       : null;
     if (el) {
       const bounds = el.getBoundingClientRect();

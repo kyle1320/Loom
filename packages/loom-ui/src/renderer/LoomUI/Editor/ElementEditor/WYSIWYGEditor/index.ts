@@ -183,8 +183,10 @@ export class WYSIWYGComponent extends UIComponent {
   private update = (node: loom.Node): void => {
     this.el = this.node && this.node.getEl();
     this.node = makeComponent(this.editor, node);
+    this.editor.removeNode(this);
     if (this.el) this.changeEl(this.node.getEl());
     else this.el = this.node.getEl();
+    this.editor.addNode(this);
   }
 
   public destroy(): void {
