@@ -1,5 +1,4 @@
 import { EventEmitter } from '../util/EventEmitter';
-import { WritableStringMap } from './StringMap';
 
 export namespace Value {
   export type Events<T> = {
@@ -46,84 +45,30 @@ export class WritableValue<T> extends Value<T> {
   }
 }
 
-export class MapKey<T> extends WritableValue<string> {
-  public readonly value: MapValue<T>;
-
-  public constructor(
-    public readonly map: WritableStringMap<T>,
-    key: string
-  ) {
-    super(key = map.normalizeKey(key));
-    this.value = new MapValue(map, this);
-  }
-
-  public set(key: string): boolean {
-    key = this.map.normalizeKey(key);
-    if (!this.map.has(key)) {
-      const oldKey = this.get();
-      if (super.set(key)) {
-        this.map.set(key, this.map.delete(oldKey));
-      }
-    }
-    return false;
-  }
-
-  public delete(): void {
-    this.map.delete(this.get());
-  }
-
-  public destroy(): void {
-    this.value.destroy();
-  }
+export abstract class ComputedValue<T> extends Value<T> {
+  public abstract destroy(): void
 }
 
-export class MapValue<T> extends WritableValue<T | undefined> {
+export class MappedValue<T, U> extends ComputedValue<U> {
   public constructor(
-    public readonly map: WritableStringMap<T>,
-    private readonly key: string | MapKey<T>
+    private readonly source: Value<T>,
+    private readonly transform: (value: T) => U,
+    private readonly cleanup: (value: U) => void
   ) {
-    super(undefined);
+    super(transform(source.get()));
 
-    if (typeof key === 'string') {
-      key = map.normalizeKey(key);
-      this.setKey(key, undefined);
-    } else {
-      key.watch(this.setKey);
+    source.on('change', this.update);
+  }
+
+  private update = (value: T): void => {
+    const oldValue = this.get();
+    if (this.set(this.transform(value))) {
+      this.cleanup(oldValue);
     }
-  }
-
-  public set = (value: T): boolean => {
-    if (super.set(value)) {
-      this.map.set(this.getKey(), value);
-      return true;
-    }
-    return false;
-  }
-
-  public getKey(): string {
-    return typeof this.key === 'string'
-      ? this.key
-      : this.key.get();
-  }
-
-  private setKey = (
-    key: string,
-    oldKey: string | undefined
-  ): void => {
-    if (typeof oldKey === 'string') {
-      this.map.offKey(oldKey, super.set);
-    }
-    super.set(this.map.get(key));
-    this.map.onKey(key, super.set);
-  }
-
-  public delete(): void {
-    this.map.delete(this.getKey());
   }
 
   public destroy(): void {
-    if (typeof this.key !== 'string') this.key.off('change', this.setKey);
-    this.map.offKey(this.getKey(), super.set);
+    this.source.off('change', this.update);
     this.allOff();
   }
 }

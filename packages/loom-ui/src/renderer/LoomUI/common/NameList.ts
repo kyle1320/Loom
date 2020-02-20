@@ -76,7 +76,7 @@ class NameListRow extends UIComponent<{
 export default class NameList<T> extends UIComponent<{
   'add': void;
   'remove': void;
-  'select': [loom.MapKey<T> | null];
+  'select': [loom.StringMapRow<T> | null];
 }> {
   private content: NameListContent<T>;
 
@@ -90,10 +90,10 @@ export default class NameList<T> extends UIComponent<{
         .on('remove', () => this.emit('remove'))
     );
 
-    this.content = new NameListContent(data)
-      .on('select', key => {
-        this.emit('select', key === null ? key : new loom.MapKey(data, key))
-      });
+    this.content = new NameListContent<T>(data)
+      .on('select', key => this.emit('select',
+        key === null ? key : new loom.StringMapRow(data, key)
+      ));
 
     this.appendChild(this.content);
   }

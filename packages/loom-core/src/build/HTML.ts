@@ -8,9 +8,9 @@ import {
   ElementDef,
   ComponentDef,
   NodeDef} from '../definitions/HTML';
-import { Value, WritableValue } from '../data/Value';
+import { Value, MappedValue, ComputedValue } from '../data/Value';
 import { MappedList } from '../data/List';
-import { MappedStringMap } from '../data/StringMap';
+import { MappedStringMap, StringMapValue } from '../data/StringMap';
 
 export type Node = TextNode | Element | UnknownComponent;
 
@@ -144,38 +144,21 @@ export class UnknownComponent implements BuildResult<ComponentDef> {
 }
 
 export class Component implements BuildResult<ComponentDef> {
-  private readonly name: Value<string>;
-  private readonly writableElement: WritableValue<Element | UnknownComponent>;
-  public readonly element: Value<Element | UnknownComponent>;
+  private readonly component: StringMapValue<ElementDef>;
+  public readonly element: ComputedValue<Element | UnknownComponent>;
 
   public constructor(
     public readonly source: ComponentDef,
     public readonly sources: Sources
   ) {
-    this.name = source.name;
-    this.element =
-      this.writableElement =
-        new WritableValue<Element | UnknownComponent>(
-          new UnknownComponent(source, sources));
-
-    this.element.watch((_, oldValue) => oldValue?.destroy());
-    this.name.watch(this.update);
-  }
-
-  private updateComponent = (): void => {
-    const component = this.sources.components.get(this.name.get());
-
-    this.writableElement.set(component
-      ? component.build(this.sources)
-      : new UnknownComponent(this.source, this.sources));
-  }
-
-  private update = (name: string, oldName: string | undefined): void => {
-    if (oldName) {
-      this.sources.components.offKey(oldName, this.updateComponent);
-    }
-    this.sources.components.onKey(name, this.updateComponent);
-    this.updateComponent();
+    this.component = new StringMapValue(sources.components, source.name);
+    this.element = new MappedValue(
+      this.component,
+      component => component
+        ? component.build(this.sources)
+        : new UnknownComponent(this.source, this.sources),
+      el => el.destroy()
+    );
   }
 
   public serialize(): string {
@@ -183,9 +166,8 @@ export class Component implements BuildResult<ComponentDef> {
   }
 
   public destroy(): void {
-    this.name.off('change', this.update);
-    this.sources.components.offKey(this.name.get(), this.updateComponent);
-    this.element.get().destroy();
+    this.component.destroy();
+    this.element.destroy();
   }
 }
 

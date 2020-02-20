@@ -16,7 +16,7 @@ export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent {
   public readonly contentDef: loom.WritableValue<
-  loom.MapKey<loom.PageDef> | loom.MapKey<loom.ElementDef> | null>;
+  loom.StringMapRow<loom.PageDef> | loom.StringMapRow<loom.ElementDef> | null>;
   public readonly content: loom.Value<ContentTypes | null>;
   public readonly data: loom.WritableValue<DataTypes | null>;
 
@@ -30,7 +30,7 @@ export default class LoomUI extends UIComponent {
     this.globalStyles = sources.styles.build(sources);
 
     this.contentDef = new loom.WritableValue<
-    loom.MapKey<loom.PageDef> | loom.MapKey<loom.ElementDef> | null
+    loom.StringMapRow<loom.PageDef> | loom.StringMapRow<loom.ElementDef> | null
     >(null);
     const content = new loom.WritableValue<ContentTypes | null>(null);
     this.content = content;

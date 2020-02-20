@@ -2,8 +2,10 @@ export interface Destroyable {
   destroy(): void;
 }
 
-export const doAll = (...callbacks: (() => void)[]): () => void => {
-  return () => callbacks.forEach(cb => cb());
+export const doAll = (
+  ...callbacks: (null | undefined | (() => void))[]
+): () => void => {
+  return () => callbacks.forEach(cb => cb && cb());
 }
 
 export const mapRecord = <K extends string | number | symbol, T, U>(

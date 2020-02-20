@@ -104,10 +104,10 @@ class PropertyContents extends UIComponent {
       case 'page':
         if (content instanceof loom.Page) {
           this.appendChild(
-            new ValueField('Location', this.ui.contentDef.get()!));
+            new ValueField('Location', this.ui.contentDef.get()!.key));
         } else if (content instanceof loom.Element) {
           this.appendChild(
-            new ValueField('Name', this.ui.contentDef.get()!));
+            new ValueField('Name', this.ui.contentDef.get()!.key));
         }
         break;
       case 'element':

@@ -20,9 +20,9 @@ class DataNavigatorHeader extends UIComponent<{ back: void }> {
     ));
 
     let cleanup: (() => void) | null = null;
-    this.autoCleanup(ui.contentDef.watch(key => {
+    this.autoCleanup(ui.contentDef.watch(row => {
       cleanup && cleanup();
-      cleanup = key && key.watch(this.setTitle.bind(this, key.value.get()));
+      cleanup = row && row.key.watch(this.setTitle.bind(this, row.value.get()));
     }), () => cleanup && cleanup());
   }
 

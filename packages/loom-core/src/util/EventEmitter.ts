@@ -57,9 +57,7 @@ export class EventEmitter<T> {
   }
 }
 
-export class PlainEmitter<T>
-  extends EventEmitter<T> {
-
+export class PlainEmitter<T> extends EventEmitter<T> {
   public emit<K extends keyof T>(type: K, ...args: AsArray<T[K]>): this {
     return super.emit(type, ...args);
   }

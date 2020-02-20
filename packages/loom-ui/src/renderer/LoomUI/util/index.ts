@@ -7,7 +7,7 @@ export class LookupValue extends loom.WritableValue<string> {
   ) {
     super(sourceMap.get(key) || '');
 
-    sourceMap.onKey(key, this.setFromSource);
+    sourceMap.valueChanges.on(key, this.setFromSource);
   }
 
   public set = (value: string | undefined): boolean => {
@@ -28,7 +28,7 @@ export class LookupValue extends loom.WritableValue<string> {
   }
 
   public destroy(): void {
-    this.sourceMap.offKey(this.key, this.setFromSource);
+    this.sourceMap.valueChanges.off(this.key, this.setFromSource);
     this.allOff();
   }
 }

@@ -12,16 +12,16 @@ export default class DefinitionNavigator extends UIComponent {
     super(makeElement('div', { className: 'definition-nav' }));
 
     const contentList = new NameList('Pages', ui.sources.pages)
-      .on('select', key => ui.contentDef.set(key));
+      .on('select', row => ui.contentDef.set(row));
     const componentList = new NameList('Components', ui.sources.components)
-      .on('select', key => ui.contentDef.set(key));
+      .on('select', row => ui.contentDef.set(row));
 
     this.autoCleanup(ui.contentDef.watch(data => {
       if (data?.value.get() instanceof loom.ElementDef) {
         contentList.select(null);
-        componentList.select(data.get());
+        componentList.select(data.key.get());
       } else {
-        contentList.select(data && data.get());
+        contentList.select(data && data.key.get());
         componentList.select(null);
       }
     }));
