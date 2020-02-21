@@ -1,4 +1,4 @@
-import { WritableStringMap } from 'loom-data';
+import { WritableStringMap, StringMapRow } from 'loom-data';
 
 import { UIComponent } from '../UIComponent';
 import { makeElement, toggleClass } from '../util/dom';
@@ -15,166 +15,83 @@ class KeyValueListHeader extends UIComponent<{ remove: void }> {
 }
 
 class KeyValueListContent extends UIComponent {
-  private newRow: KeyValueListRow;
-  private rows: Record<string, KeyValueListRow> = {};
+  private newRow!: StringMapRow<string>;
 
   public constructor(
     private readonly data: WritableStringMap<string>
   ) {
     super(makeElement('div', { className: 'keyvaluelist__content' }));
 
-    this.appendChild(
-      this.newRow = new KeyValueListRow('', '').on('changeKey', this.addNewRow)
-    );
-    this.newRow.isNewRow();
-
-    this.autoCleanup(data.watch(
-      (key, value) => this.setRow(key, value),
-      key => this.deleteRow(key)
-    ));
+    this.addNewRow();
+    this.autoCleanup(data.watchRows(this.addRow));
   }
 
   private addNewRow = (): void => {
-    const key = this.data.normalizeKey(this.newRow.getKey());
-    if (this.data.has(key)) {
-      this.newRow.setKey('');
-      const row = this.rows[key];
-      row && row.selectValue();
-      return;
-    }
-
-    const row = this.newRow;
-    row.setKey(key);
-    this.rows[key] = this.listenRow(row.off('changeKey', this.addNewRow));
-    this.data.set(key, row.getValue());
     this.appendChild(
-      this.newRow = new KeyValueListRow('', '').on('changeKey', this.addNewRow)
+      new KeyValueListRow(this.newRow = new StringMapRow(this.data, '', ''))
     );
-    this.newRow.isNewRow();
   }
 
-  private listenRow(row: KeyValueListRow): KeyValueListRow {
-    row.isNewRow(false);
-    return row
-      .on('changeValue',
-        ({ key, value }) => row.setKey(this.data.set(key, value)))
-      .on('changeKey',
-        ({ oldKey, newKey }) => this.changeKey(row, oldKey, newKey))
-      .on('delete', key => this.deleteRow(key));
-  }
-
-  private setRow(key: string, value: string): void {
-    if (key in this.rows) {
-      this.rows[key].setValue(value);
+  private addRow = (key: string, value: string): void => {
+    if (key === this.newRow.key.get()) {
+      this.addNewRow();
     } else {
-      const row = this.listenRow(new KeyValueListRow(key, value));
-      this.rows[key] = row;
-      this.insertChild(row, this.children.length - 1);
-    }
-  }
-
-  private deleteRow(key: string): void {
-    const row = this.rows[key];
-    delete this.rows[key];
-    this.data.delete(key);
-    row && row.destroy();
-  }
-
-  private changeKey(
-    row: KeyValueListRow,
-    oldKey: string,
-    newKey: string
-  ): void {
-    newKey = this.data.normalizeKey(newKey);
-    if (this.data.has(newKey)) {
-      row.setKey(oldKey);
-      return;
-    }
-    const value = this.data.get(oldKey) || '';
-    delete this.rows[oldKey];
-    this.data.delete(oldKey);
-    if (newKey) {
-      this.rows[newKey] = row;
-      row.setKey(this.data.set(newKey, value));
-    } else {
-      row.destroy();
+      this.insertChild(
+        new KeyValueListRow(new StringMapRow(this.data, key, value)),
+        this.children.length - 1
+      );
     }
   }
 }
 
-class KeyValueListRow extends UIComponent<{
-  changeValue: { key: string; value: string };
-  changeKey: { oldKey: string; newKey: string };
-  delete: string;
-}, HTMLElement> {
-  private readonly removeBtn: HTMLElement;
-  private readonly keyInput: HTMLInputElement;
-  private readonly valueInput: HTMLInputElement;
+class KeyValueListRow extends UIComponent<{}, HTMLElement> {
+  public constructor(row: StringMapRow<string>) {
+    let removeBtn: HTMLElement;
+    let keyInput: HTMLInputElement;
+    let valueInput: HTMLInputElement;
 
-  private key: string;
-
-  public constructor(key: string, value: string) {
-    super(makeElement('div', { className: 'keyvaluelist__row' }));
-
-    this.key = key;
-
-    this.el.appendChild(this.removeBtn = makeElement('div', {
-      className: 'icon-btn fa fa-minus',
-      onclick: () => this.emit('delete', this.getKey())
-    }));
-
-    this.el.appendChild(this.keyInput = makeElement('input', {
-      className: 'keyvaluelist__key-input',
-      value: key,
-      placeholder: 'Key',
-      oninput: () => this.enableValueInput(),
-      onchange: () => {
-        const oldKey = this.key;
-        this.key = this.getKey();
-        this.emit('changeKey', { oldKey, newKey: this.key });
-      }
-    }));
-
-    this.el.appendChild(this.valueInput = makeElement('input', {
-      className: 'keyvaluelist__value-input',
-      value: value,
-      placeholder: 'Value',
-      oninput: () => this.emit('changeValue', {
-        key: this.getKey(),
-        value: this.getValue()
+    super(makeElement('div', { className: 'keyvaluelist__row' },
+      removeBtn = makeElement('div', {
+        className: 'icon-btn fa fa-minus',
+        onclick: () => row.delete()
+      }),
+      keyInput = makeElement('input', {
+        className: 'keyvaluelist__key-input',
+        placeholder: 'Key',
+        oninput: () => enableValueInput(),
+        onchange: () => {
+          const key = keyInput.value;
+          if (key) {
+            if (row.key.set(keyInput.value)) row.insert();
+            else keyInput.value = row.key.get();
+          } else {
+            row.delete();
+          }
+          enableValueInput();
+        }
+      }),
+      valueInput = makeElement('input', {
+        className: 'keyvaluelist__value-input',
+        placeholder: 'Value',
+        oninput: () => row.value.set(valueInput.value)
       })
-    }));
-  }
+    ));
 
-  public setKey(value: string): void {
-    this.key = this.keyInput.value = value;
-    this.enableValueInput();
-  }
+    const enableValueInput = (): void => {
+      const disableValue = !keyInput.value;
+      toggleClass(removeBtn, 'disabled', !row.key.get());
+      toggleClass(valueInput, 'disabled', disableValue);
+      valueInput.disabled = disableValue;
+    };
 
-  public getKey(): string {
-    return this.keyInput.value;
-  }
+    this.autoCleanup(row.watch(
+      key => keyInput.value = key,
+      value => valueInput.value = value || '',
+      () => this.destroy()
+    ),
+    () => row.destroy());
 
-  public setValue(value: string): void {
-    this.valueInput.value = value;
-  }
-
-  public getValue(): string {
-    return this.valueInput.value;
-  }
-
-  public selectValue(): void {
-    this.valueInput.focus();
-  }
-
-  public isNewRow(isNewRow = true): void {
-    toggleClass(this.removeBtn, 'disabled', isNewRow);
-    this.enableValueInput(isNewRow || undefined);
-  }
-
-  private enableValueInput(disable = !this.getKey()): void {
-    toggleClass(this.valueInput, 'disabled', disable);
-    this.valueInput.disabled = disable;
+    enableValueInput();
   }
 }
 

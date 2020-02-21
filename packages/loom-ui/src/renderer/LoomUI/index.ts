@@ -16,6 +16,10 @@ export type ContentTypes = loom.Page | loom.Element;
 export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent {
+  public readonly pageDef:
+  WritableValue<StringMapRow<loom.PageDef> | null>;
+  public readonly componentDef:
+  WritableValue<StringMapRow<loom.ElementDef> | null>;
   public readonly contentDef: WritableValue<
   StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null>;
   public readonly content: Value<ContentTypes | null>;
@@ -30,6 +34,12 @@ export default class LoomUI extends UIComponent {
 
     this.globalStyles = sources.styles.build(sources);
 
+    this.pageDef = new WritableValue<
+    StringMapRow<loom.PageDef> | null
+    >(null);
+    this.componentDef = new WritableValue<
+    StringMapRow<loom.ElementDef> | null
+    >(null);
     this.contentDef = new WritableValue<
     StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null
     >(null);
@@ -38,18 +48,25 @@ export default class LoomUI extends UIComponent {
     this.data = new WritableValue<DataTypes | null>(null);
 
     // when content changes, automatically build it & reset data
-    this.content.watch((_, old) => old && old.destroy());
+    this.content.watch((_, old) => {
+      old && old.destroy();
+      this.data.set(null);
+    });
+    this.pageDef.watch(def => {
+      if (def) this.componentDef.set(null);
+      this.contentDef.set(def);
+    });
+    this.componentDef.watch(def => {
+      if (def) this.pageDef.set(null);
+      this.contentDef.set(def);
+    });
     this.contentDef.watch(def => {
       content.set(def && def.value.get()?.build(this.sources) || null);
-      this.data.set(null);
     });
 
     this.appendChild(new Navigator(this));
     this.appendChild(new Editor(this));
-  }
 
-  public destroy(): void {
-    this.contentDef.set(null);
-    super.destroy();
+    this.autoCleanup(() => content.set(null));
   }
 }

@@ -1,4 +1,4 @@
-import { StringMapRow, WritableStringMap } from 'loom-data';
+import { StringMapRow, WritableStringMap, WritableValue } from 'loom-data';
 
 import IconButton from './IconButton';
 import { UIComponent } from '../UIComponent';
@@ -20,85 +20,56 @@ class NameListHeader extends UIComponent<{
   }
 }
 
-class NameListContent<T> extends UIComponent<{
-  'select': [string | null];
-}> {
-  private rows: Record<string, NameListRow> = {};
-
-  public constructor(data: WritableStringMap<T>) {
+class NameListContent<T> extends UIComponent {
+  public constructor(
+    data: WritableStringMap<T>,
+    selected: WritableValue<StringMapRow<T> | null>
+  ) {
     super(makeElement('div', { className: 'namelist__content' }));
 
-    this.autoCleanup(data.watch(this.setRow, this.deleteRow));
-  }
-
-  private setRow = (key: string): void => {
-    if (!(key in this.rows)) {
-      const row = new NameListRow(key)
-        .on('select', key => this.emit('select', key));
-      this.rows[key] = row;
-      this.appendChild(row);
-    }
-  }
-
-  private deleteRow = (name: string): void => {
-    const row = this.rows[name];
-    delete this.rows[name];
-    row.destroy();
-  }
-
-  public select(selectedKey: string | null): void {
-    for (const key in this.rows) {
-      this.rows[key].select(selectedKey);
-    }
+    this.autoCleanup(data.watchRows(key => this.appendChild(
+      new NameListRow(new StringMapRow(data, key, null!), selected)
+    )));
   }
 }
 
-class NameListRow extends UIComponent<{
-  select: [string | null];
-}, HTMLElement> {
-  private selected = false;
-
+class NameListRow<T> extends UIComponent<{}, HTMLElement> {
   public constructor(
-    private readonly key: string
+    row: StringMapRow<T>,
+    selected: WritableValue<StringMapRow<T> | null>
   ) {
     super(makeElement('div', {
       className: 'namelist__row',
-      onclick: () => this.emit('select', this.key)
-    }, key));
-  }
+      onclick: () => selected.set(row)
+    }));
 
-  public select(key: string | null): void {
-    this.selected = this.key === key;
-    toggleClass(this.el, 'selected', this.selected);
+    this.autoCleanup(row.watch(
+      key => this.el.textContent = key,
+      () => { /**/ },
+      () => this.destroy()
+    ), selected.watch(r => {
+      toggleClass(this.el, 'selected',
+        !!(r && r.key.get() == row.key.get()));
+    }));
   }
 }
 
-export default class NameList<T> extends UIComponent<{
-  'add': void;
-  'remove': void;
-  'select': [StringMapRow<T> | null];
-}> {
-  private content: NameListContent<T>;
-
+export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
     title: string,
-    data: WritableStringMap<T>
+    data: WritableStringMap<T>,
+    public readonly selected: WritableValue<StringMapRow<T> | null>
+    = new WritableValue<StringMapRow<T> | null>(null)
   ) {
     super(makeElement('div', { className: 'namelist' }),
       new NameListHeader(title)
         .on('add', () => this.emit('add'))
-        .on('remove', () => this.emit('remove'))
+        .on('remove', () => {
+          selected.get()?.delete();
+          selected.set(null);
+        })
     );
 
-    this.content = new NameListContent<T>(data)
-      .on('select', key => this.emit('select',
-        key === null ? key : new StringMapRow(data, key)
-      ));
-
-    this.appendChild(this.content);
-  }
-
-  public select(key: string | null): void {
-    this.content.select(key);
+    this.appendChild(new NameListContent<T>(data, selected));
   }
 }
