@@ -21,7 +21,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
 
   // per-key key change listeners
   public readonly keyChanges:
-  PlainEmitter<Record<string, [string, T]>> = new PlainEmitter();
+  PlainEmitter<Record<string, [string | undefined, T]>> = new PlainEmitter();
 
   // per-key value change listeners
   public readonly valueChanges:
@@ -35,6 +35,11 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     super();
 
     if (data) this.data = mapRecordKeys(data, normalizeKey);
+
+    this.on('changeKey', this.keyChanges.emit.bind(this.keyChanges));
+    this.on('set', this.valueChanges.emit.bind(this.valueChanges));
+    this.on('delete', (k, v) => this.valueChanges.emit(k, undefined, v));
+    this.on('deleteRow', (k, v) => this.keyChanges.emit(k, undefined, v));
   }
 
   public get(key: string): T | undefined {
@@ -63,28 +68,27 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
       } else {
         this.emit('changeValue', key, value, oldValue);
       }
-      this.valueChanges.emit(key, value, oldValue);
     }
 
     return key;
   }
 
-  protected changeKey(oldKey: string, newKey: string): string | null {
+  protected changeKey(oldKey: string, newKey: string): string | false {
     oldKey = this.normalizeKey(oldKey);
     newKey = this.normalizeKey(newKey);
 
-    if (oldKey in this.data && !(newKey in this.data)) {
+    if (newKey in this.data) return false;
+
+    if (oldKey in this.data) {
       const value = this.data[oldKey];
       delete this.data[oldKey];
       this.emit('delete', oldKey, value);
       this.data[newKey] = value;
       this.emit('set', newKey, value, undefined);
       this.emit('changeKey', oldKey, newKey, value);
-      this.keyChanges.emit(oldKey, newKey, value);
-      return newKey;
     }
 
-    return null;
+    return newKey;
   }
 
   protected delete(key: string): T | undefined {
@@ -95,7 +99,6 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
       delete this.data[key];
       this.emit('delete', key, value);
       this.emit('deleteRow', key, value);
-      this.valueChanges.emit(key, undefined, value);
     }
 
     return value;
@@ -120,7 +123,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
 
   public watchRows(
     onAdd: (key: string, value: T) => void,
-    onDelete: (data: string, value: T) => void,
+    onDelete?: (data: string, value: T) => void,
     onChangeKey?: (oldKey: string, newKey: string, value: T) => void,
     onChangeValue?: (key: string, value: T, oldValue: T) => void,
   ): () => void {
@@ -129,7 +132,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     }
     return doAll(
       this.onOff('addRow', onAdd),
-      this.onOff('deleteRow', onDelete),
+      onDelete && this.onOff('deleteRow', onDelete),
       onChangeKey && this.onOff('changeKey', onChangeKey),
       onChangeValue && this.onOff('changeValue', onChangeValue)
     );
@@ -211,7 +214,7 @@ export class WritableStringMap<T> extends StringMap<T> {
     return super.delete(key);
   }
 
-  public changeKey(oldKey: string, newKey: string): string | null {
+  public changeKey(oldKey: string, newKey: string): string | false {
     return super.changeKey(oldKey, newKey);
   }
 }
