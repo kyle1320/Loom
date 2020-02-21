@@ -2,7 +2,7 @@ import { EventEmitter } from './EventEmitter';
 
 export namespace Value {
   export type Events<T> = {
-    'change': [T, T | undefined];
+    'change': [T, T];
   }
 }
 
