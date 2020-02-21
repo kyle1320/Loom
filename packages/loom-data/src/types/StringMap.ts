@@ -139,38 +139,89 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   }
 }
 
-export class StringMapRow<T> {
-  public readonly key: StringMapKey<T>;
-  public readonly value: StringMapValue<T>;
+export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
+  public readonly key: WritableValue<string>;
+  public readonly value: WritableValue<T>;
 
-  public constructor(map: WritableStringMap<T>, key: string) {
-    this.key = new StringMapKey(map, key);
-    this.value = new StringMapValue(map, this.key);
-  }
+  public destroy: () => void;
 
-  public destroy(): void {
-    this.key.destroy();
-    this.value.destroy();
-  }
-}
-
-export class StringMapKey<T> extends WritableValue<string> {
   public constructor(
     public readonly map: WritableStringMap<T>,
-    key: string
+    key: string,
+    defaultValue: T
   ) {
-    super(key = map.normalizeKey(key));
-    map.keyChanges.on(key, super.set);
+    super();
+
+    key = map.normalizeKey(key);
+
+    const deleted = (): void => void this.emit('delete');
+    const keyVal = this.key = new class extends WritableValue<string> {
+      public set(key: string): boolean {
+        const oldKey = this.get();
+        const res = map.changeKey(oldKey, key);
+        return res !== false && super.set(res);
+      }
+
+      public update = (key: string | undefined): void => {
+        if (typeof key === 'string') super.set(key);
+        else deleted();
+      }
+    }(key);
+    const valVal = this.value = new class extends WritableValue<T> {
+      public set = (value: T): boolean => {
+        if (super.set(value)) {
+          const key = keyVal.get();
+          map.has(key) && map.set(key, value);
+          return true;
+        }
+        return false;
+      }
+
+      public update = (value: T | undefined): void => {
+        if (typeof value !== 'undefined') super.set(value);
+      }
+    }(defaultValue);
+
+    keyVal.watch((key: string, oldKey: string | undefined) => {
+      if (typeof oldKey === 'string') {
+        map.keyChanges.off(oldKey, keyVal.update);
+        map.valueChanges.off(oldKey, valVal.update);
+      }
+      map.keyChanges.on(key, keyVal.update);
+      map.valueChanges.off(key, valVal.update);
+
+      valVal.update(map.get(key));
+    });
+
+    this.destroy = (): void => {
+      const key = this.key.get();
+      map.keyChanges.off(key, keyVal.update);
+      map.valueChanges.off(key, valVal.update);
+    };
   }
 
-  public set(key: string): boolean {
-    const oldKey = this.get();
-    const res = this.map.changeKey(oldKey, key);
-    return res !== null && super.set(res);
+  public exists(): boolean {
+    return this.map.has(this.key.get());
   }
 
-  public destroy(): void {
-    this.map.keyChanges.off(this.get(), super.set);
+  public insert(): void {
+    this.map.set(this.key.get(), this.value.get());
+  }
+
+  public delete(): void {
+    this.map.delete(this.key.get());
+  }
+
+  public watch(
+    onKeyChange: (key: string, oldKey: string | undefined) => void,
+    onValueChange: (value: T, oldValue: T | undefined) => void,
+    onDelete: () => void
+  ): () => void {
+    return doAll(
+      this.key.watch(onKeyChange),
+      this.value.watch(onValueChange),
+      this.onOff('delete', onDelete)
+    );
   }
 }
 
@@ -179,7 +230,7 @@ export class StringMapValue<T> extends WritableValue<T | undefined> {
     public readonly map: WritableStringMap<T>,
     private readonly key: Value<string>
   ) {
-    super(null!);
+    super(undefined);
 
     key.watch(this.updateKey);
   }
