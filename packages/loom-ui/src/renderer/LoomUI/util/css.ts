@@ -48,7 +48,7 @@ function attachStyle(
   cssStyle: CSSStyleDeclaration,
   style: loom.StyleDeclaration
 ): () => void {
-  return style.watch(
+  return style.watchBasic(
     (key, value) => {
       cssStyle.setProperty(key, '');
       cssStyle.setProperty(key, value);

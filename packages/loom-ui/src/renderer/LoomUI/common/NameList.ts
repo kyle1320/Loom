@@ -27,7 +27,7 @@ class NameListContent<T> extends UIComponent {
   ) {
     super(makeElement('div', { className: 'namelist__content' }));
 
-    this.autoCleanup(data.watchRows(key => this.appendChild(
+    this.autoCleanup(data.watchAll(key => this.appendChild(
       new NameListRow(new StringMapRow(data, key, null!), selected)
     )));
   }
