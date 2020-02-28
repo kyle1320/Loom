@@ -77,6 +77,7 @@ export class MappedValue<T, U> extends ComputedValue<U> {
   }
 
   public destroy(): void {
+    this.cleanup(this.get());
     this.source.off('change', this.update);
     this.allOff();
   }
