@@ -42,7 +42,9 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
   ) {
     super(makeElement('div', {
       className: 'namelist__row',
-      onclick: () => selected.set(row)
+      onclick: () => selected.set(
+        new StringMapRow(row.map, row.key.get(), row.value.get())
+      )
     }));
 
     this.autoCleanup(row.watch(
@@ -52,7 +54,7 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
     ), selected.watch(r => {
       toggleClass(this.el, 'selected',
         !!(r && r.key.get() == row.key.get()));
-    }));
+    }), () => row.destroy());
   }
 }
 

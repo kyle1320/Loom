@@ -16,12 +16,12 @@ export type ContentTypes = loom.Page | loom.Element;
 export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent {
-  public readonly pageDef:
+  public readonly selectedPage:
   WritableValue<StringMapRow<loom.PageDef> | null>;
-  public readonly componentDef:
+  public readonly selectedComponent:
   WritableValue<StringMapRow<loom.ElementDef> | null>;
-  public readonly contentDef: WritableValue<
-  StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null>;
+  public readonly contentDef:
+  Value<StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null>;
   public readonly content: Value<ContentTypes | null>;
   public readonly data: WritableValue<DataTypes | null>;
 
@@ -34,17 +34,16 @@ export default class LoomUI extends UIComponent {
 
     this.globalStyles = sources.styles.build(sources);
 
-    this.pageDef = new WritableValue<
+    this.selectedPage = new WritableValue<
     StringMapRow<loom.PageDef> | null
     >(null);
-    this.componentDef = new WritableValue<
+    this.selectedComponent = new WritableValue<
     StringMapRow<loom.ElementDef> | null
     >(null);
-    this.contentDef = new WritableValue<
+    const contentDef = this.contentDef = new WritableValue<
     StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null
     >(null);
-    const content = new WritableValue<ContentTypes | null>(null);
-    this.content = content;
+    const content = this.content = new WritableValue<ContentTypes | null>(null);
     this.data = new WritableValue<DataTypes | null>(null);
 
     // when content changes, automatically build it & reset data
@@ -52,15 +51,15 @@ export default class LoomUI extends UIComponent {
       old && old.destroy();
       this.data.set(null);
     });
-    this.pageDef.watch(def => {
-      if (def) this.componentDef.set(null);
-      this.contentDef.set(def);
+    this.selectedPage.watch(def => {
+      if (def) this.selectedComponent.set(null);
+      contentDef.set(def);
     });
-    this.componentDef.watch(def => {
-      if (def) this.pageDef.set(null);
-      this.contentDef.set(def);
+    this.selectedComponent.watch(def => {
+      if (def) this.selectedPage.set(null);
+      contentDef.set(def);
     });
-    this.contentDef.watch((def, oldDef) => {
+    contentDef.watch((def, oldDef) => {
       oldDef && oldDef.destroy();
       content.set(def && def.value.get()?.build(this.sources) || null);
     });
