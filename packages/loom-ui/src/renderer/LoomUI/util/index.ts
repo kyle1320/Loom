@@ -1,13 +1,15 @@
 import { WritableValue, WritableStringMap } from 'loom-data';
 
 export class LookupValue extends WritableValue<string> {
+  private readonly unwatch: () => void;
+
   public constructor(
     private readonly sourceMap: WritableStringMap<string>,
     private readonly key: string
   ) {
     super(sourceMap.get(key) || '');
 
-    sourceMap.valueChanges.on(key, this.setFromSource);
+    this.unwatch = sourceMap.watchKey(key, { change: this.setFromSource });
   }
 
   public set = (value: string | undefined): boolean => {
@@ -28,7 +30,7 @@ export class LookupValue extends WritableValue<string> {
   }
 
   public destroy(): void {
-    this.sourceMap.valueChanges.off(this.key, this.setFromSource);
+    this.unwatch();
     this.allOff();
   }
 }

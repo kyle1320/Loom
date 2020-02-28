@@ -76,10 +76,10 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
         this.changeEl(this.makeEl());
         editor.addNode(this);
       }),
-      data.attrs.watch(
-        (key, value) => this.el.setAttribute(key, value),
-        key => this.el.removeAttribute(key)
-      ),
+      data.attrs.watch({
+        set: (key, value) => this.el.setAttribute(key, value),
+        delete: key => this.el.removeAttribute(key)
+      }),
       data.children.watch(
         (index, value) => !this.ignoreEvents &&
           this.insertChild(makeComponent(editor, value), index),

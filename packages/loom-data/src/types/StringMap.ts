@@ -3,25 +3,87 @@ import { mapRecordKeys, doAll, Destroyable } from '../util';
 import { Value, WritableValue } from './Value';
 
 export namespace StringMap {
-  export type Events<T> = {
-    'add': [string, T];
-    'update': [string, T, T];
-    'move': [string, string, T];
-    'delete': [string, T];
+  export interface Listeners<T> {
+    /** Additions / updates / deletions, including moves */
+    change: (
+      key: string,
+      value: T | undefined,
+      oldValue: T | undefined
+    ) => void;
+
+    /** Additions / updates, including moves */
+    set: (key: string, value: T, oldValue: T | undefined) => void;
+
+    /** Additions only, including moves */
+    add: (key: string, value: T) => void;
+
+    /** Deletions only, including moves */
+    delete: (key: string, value: T) => void;
+
+    /** Updates only */
+    update: (key: string, value: T, oldValue: T) => void;
+
+    /** Changes to existing keys */
+    move: (key: string, newKey: string, value: T) => void;
+
+    /** Additions only, excluding moves */
+    addRow: (key: string, value: T) => void;
+
+    /** Deletions only, excluding moves */
+    deleteRow: (key: string, value: T) => void;
   }
+
+  export type Events<T> = {
+    [k in keyof Listeners<T>]:
+    Listeners<T>[k] extends (...args: infer A) => void ? A : never
+  }
+
+  export type KeyListeners<T> = {
+    [k in keyof Listeners<T>]:
+    Listeners<T>[k] extends (key: string, ...args: infer A) => void
+      ? (...args: A) => void : never
+  };
+
+  export type KeyEvents<T> = {
+    [k in keyof KeyListeners<T>]:
+    KeyListeners<T>[k] extends (...args: infer A) => void ? A : never
+  };
+
+  type Expect<T, K> = {
+    [k in keyof T]?: k extends K ? T[k] : undefined
+  }
+
+  export type CheckedListeners<T> =
+    Expect<Listeners<T>, 'change'> |
+    Expect<Listeners<T>, 'set' | 'delete'> |
+    Expect<Listeners<T>, 'add' | 'update' | 'delete'> |
+    Expect<Listeners<T>, 'addRow' | 'move' | 'update' | 'deleteRow'> |
+    Listeners<T>
+
+  export type CheckedKeyListeners<T> =
+    Expect<KeyListeners<T>, 'change'> |
+    Expect<KeyListeners<T>, 'set' | 'delete'> |
+    Expect<KeyListeners<T>, 'add' | 'update' | 'delete'> |
+    Expect<KeyListeners<T>, 'addRow' | 'move' | 'update' | 'deleteRow'> |
+    KeyListeners<T>
 }
 
 export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   protected readonly data: Record<string, T> = {};
 
-  // per-key key change listeners
-  public readonly keyChanges:
-  PlainEmitter<Record<string, [string | undefined, T]>> = new PlainEmitter();
-
-  // per-key value change listeners
-  public readonly valueChanges:
-  PlainEmitter<Record<string, [T | undefined, T | undefined]>>
-  = new PlainEmitter();
+  private readonly keyListeners: {
+    [k in keyof StringMap.KeyEvents<T>]:
+    PlainEmitter<Record<string, StringMap.KeyEvents<T>[k]>>
+  } = {
+    change: new PlainEmitter(),
+    set: new PlainEmitter(),
+    add: new PlainEmitter(),
+    delete: new PlainEmitter(),
+    update: new PlainEmitter(),
+    move: new PlainEmitter(),
+    addRow: new PlainEmitter(),
+    deleteRow: new PlainEmitter()
+  };
 
   public constructor(
     data?: Record<string, T>,
@@ -31,16 +93,38 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
 
     if (data) this.data = mapRecordKeys(data, normalizeKey);
 
-    this.on('add', (k, v) => this.valueChanges.emit(k, v, undefined));
-    this.on('update', (k, v, vold) => this.valueChanges.emit(k, v, vold));
-    this.on('move', (kold, knew, v) => {
-      this.valueChanges.emit(kold, undefined, v);
-      this.valueChanges.emit(knew, v, undefined);
-      this.keyChanges.emit(kold, knew, v);
+    this.watch({
+      change: this.keyListeners.change.emit.bind(this.keyListeners.change),
+      set: this.keyListeners.set.emit.bind(this.keyListeners.set),
+      add: this.keyListeners.add.emit.bind(this.keyListeners.add),
+      move: this.keyListeners.move.emit.bind(this.keyListeners.move),
+      update: this.keyListeners.update.emit.bind(this.keyListeners.update),
+      delete: this.keyListeners.delete.emit.bind(this.keyListeners.delete),
+      addRow: this.keyListeners.addRow.emit.bind(this.keyListeners.addRow),
+      deleteRow:
+        this.keyListeners.deleteRow.emit.bind(this.keyListeners.deleteRow),
     });
-    this.on('delete', (k, v) => {
-      this.valueChanges.emit(k, undefined, v);
-      this.keyChanges.emit(k, undefined, v);
+    this.watch({
+      move: (key, newKey, value) => {
+        this.emit('delete', key, value);
+        this.emit('change', key, undefined, value);
+        this.emit('add', newKey, value);
+        this.emit('set', newKey, value, undefined);
+        this.emit('change', newKey, value, undefined);
+      },
+      update: (key, value, oldValue) => {
+        this.emit('set', key, value, oldValue);
+        this.emit('change', key, value, oldValue);
+      },
+      addRow: (key, value) => {
+        this.emit('add', key, value);
+        this.emit('set', key, value, undefined);
+        this.emit('change', key, value, undefined);
+      },
+      deleteRow: (key, value) => {
+        this.emit('delete', key, value);
+        this.emit('change', key, undefined, value);
+      }
     });
   }
 
@@ -65,7 +149,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     if (oldValue !== value) {
       this.data[key] = value;
       if (typeof oldValue === 'undefined') {
-        this.emit('add', key, value);
+        this.emit('addRow', key, value);
       } else {
         this.emit('update', key, value, oldValue);
       }
@@ -96,7 +180,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     const value = this.data[key];
     if (key in this.data) {
       delete this.data[key];
-      this.emit('delete', key, value);
+      this.emit('deleteRow', key, value);
     }
 
     return value;
@@ -106,43 +190,46 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     return this.data;
   }
 
-  public watchBasic(
-    onSet: (key: string, value: T, oldValue?: T) => void,
-    onDelete: (data: string, value: T) => void
-  ): () => void {
-    return this.watchUpdates(onSet, onDelete, onSet);
-  }
-
-  public watchUpdates(
-    onAdd: (key: string, value: T) => void,
-    onDelete: (data: string, value: T) => void,
-    onUpdate: (key: string, value: T, oldValue: T) => void
-  ): () => void {
-    return this.watchAll(
-      onAdd,
-      onDelete,
-      (kold, knew, v) => {
-        onDelete(kold, v);
-        onAdd(knew, v);
-      },
-      onUpdate,
+  public watch(ls: StringMap.CheckedListeners<T>): () => void {
+    for (const key in this.data) {
+      ls.change && ls.change(key, this.data[key], undefined);
+      ls.add && ls.add(key, this.data[key]);
+      ls.set && ls.set(key, this.data[key], undefined);
+      ls.addRow && ls.addRow(key, this.data[key]);
+    }
+    return doAll(
+      ls.change && this.onOff('change', ls.change),
+      ls.add && this.onOff('add', ls.add),
+      ls.set && this.onOff('set', ls.set),
+      ls.move && this.onOff('move', ls.move),
+      ls.update && this.onOff('update', ls.update),
+      ls.delete && this.onOff('delete', ls.delete),
+      ls.addRow && this.onOff('addRow', ls.addRow),
+      ls.deleteRow && this.onOff('deleteRow', ls.deleteRow),
     );
   }
 
-  public watchAll(
-    onAdd?: (key: string, value: T) => void,
-    onDelete?: (key: string, value: T) => void,
-    onMove?: (oldKey: string, newKey: string, value: T) => void,
-    onUpdate?: (data: string, value: T, oldValue: T) => void
+  public watchKey(
+    key: string,
+    ls: StringMap.CheckedKeyListeners<T>
   ): () => void {
-    for (const key in this.data) {
-      onAdd && onAdd(key, this.data[key]);
+    key = this.normalizeKey(key);
+
+    if (key in this.data) {
+      ls.change && ls.change(this.data[key], undefined);
+      ls.add && ls.add(this.data[key]);
+      ls.set && ls.set(this.data[key], undefined);
+      ls.addRow && ls.addRow(this.data[key]);
     }
     return doAll(
-      onAdd && this.onOff('add', onAdd),
-      onUpdate && this.onOff('update', onUpdate),
-      onMove && this.onOff('move', onMove),
-      onDelete && this.onOff('delete', onDelete)
+      ls.change && this.keyListeners.change.onOff(key, ls.change),
+      ls.add && this.keyListeners.add.onOff(key, ls.add),
+      ls.set && this.keyListeners.set.onOff(key, ls.set),
+      ls.move && this.keyListeners.move.onOff(key, ls.move),
+      ls.update && this.keyListeners.update.onOff(key, ls.update),
+      ls.delete && this.keyListeners.delete.onOff(key, ls.delete),
+      ls.addRow && this.keyListeners.addRow.onOff(key, ls.addRow),
+      ls.deleteRow && this.keyListeners.deleteRow.onOff(key, ls.deleteRow),
     );
   }
 }
@@ -162,7 +249,6 @@ export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
 
     key = map.normalizeKey(key);
 
-    const deleted = (): void => void this.emit('delete');
     const keyVal = this.key = new class extends WritableValue<string> {
       public set(key: string): boolean {
         const oldKey = this.get();
@@ -170,12 +256,11 @@ export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
         return res !== false && super.set(res);
       }
 
-      public update = (key: string | undefined): void => {
-        if (typeof key !== 'undefined') super.set(key);
-        else deleted();
+      public update = (key: string): void => {
+        super.set(key);
       }
     }(key);
-    const valVal = this.value = new class extends WritableValue<T> {
+    this.value = new class extends WritableValue<T> {
       public set = (value: T): boolean => {
         if (super.set(value)) {
           const key = keyVal.get();
@@ -184,28 +269,14 @@ export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
         }
         return false;
       }
-
-      public update = (value: T | undefined): void => {
-        if (typeof value !== 'undefined') super.set(value);
-      }
     }(defaultValue);
 
-    keyVal.watch((key: string, oldKey: string | undefined) => {
-      if (typeof oldKey === 'string') {
-        map.keyChanges.off(oldKey, keyVal.update);
-        map.valueChanges.off(oldKey, valVal.update);
-      }
-      map.keyChanges.on(key, keyVal.update);
-      map.valueChanges.on(key, valVal.update);
-
-      valVal.update(map.get(key));
-    });
-
-    this.destroy = (): void => {
-      const key = this.key.get();
-      map.keyChanges.off(key, keyVal.update);
-      map.valueChanges.off(key, valVal.update);
-    };
+    this.destroy = keyVal.watch(key => map.watchKey(key, {
+      addRow: this.value.set,
+      move: keyVal.update,
+      update: this.value.set,
+      deleteRow: () => this.emit('delete')
+    }));
   }
 
   public exists(): boolean {
@@ -234,13 +305,17 @@ export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
 }
 
 export class StringMapValue<T> extends WritableValue<T | undefined> {
+  public destroy: () => void;
+
   public constructor(
     public readonly map: WritableStringMap<T>,
     private readonly key: Value<string>
   ) {
     super(undefined);
 
-    key.watch(this.updateKey);
+    this.destroy = key.watch(key => this.map.watchKey(key, {
+      change: val => super.set(val)
+    }));
   }
 
   public set = (value: T): boolean => {
@@ -249,18 +324,6 @@ export class StringMapValue<T> extends WritableValue<T | undefined> {
       return true;
     }
     return false;
-  }
-
-  public destroy(): void {
-    this.map.valueChanges.off(this.key.get(), super.set);
-    this.key.off('change', this.updateKey);
-    this.allOff();
-  }
-
-  private updateKey = (key: string, oldKey: string | undefined): void => {
-    oldKey && this.map.valueChanges.off(oldKey, super.set);
-    super.set(this.map.get(key));
-    this.map.valueChanges.on(key, super.set);
   }
 }
 
@@ -295,16 +358,16 @@ export class MappedStringMap<T, U> extends ComputedStringMap<U> {
   ) {
     super();
 
-    this.unwatch = sourceMap.watch(
-      (key, value) => this.set(key, transform(value, key, undefined)),
-      key => this.cleanup(this.delete(key)!),
-      (oldKey, newKey) => this.changeKey(oldKey, newKey),
-      (key, value) => {
+    this.unwatch = sourceMap.watch({
+      addRow: (key, value) => this.set(key, transform(value, key, undefined)),
+      deleteRow: key => this.cleanup(this.delete(key)!),
+      move: (oldKey, newKey) => this.changeKey(oldKey, newKey),
+      update: (key, value) => {
         const oldValue = this.data[key];
         this.cleanup(oldValue);
         this.set(key, transform(value, key, oldValue));
       }
-    );
+    });
   }
 
   public destroy(): void {

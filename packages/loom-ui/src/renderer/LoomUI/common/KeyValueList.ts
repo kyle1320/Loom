@@ -23,7 +23,7 @@ class KeyValueListContent extends UIComponent {
     super(makeElement('div', { className: 'keyvaluelist__content' }));
 
     this.addNewRow();
-    this.autoCleanup(data.watchAll(this.addRow));
+    this.autoCleanup(data.watch({ addRow: this.addRow }));
   }
 
   private addNewRow = (): void => {

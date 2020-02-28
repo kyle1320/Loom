@@ -40,7 +40,7 @@ function attachRule(
 ): () => void {
   return many(
     attachStyle(cssRule.style, rule.style),
-    rule.selector.watch(s => cssRule.selectorText = s)
+    rule.selector.watch(s => void (cssRule.selectorText = s))
   );
 }
 
@@ -48,11 +48,11 @@ function attachStyle(
   cssStyle: CSSStyleDeclaration,
   style: loom.StyleDeclaration
 ): () => void {
-  return style.watchBasic(
-    (key, value) => {
+  return style.watch({
+    set: (key, value) => {
       cssStyle.setProperty(key, '');
       cssStyle.setProperty(key, value);
     },
-    key => cssStyle.removeProperty(key)
-  );
+    delete: key => cssStyle.removeProperty(key)
+  });
 }
