@@ -21,7 +21,7 @@
     border: 0px solid transparent;
     border-image: repeating-linear-gradient(45deg,
       transparent 0 1px, rgba(white, 0.5) 2px,
-      red 3px, transparent 4px
+      rgba(red, 0.8) 3px, transparent 4px
     );
   }
 
@@ -31,7 +31,7 @@
     border: 0px solid transparent;
     border-image-source: repeating-linear-gradient(45deg,
       transparent 0 1px, rgba(white, 0.5) 2px,
-      rgba(blue, 0.5) 3px, transparent 4px
+      rgba(green, 0.5) 3px, transparent 4px
     );
   }
 }
