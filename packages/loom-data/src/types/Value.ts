@@ -31,11 +31,20 @@ export class Value<T> extends EventEmitter<Value.Events<T>> {
     this._frozen = true;
   }
 
+  // onChange can return a "cleanup" callback that will be called
+  // when a new change happens and before onChange is re-called
   public watch(
-    onChange: (value: T, oldValue: T | undefined) => void
+    onChange: (value: T, oldValue: T | undefined) => (() => void) | void
   ): () => void {
-    onChange(this._value, undefined);
-    return this.onOff('change', onChange);
+    let cleanup = onChange(this._value, undefined);
+    const off = this.onOff('change', (value: T, oldValue: T | undefined) => {
+      typeof cleanup === 'function' && cleanup();
+      cleanup = onChange(value, oldValue);
+    });
+    return () => {
+      typeof cleanup === 'function' && cleanup();
+      off();
+    };
   }
 }
 
