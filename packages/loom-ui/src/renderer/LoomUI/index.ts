@@ -60,7 +60,8 @@ export default class LoomUI extends UIComponent {
       if (def) this.pageDef.set(null);
       this.contentDef.set(def);
     });
-    this.contentDef.watch(def => {
+    this.contentDef.watch((def, oldDef) => {
+      oldDef && oldDef.destroy();
       content.set(def && def.value.get()?.build(this.sources) || null);
     });
 

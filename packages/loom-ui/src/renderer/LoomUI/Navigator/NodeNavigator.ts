@@ -55,7 +55,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
 
-    ui.data.watch(this.updateSelected);
+    this.autoCleanup(ui.data.watch(this.updateSelected));
     title.on('change', this.setTitle);
   }
 

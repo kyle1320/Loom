@@ -229,7 +229,7 @@ export default class WYSIWYGEditor extends UIComponent<{
             body.addTo(doc.body);
           }
 
-          addStyles(doc, ui.globalStyles);
+          const removeStyles = addStyles(doc, ui.globalStyles);
 
           doc.addEventListener('selectionchange', () => {
             const selection = doc.getSelection() || null;
@@ -249,6 +249,7 @@ export default class WYSIWYGEditor extends UIComponent<{
           });
 
           return () => {
+            removeStyles();
             head.destroy();
             body.destroy();
             observer.disconnect();

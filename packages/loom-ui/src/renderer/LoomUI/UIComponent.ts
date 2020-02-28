@@ -18,9 +18,7 @@ export class UIComponent<
   }
 
   public destroy(): void {
-    for (const child of this.children) {
-      child.destroy();
-    }
+    this.empty();
     this.allOff();
     this.unlisteners.forEach(cb => cb());
     if (this.parent) {
