@@ -1,5 +1,6 @@
 import * as loom from 'loom-core';
 
+import StylesEditor from './StylesEditor';
 import LoomUI from '../../..';
 import { UIComponent } from '../../../UIComponent';
 import { LookupValue } from '../../../util';
@@ -131,10 +132,7 @@ class PropertyContents extends UIComponent {
         }
         break;
       case 'style':
-        for (const rule of this.ui.globalStyles.rules) {
-          this.appendChild(
-            new KeyValueList(rule.selector.get(), rule.style.source));
-        }
+        this.appendChild(new StylesEditor(this.ui.globalStyles));
         break;
     }
   }
