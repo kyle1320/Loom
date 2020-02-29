@@ -215,8 +215,8 @@ export class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
   ): () => void {
     key = this.normalizeKey(key);
 
+    ls.change && ls.change(this.data[key], undefined);
     if (key in this.data) {
-      ls.change && ls.change(this.data[key], undefined);
       ls.add && ls.add(this.data[key]);
       ls.set && ls.set(this.data[key], undefined);
       ls.addRow && ls.addRow(this.data[key]);
