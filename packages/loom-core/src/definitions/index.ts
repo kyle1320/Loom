@@ -1,4 +1,4 @@
-import { WritableStringMap } from 'loom-data';
+import { WritableDictionary } from 'loom-data';
 
 import { ElementDef, PageDef } from './HTML';
 import { BuildResult, Results } from '../build';
@@ -18,19 +18,20 @@ export interface SourcesConfig {
 }
 
 export class Sources {
-  public readonly components: WritableStringMap<ElementDef>;
-  public readonly pages: WritableStringMap<PageDef>;
+  public readonly components: WritableDictionary<ElementDef>;
+  public readonly pages: WritableDictionary<PageDef>;
   public readonly styles: SheetDef;
 
   public constructor(
     public config: SourcesConfig | null,
-    components: WritableStringMap<ElementDef> | Record<string, ElementDef> = {},
-    pages: WritableStringMap<PageDef> | Record<string, PageDef> = {}
+    components: WritableDictionary<ElementDef> | Record<string, ElementDef>
+    = {},
+    pages: WritableDictionary<PageDef> | Record<string, PageDef> = {}
   ) {
-    this.components = components instanceof WritableStringMap
-      ? components : new WritableStringMap(components);
-    this.pages = pages instanceof WritableStringMap
-      ? pages : new WritableStringMap(pages);
+    this.components = components instanceof WritableDictionary
+      ? components : new WritableDictionary(components);
+    this.pages = pages instanceof WritableDictionary
+      ? pages : new WritableDictionary(pages);
     this.styles = new SheetDef([]);
   }
 

@@ -1,4 +1,4 @@
-import { WritableValue, StringMapRow, Value } from 'loom-data';
+import { WritableValue, DictionaryRow, Value } from 'loom-data';
 import * as loom from 'loom-core';
 
 import Editor from './Editor';
@@ -17,11 +17,11 @@ export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
 export default class LoomUI extends UIComponent {
   public readonly selectedPage:
-  WritableValue<StringMapRow<loom.PageDef> | null>;
+  WritableValue<DictionaryRow<loom.PageDef> | null>;
   public readonly selectedComponent:
-  WritableValue<StringMapRow<loom.ElementDef> | null>;
+  WritableValue<DictionaryRow<loom.ElementDef> | null>;
   public readonly contentDef:
-  Value<StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null>;
+  Value<DictionaryRow<loom.PageDef> | DictionaryRow<loom.ElementDef> | null>;
   public readonly content: Value<ContentTypes | null>;
   public readonly data: WritableValue<DataTypes | null>;
 
@@ -35,13 +35,13 @@ export default class LoomUI extends UIComponent {
     this.globalStyles = sources.styles.build(sources);
 
     this.selectedPage = new WritableValue<
-    StringMapRow<loom.PageDef> | null
+    DictionaryRow<loom.PageDef> | null
     >(null);
     this.selectedComponent = new WritableValue<
-    StringMapRow<loom.ElementDef> | null
+    DictionaryRow<loom.ElementDef> | null
     >(null);
     const contentDef = this.contentDef = new WritableValue<
-    StringMapRow<loom.PageDef> | StringMapRow<loom.ElementDef> | null
+    DictionaryRow<loom.PageDef> | DictionaryRow<loom.ElementDef> | null
     >(null);
     const content = this.content = new WritableValue<ContentTypes | null>(null);
     this.data = new WritableValue<DataTypes | null>(null);

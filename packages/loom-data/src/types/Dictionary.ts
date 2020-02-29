@@ -2,7 +2,7 @@ import { EventEmitter, PlainEmitter } from './EventEmitter';
 import { mapRecordKeys, doAll, Destroyable } from '../util';
 import { Value, WritableValue } from './Value';
 
-export namespace StringMap {
+export namespace Dictionary {
   export interface Listeners<T> {
     /** Additions / updates / deletions, including moves */
     change: (
@@ -68,12 +68,12 @@ export namespace StringMap {
     KeyListeners<T>
 }
 
-export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
+export class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
   protected readonly data: Record<string, T> = {};
 
   private readonly keyListeners: {
-    [k in keyof StringMap.KeyEvents<T>]:
-    PlainEmitter<Record<string, StringMap.KeyEvents<T>[k]>>
+    [k in keyof Dictionary.KeyEvents<T>]:
+    PlainEmitter<Record<string, Dictionary.KeyEvents<T>[k]>>
   } = {
     change: new PlainEmitter(),
     set: new PlainEmitter(),
@@ -190,7 +190,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
     return this.data;
   }
 
-  public watch(ls: StringMap.CheckedListeners<T>): () => void {
+  public watch(ls: Dictionary.CheckedListeners<T>): () => void {
     for (const key in this.data) {
       ls.change && ls.change(key, this.data[key], undefined);
       ls.add && ls.add(key, this.data[key]);
@@ -211,7 +211,7 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
 
   public watchKey(
     key: string,
-    ls: StringMap.CheckedKeyListeners<T>
+    ls: Dictionary.CheckedKeyListeners<T>
   ): () => void {
     key = this.normalizeKey(key);
 
@@ -234,14 +234,14 @@ export class StringMap<T> extends EventEmitter<StringMap.Events<T>> {
   }
 }
 
-export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
+export class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
   public readonly key: WritableValue<string>;
   public readonly value: WritableValue<T>;
 
   public destroy: () => void;
 
   public constructor(
-    public readonly map: WritableStringMap<T>,
+    public readonly map: WritableDictionary<T>,
     key: string,
     defaultValue: T
   ) {
@@ -304,11 +304,11 @@ export class StringMapRow<T> extends EventEmitter<{ delete: void }> {
   }
 }
 
-export class StringMapValue<T> extends WritableValue<T | undefined> {
+export class DictionaryValue<T> extends WritableValue<T | undefined> {
   public destroy: () => void;
 
   public constructor(
-    public readonly map: WritableStringMap<T>,
+    public readonly map: WritableDictionary<T>,
     private readonly key: Value<string>
   ) {
     super(undefined);
@@ -327,7 +327,7 @@ export class StringMapValue<T> extends WritableValue<T | undefined> {
   }
 }
 
-export class WritableStringMap<T> extends StringMap<T> {
+export class WritableDictionary<T> extends Dictionary<T> {
   public set(key: string, value: T): string {
     return super.set(key, value);
   }
@@ -341,18 +341,18 @@ export class WritableStringMap<T> extends StringMap<T> {
   }
 }
 
-export abstract class ComputedStringMap<T>
-  extends StringMap<T>
+export abstract class ComputedDictionary<T>
+  extends Dictionary<T>
   implements Destroyable {
 
   public abstract destroy(): void;
 }
 
-export class MappedStringMap<T, U> extends ComputedStringMap<U> {
+export class MappedDictionary<T, U> extends ComputedDictionary<U> {
   private unwatch: () => void;
 
   public constructor(
-    sourceMap: StringMap<T>,
+    sourceMap: Dictionary<T>,
     transform: (val: T, key: string, oldValue?: U) => U,
     private readonly cleanup: (val: U) => void
   ) {

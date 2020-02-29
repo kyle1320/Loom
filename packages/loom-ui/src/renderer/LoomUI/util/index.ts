@@ -1,10 +1,10 @@
-import { WritableValue, WritableStringMap } from 'loom-data';
+import { WritableValue, WritableDictionary } from 'loom-data';
 
 export class LookupValue extends WritableValue<string> {
   private readonly unwatch: () => void;
 
   public constructor(
-    private readonly sourceMap: WritableStringMap<string>,
+    private readonly sourceMap: WritableDictionary<string>,
     private readonly key: string
   ) {
     super(sourceMap.get(key) || '');

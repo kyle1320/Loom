@@ -1,7 +1,7 @@
 import {
   MappedList,
   Value,
-  MappedStringMap } from 'loom-data';
+  MappedDictionary } from 'loom-data';
 
 import { BuildResult } from '.';
 import {
@@ -79,7 +79,7 @@ export class StyleRule implements BuildResult<StyleRuleDef> {
 }
 
 export class StyleDeclaration
-  extends MappedStringMap<string, string>
+  extends MappedDictionary<string, string>
   implements BuildResult<StyleDeclarationDef> {
 
   public constructor(

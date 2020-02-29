@@ -1,6 +1,6 @@
 import {
-  MappedStringMap,
-  ComputedStringMap } from 'loom-data';
+  MappedDictionary,
+  ComputedDictionary } from 'loom-data';
 
 import { Definition, Sources } from '../definitions';
 import { Page } from './HTML';
@@ -9,11 +9,11 @@ import { exportResults } from '../serialization/out';
 import { PageDef } from '../definitions/HTML';
 
 export class Results {
-  public readonly pages: ComputedStringMap<Page>;
+  public readonly pages: ComputedDictionary<Page>;
   public readonly styles: Sheet;
 
   public constructor(sources: Sources) {
-    this.pages = new MappedStringMap<PageDef, Page>(
+    this.pages = new MappedDictionary<PageDef, Page>(
       sources.pages, x => x.build(sources), x => x.destroy()
     );
     this.styles = sources.styles.build(sources);

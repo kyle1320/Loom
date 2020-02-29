@@ -1,4 +1,4 @@
-import { StringMapRow, WritableStringMap, WritableValue } from 'loom-data';
+import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
 import IconButton from './IconButton';
 import { UIComponent } from '../UIComponent';
@@ -22,14 +22,14 @@ class NameListHeader extends UIComponent<{
 
 class NameListContent<T> extends UIComponent {
   public constructor(
-    data: WritableStringMap<T>,
-    selected: WritableValue<StringMapRow<T> | null>
+    data: WritableDictionary<T>,
+    selected: WritableValue<DictionaryRow<T> | null>
   ) {
     super(makeElement('div', { className: 'namelist__content' }));
 
     this.autoCleanup(data.watch({
       addRow: key => this.appendChild(
-        new NameListRow(new StringMapRow(data, key, null!), selected)
+        new NameListRow(new DictionaryRow(data, key, null!), selected)
       )
     }));
   }
@@ -37,13 +37,13 @@ class NameListContent<T> extends UIComponent {
 
 class NameListRow<T> extends UIComponent<{}, HTMLElement> {
   public constructor(
-    row: StringMapRow<T>,
-    selected: WritableValue<StringMapRow<T> | null>
+    row: DictionaryRow<T>,
+    selected: WritableValue<DictionaryRow<T> | null>
   ) {
     super(makeElement('div', {
       className: 'namelist__row',
       onclick: () => selected.set(
-        new StringMapRow(row.map, row.key.get(), row.value.get())
+        new DictionaryRow(row.map, row.key.get(), row.value.get())
       )
     }));
 
@@ -61,9 +61,9 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
 export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
     title: string,
-    data: WritableStringMap<T>,
-    public readonly selected: WritableValue<StringMapRow<T> | null>
-    = new WritableValue<StringMapRow<T> | null>(null)
+    data: WritableDictionary<T>,
+    public readonly selected: WritableValue<DictionaryRow<T> | null>
+    = new WritableValue<DictionaryRow<T> | null>(null)
   ) {
     super(makeElement('div', { className: 'namelist' }),
       new NameListHeader(title)

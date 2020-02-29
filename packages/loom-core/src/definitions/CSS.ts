@@ -1,6 +1,6 @@
 import {
   WritableList,
-  WritableStringMap,
+  WritableDictionary,
   WritableValue } from 'loom-data';
 
 import { Definition, Sources } from '../definitions';
@@ -62,7 +62,7 @@ export class StyleRuleDef implements Definition {
 }
 
 export class StyleDeclarationDef
-  extends WritableStringMap<string>
+  extends WritableDictionary<string>
   implements Definition {
 
   public build(sources: Sources): StyleDeclaration {

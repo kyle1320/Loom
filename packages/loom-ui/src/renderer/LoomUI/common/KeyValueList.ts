@@ -1,4 +1,4 @@
-import { WritableStringMap, StringMapRow } from 'loom-data';
+import { WritableDictionary, DictionaryRow } from 'loom-data';
 
 import { UIComponent } from '../UIComponent';
 import { makeElement, toggleClass } from '../util/dom';
@@ -15,10 +15,10 @@ class KeyValueListHeader extends UIComponent<{ remove: void }> {
 }
 
 class KeyValueListContent extends UIComponent {
-  private newRow!: StringMapRow<string>;
+  private newRow!: DictionaryRow<string>;
 
   public constructor(
-    private readonly data: WritableStringMap<string>
+    private readonly data: WritableDictionary<string>
   ) {
     super(makeElement('div', { className: 'keyvaluelist__content' }));
 
@@ -28,7 +28,7 @@ class KeyValueListContent extends UIComponent {
 
   private addNewRow = (): void => {
     this.appendChild(
-      new KeyValueListRow(this.newRow = new StringMapRow(this.data, '', ''))
+      new KeyValueListRow(this.newRow = new DictionaryRow(this.data, '', ''))
     );
   }
 
@@ -37,7 +37,7 @@ class KeyValueListContent extends UIComponent {
       this.addNewRow();
     } else {
       this.insertChild(
-        new KeyValueListRow(new StringMapRow(this.data, key, value)),
+        new KeyValueListRow(new DictionaryRow(this.data, key, value)),
         this.children.length - 1
       );
     }
@@ -45,7 +45,7 @@ class KeyValueListContent extends UIComponent {
 }
 
 class KeyValueListRow extends UIComponent<{}, HTMLElement> {
-  public constructor(row: StringMapRow<string>) {
+  public constructor(row: DictionaryRow<string>) {
     let removeBtn: HTMLElement;
     let keyInput: HTMLInputElement;
     let valueInput: HTMLInputElement;
@@ -96,7 +96,7 @@ class KeyValueListRow extends UIComponent<{}, HTMLElement> {
 }
 
 export default class KeyValueList extends UIComponent {
-  public constructor(title: string, data: WritableStringMap<string>) {
+  public constructor(title: string, data: WritableDictionary<string>) {
     super(makeElement('div', { className: 'keyvaluelist' }),
       new KeyValueListHeader(title),
       new KeyValueListContent(data)

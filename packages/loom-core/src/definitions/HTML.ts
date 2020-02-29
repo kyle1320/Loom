@@ -1,6 +1,6 @@
 import {
   WritableList,
-  WritableStringMap,
+  WritableDictionary,
   WritableValue } from 'loom-data';
 
 import { Definition, Sources } from '../definitions';
@@ -34,7 +34,7 @@ export class TextNodeDef implements Definition {
 }
 
 export class AttributesDef
-  extends WritableStringMap<string>
+  extends WritableDictionary<string>
   implements Definition {
 
   public constructor(data?: Record<string, string>) {

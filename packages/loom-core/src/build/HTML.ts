@@ -1,9 +1,9 @@
 import {
   ComputedValue,
   MappedList,
-  MappedStringMap,
+  MappedDictionary,
   MappedValue,
-  StringMapValue,
+  DictionaryValue,
   Value } from 'loom-data';
 
 import { BuildResult } from '.';
@@ -39,7 +39,7 @@ export class TextNode implements BuildResult<TextNodeDef> {
 }
 
 export class Attributes
-  extends MappedStringMap<string, string>
+  extends MappedDictionary<string, string>
   implements BuildResult<AttributesDef> {
 
   public constructor(
@@ -149,14 +149,14 @@ export class UnknownComponent implements BuildResult<ComponentDef> {
 }
 
 export class Component implements BuildResult<ComponentDef> {
-  private readonly component: StringMapValue<ElementDef>;
+  private readonly component: DictionaryValue<ElementDef>;
   public readonly element: ComputedValue<Element | UnknownComponent>;
 
   public constructor(
     public readonly source: ComponentDef,
     public readonly sources: Sources
   ) {
-    this.component = new StringMapValue(sources.components, source.name);
+    this.component = new DictionaryValue(sources.components, source.name);
     this.element = new MappedValue(
       this.component,
       component => component
