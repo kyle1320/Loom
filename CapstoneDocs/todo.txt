@@ -1,6 +1,5 @@
 Make styles show only relevant rules
   - Root UI maintains built document?
-Refactor KeyValueList to use MapKey & MapValue classes
 Ability to create & delete elements from UI
   - WYSIWYG controls
 Create multi-select field for "classes"
