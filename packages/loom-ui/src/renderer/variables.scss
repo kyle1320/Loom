@@ -1,0 +1,18 @@
+$primary-0: #ffffff;
+$primary-1: darken($primary-0, 5%);
+$primary-2: darken($primary-0, 10%);
+$primary-3: darken($primary-0, 15%);
+$primary-4: darken($primary-0, 20%);
+$primary-5: darken($primary-0, 25%);
+$primary-6: darken($primary-0, 30%);
+$primary-7: darken($primary-0, 35%);
+$primary-8: darken($primary-0, 40%);
+$primary-9: darken($primary-0, 45%);
+
+$accent: #266eff;
+$text: #404040;
+
+$primary-hl-0: mix($accent, $primary-0, 10%);
+$primary-hl-1: mix($accent, $primary-0, 20%);
+$primary-hl-2: mix($accent, $primary-0, 30%);
+$primary-hl-3: mix($accent, $primary-0, 40%);
