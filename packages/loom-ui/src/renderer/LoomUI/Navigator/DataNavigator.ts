@@ -57,8 +57,11 @@ class DataNavigatorContent extends UIComponent {
 
 export default class DataNavigator extends UIComponent<{ back: void }> {
   public constructor(ui: LoomUI) {
-    super(makeElement('div', { className: 'data-nav' }),
-      new DataNavigatorHeader(ui).on('back', () => this.emit('back')),
-      new DataNavigatorContent(ui));
+    super(makeElement('div', {
+      className: 'data-nav',
+      onclick: () => ui.data.set(null)
+    }),
+    new DataNavigatorHeader(ui).on('back', () => this.emit('back')),
+    new DataNavigatorContent(ui));
   }
 }

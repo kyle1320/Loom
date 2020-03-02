@@ -165,7 +165,9 @@ export default class PropertiesEditor extends UIComponent {
     const data = this.ui.data.get();
     const allTabs: TabName[] = [];
 
-    allTabs.push('page');
+    if (data === null) {
+      allTabs.push('page');
+    }
 
     if (content instanceof loom.Element ||
         data instanceof loom.TextNode ||

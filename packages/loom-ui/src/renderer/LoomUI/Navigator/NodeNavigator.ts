@@ -46,7 +46,10 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     super(makeElement('div', {
       className: 'node-nav node-nav__' + type,
       style: { paddingLeft: (depth*10) + 'px' },
-      onclick: () => ui.data.set(node)
+      onclick: e => {
+        e.stopPropagation();
+        ui.data.set(node);
+      }
     }));
 
     this.iconEl = makeElement('i', { className: this.getIcon() });
