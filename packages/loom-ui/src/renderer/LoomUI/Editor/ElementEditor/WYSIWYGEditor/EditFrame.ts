@@ -34,8 +34,6 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
   }
 
   private refresh = (): void => {
-    if (!this.node) return;
-
     function getValue(s: string): number {
       return +s.replace(/px$/, '') || 0
     }
@@ -59,7 +57,7 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
         `${values.top} ${values.right} ${values.bottom} ${values.left}`;
     }
 
-    const n = this.node.getEl();
+    const n = this.node && this.node.getEl();
     const el = n
       ? n.nodeType === 3 ? n.parentElement
         : n.nodeType === 1 ? n as unknown as HTMLElement : null
