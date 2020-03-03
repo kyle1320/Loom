@@ -25,16 +25,5 @@
     &:focus {
       outline: none;
     }
-
-    &::after {
-      position: absolute;
-      top: 0;
-      right: 0;
-      content: '';
-      background-color: red;
-      width: 10px;
-      height: 10px;
-      z-index: 1;
-    }
   }
 }

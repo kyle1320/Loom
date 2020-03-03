@@ -141,7 +141,7 @@ class PropertyContents extends UIComponent {
   private addField(title: string, input: UIComponent): void {
     this.appendChild(new UIComponent(
       makeElement('label', { className: 'property-field' },
-        makeElement('span', {}, title)),
+        makeElement('div', { className: 'property-field__title' }, title)),
       input
     ));
   }
