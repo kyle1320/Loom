@@ -36,15 +36,12 @@ export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
     };
     this.el.addEventListener('change', update);
 
-    this.autoCleanup(selected.watch(value => {
-      this.el.selectedIndex = value === null
-        ? -1 : source.asArray().indexOf(value);
-    }), source.watch(
+    this.autoCleanup(source.watch(
       (index, value) => this.insertChild(new SelectOption(value, watch), index),
       index => this.removeChild(index)
-    ));
-
-    this.el.selectedIndex = 0;
-    update();
+    ), selected.watch(value => {
+      this.el.selectedIndex = value === null
+        ? -1 : source.asArray().indexOf(value);
+    }));
   }
 }

@@ -33,6 +33,10 @@ export default class StylesEditor extends UIComponent {
       (rule, cb) => rule.selector.watch(cb)
     );
 
+    if (sheet.rules.size() > 0) {
+      selector.selected.set(sheet.rules.get(0));
+    }
+
     this.appendChild(selector);
     this.appendChild(new RuleEditor(selector.selected));
   }
