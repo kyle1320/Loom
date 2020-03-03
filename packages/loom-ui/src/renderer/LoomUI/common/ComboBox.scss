@@ -1,0 +1,40 @@
+@import "~@/variables";
+
+.combo-box {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% - 15px);
+    height: 100%;
+    z-index: 1;
+    background-color: $primary-0;
+  }
+
+  select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    background: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      content: '';
+      background-color: red;
+      width: 10px;
+      height: 10px;
+      z-index: 1;
+    }
+  }
+}

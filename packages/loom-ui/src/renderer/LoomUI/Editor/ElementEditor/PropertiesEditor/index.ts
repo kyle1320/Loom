@@ -1,11 +1,13 @@
+import { List } from 'loom-data';
 import * as loom from 'loom-core';
 
 import StylesEditor from './StylesEditor';
 import LoomUI from '../../..';
 import { UIComponent } from '../../../UIComponent';
 import { LookupValue } from '../../../util';
-import { makeElement } from '../../../util/dom';
+import { makeElement, basicTags } from '../../../util/dom';
 import Input from '../../../common/Input';
+import ComboBox from '../../../common/ComboBox';
 import TextArea from '../../../common/TextArea';
 import KeyValueList from '../../../common/KeyValueList';
 
@@ -113,7 +115,8 @@ class PropertyContents extends UIComponent {
         if (data instanceof loom.TextNode) {
           this.addField('Content', new TextArea(data.source.content));
         } else if (data instanceof loom.Element) {
-          this.addField('Tag', new Input(
+          this.addField('Tag', new ComboBox(
+            new List(basicTags),
             data.source.tag,
             data instanceof loom.HeadElement ||
             data instanceof loom.BodyElement));
