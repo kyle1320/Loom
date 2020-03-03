@@ -1,18 +1,19 @@
+import { WritableValue } from 'loom-data';
+
 import { UIComponent } from '../UIComponent';
 import { makeElement } from '../util/dom';
 
-export default class Input extends UIComponent<{
-  change: string;
-}, HTMLInputElement> {
-  public constructor(value: string, disabled = false) {
+export default class Input extends UIComponent<{}, HTMLInputElement> {
+  public constructor(
+    public readonly value: WritableValue<string>,
+    disabled = false
+  ) {
     super(makeElement('input', {
-      value,
+      value: value.get(),
       disabled,
-      oninput: () => this.emit('change', this.el.value)
+      oninput: () => value.set(this.el.value)
     }));
-  }
 
-  public set(val: string): void {
-    this.el.value = val;
+    this.autoCleanup(value.watch(x => void (this.el.value = x)));
   }
 }

@@ -10,7 +10,7 @@ class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
   ) {
     super(makeElement('option'));
 
-    this.autoCleanup(watch(
+    watch && this.autoCleanup(watch(
       source,
       name => this.el.textContent = name
     ));
@@ -20,7 +20,11 @@ class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
 export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
   public constructor(
     source: List<T>,
-    watch: (value: T, cb: (name: string) => void) => () => void,
+    watch: (value: T, cb: (name: string) => void) => () => void
+    = (val, cb) => {
+      cb(String(val));
+      return () => { /**/ };
+    },
     public readonly selected: WritableValue<T | null>
     = new WritableValue<T | null>(null)
   ) {
