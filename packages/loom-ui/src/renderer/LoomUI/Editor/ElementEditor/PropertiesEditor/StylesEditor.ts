@@ -4,9 +4,9 @@ import { Sheet, StyleRule } from 'loom-core';
 import { UIComponent } from '../../../UIComponent';
 import { makeElement } from '../../../util/dom';
 import Select from '../../../common/Select';
+import KeyValueList from '../../../common/KeyValueList';
 
 import './StylesEditor.scss';
-import KeyValueList from '../../../common/KeyValueList';
 
 class RuleEditor extends UIComponent {
   public constructor(rule: Value<StyleRule | null>) {
@@ -19,7 +19,7 @@ class RuleEditor extends UIComponent {
     this.empty();
 
     if (rule) {
-      this.appendChild(new KeyValueList('', rule.style.source));
+      this.appendChild(new KeyValueList(rule.style.source));
     }
   }
 }

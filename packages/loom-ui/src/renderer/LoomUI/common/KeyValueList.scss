@@ -2,15 +2,8 @@
 
 .keyvaluelist {
   overflow: hidden;
-  padding: 1px 0 0 1px;
-
-  &__header {
-    display: flex;
-    flex-flow: row nowrap;
-  }
 
   &__content {
-    margin-top: 2px;
     max-height: 100px;
     overflow-y: auto;
   }

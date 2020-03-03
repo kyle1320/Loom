@@ -5,9 +5,9 @@ import LoomUI from '../../..';
 import { UIComponent } from '../../../UIComponent';
 import { LookupValue } from '../../../util';
 import { makeElement } from '../../../util/dom';
+import Input from '../../../common/Input';
+import TextArea from '../../../common/TextArea';
 import KeyValueList from '../../../common/KeyValueList';
-import ValueField from '../../../common/ValueField';
-import TextField from '../../../common/TextField';
 
 import './PropertiesEditor.scss';
 
@@ -104,37 +104,43 @@ class PropertyContents extends UIComponent {
     switch (this.selectedTab) {
       case 'page':
         if (content instanceof loom.Page) {
-          this.appendChild(
-            new ValueField('Location', this.ui.contentDef.get()!.key));
+          this.addField('Location', new Input(this.ui.contentDef.get()!.key));
         } else if (content instanceof loom.Element) {
-          this.appendChild(
-            new ValueField('Name', this.ui.contentDef.get()!.key));
+          this.addField('Name', new Input(this.ui.contentDef.get()!.key));
         }
         break;
       case 'element':
         if (data instanceof loom.TextNode) {
-          this.appendChild(new TextField('Content', data.source.content));
+          this.addField('Content', new TextArea(data.source.content));
         } else if (data instanceof loom.Element) {
-          this.appendChild(new ValueField('Tag', data.source.tag,
+          this.addField('Tag', new Input(
+            data.source.tag,
             data instanceof loom.HeadElement ||
             data instanceof loom.BodyElement));
-          this.appendChild(new ValueField('Id',
+          this.addField('Id', new Input(
             new LookupValue(data.source.attrs, 'id')));
-          this.appendChild(new KeyValueList('Attributes', data.source.attrs));
+          this.addField('Attributes', new KeyValueList(data.source.attrs));
         } else if (data instanceof loom.Component) {
-          this.appendChild(new ValueField('Name', data.source.name));
+          this.addField('Name', new Input(data.source.name));
         } else if (content instanceof loom.Element) {
-          this.appendChild(new ValueField('Tag', content.source.tag));
-          this.appendChild(new ValueField('Id',
-            new LookupValue(content.source.attrs, 'id')));
-          this.appendChild(
-            new KeyValueList('Attributes', content.source.attrs));
+          this.addField('Tag', new Input(content.source.tag));
+          this.addField('Id',
+            new Input(new LookupValue(content.source.attrs, 'id')));
+          this.addField('Attributes',  new KeyValueList(content.source.attrs));
         }
         break;
       case 'style':
         this.appendChild(new StylesEditor(this.ui.globalStyles));
         break;
     }
+  }
+
+  private addField(title: string, input: UIComponent): void {
+    this.appendChild(new UIComponent(
+      makeElement('label', { className: 'property-field' },
+        makeElement('span', {}, title)),
+      input
+    ));
   }
 }
 

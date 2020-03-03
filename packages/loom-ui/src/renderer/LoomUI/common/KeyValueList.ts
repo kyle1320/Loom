@@ -5,15 +5,6 @@ import { makeElement, toggleClass } from '../util/dom';
 
 import './KeyValueList.scss';
 
-class KeyValueListHeader extends UIComponent<{ remove: void }> {
-  public constructor(title: string) {
-    super(
-      makeElement('div', { className: 'keyvaluelist__header' },
-        makeElement('div', { className: 'keyvaluelist__title' }, title))
-    );
-  }
-}
-
 class KeyValueListContent extends UIComponent {
   private newRow!: DictionaryRow<string>;
 
@@ -96,9 +87,8 @@ class KeyValueListRow extends UIComponent<{}, HTMLElement> {
 }
 
 export default class KeyValueList extends UIComponent {
-  public constructor(title: string, data: WritableDictionary<string>) {
+  public constructor(data: WritableDictionary<string>) {
     super(makeElement('div', { className: 'keyvaluelist' }),
-      new KeyValueListHeader(title),
       new KeyValueListContent(data)
     );
   }
