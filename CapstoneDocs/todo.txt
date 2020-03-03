@@ -3,7 +3,6 @@ Make styles show only relevant rules
 Ability to create & delete elements from UI
   - WYSIWYG controls
 Create multi-select field for "classes"
-Create combobox field for tag, etc.
 Add advanced controls to WYSIWYG
 Make field editors context-aware
   - e.g. a "Location" field for anchor elements
