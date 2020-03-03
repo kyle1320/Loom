@@ -1,0 +1,33 @@
+@import "~@/variables";
+
+.multi-select {
+  background-color: $primary-0;
+  border: 1px solid $primary-5;
+  padding: 2px;
+  cursor: text;
+  white-space: pre-wrap;
+
+  &__value {
+    position: relative;
+    display: inline-block;
+    background-color: $primary-3;
+    border-radius: 100px;
+    padding: 2px 6px;
+    padding-right: 20px;
+    margin: 0 1px;
+
+    .icon-btn {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      padding: 0;
+      margin-left: 3px;
+      transform: translateY(-50%);
+    }
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}

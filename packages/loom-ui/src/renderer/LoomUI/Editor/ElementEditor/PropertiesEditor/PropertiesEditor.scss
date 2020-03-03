@@ -24,13 +24,27 @@
     }
   }
 
-  input, select {
+  input, select, .multi-select {
     min-width: 0;
     font-size: 12px;
     line-height: 14px;
     padding: 3px 6px;
     height: 22px;
     border-radius: 5px;
+  }
+
+  .multi-select {
+    height: auto;
+    min-height: 36px;
+    padding: 3px;
+  }
+
+  hr {
+    width: 100%;
+    margin: 6px 0;
+    padding: 0;
+    border: 0px solid $primary-5;
+    border-bottom-width: 1px;
   }
 }
 
@@ -69,10 +83,10 @@
   }
 
   &__title {
-    min-width: 30%;
-    flex-basis: auto;
+    flex-basis: 0;
     flex-shrink: 0;
     font-size: 12px;
+    margin-right: 3px;
   }
 
   .keyvaluelist {

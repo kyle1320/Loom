@@ -2,7 +2,6 @@ Make styles show only relevant rules
   - Root UI maintains built document?
 Ability to create & delete elements from UI
   - WYSIWYG controls
-Create multi-select field for "classes"
 Add advanced controls to WYSIWYG
 Make field editors context-aware
   - e.g. a "Location" field for anchor elements

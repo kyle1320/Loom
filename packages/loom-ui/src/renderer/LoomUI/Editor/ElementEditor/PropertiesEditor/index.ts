@@ -9,6 +9,7 @@ import { makeElement, basicTags } from '../../../util/dom';
 import Input from '../../../common/Input';
 import ComboBox from '../../../common/ComboBox';
 import TextArea from '../../../common/TextArea';
+import MultiSelect from '../../../common/MultiSelect';
 import KeyValueList from '../../../common/KeyValueList';
 
 import './PropertiesEditor.scss';
@@ -122,6 +123,9 @@ class PropertyContents extends UIComponent {
             data instanceof loom.BodyElement));
           this.addField('Id', new Input(
             new LookupValue(data.source.attrs, 'id')));
+          this.addField('Class',
+            new MultiSelect(new LookupValue(data.source.attrs, 'class')));
+          this.appendChild(new UIComponent(makeElement('hr')));
           this.addField('Attributes', new KeyValueList(data.source.attrs));
         } else if (data instanceof loom.Component) {
           this.addField('Name', new Input(data.source.name));
@@ -129,6 +133,8 @@ class PropertyContents extends UIComponent {
           this.addField('Tag', new Input(content.source.tag));
           this.addField('Id',
             new Input(new LookupValue(content.source.attrs, 'id')));
+          this.addField('Class',
+            new MultiSelect(new LookupValue(content.source.attrs, 'class')));
           this.addField('Attributes',  new KeyValueList(content.source.attrs));
         }
         break;
