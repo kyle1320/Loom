@@ -17,7 +17,7 @@
   }
 
   &__content {
-    padding: 8px 4px;
+    padding: 6px 4px;
 
     & > * {
       margin-bottom: 5px;
@@ -72,14 +72,14 @@
 }
 
 .property-field {
-  margin: 1px;
+  margin: 3px;
   display: flex;
   flex-flow: row wrap;
+  align-items: first-baseline;
 
   & > * {
     flex-grow: 1;
     flex-basis: 100px;
-    margin-bottom: 4px;
   }
 
   &__title {
@@ -87,6 +87,8 @@
     flex-shrink: 0;
     font-size: 12px;
     margin-right: 3px;
+    line-height: 14px;
+    padding: 3px 0;
   }
 
   .keyvaluelist {
