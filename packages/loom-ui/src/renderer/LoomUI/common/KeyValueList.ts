@@ -29,7 +29,7 @@ class KeyValueListContent extends UIComponent {
     } else {
       this.insertChild(
         new KeyValueListRow(new DictionaryRow(this.data, key, value)),
-        this.children.length - 1
+        this.numChildren() - 1
       );
     }
   }

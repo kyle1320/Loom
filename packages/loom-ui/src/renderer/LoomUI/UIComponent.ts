@@ -34,6 +34,10 @@ export class UIComponent<
     return this.el;
   }
 
+  protected numChildren(): number {
+    return this.children.length;
+  }
+
   protected autoCleanup(...callbacks: (() => void)[]): () => void {
     const remove = (): void => {
       if (this.unlisteners.delete(remove)) {
