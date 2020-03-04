@@ -5,8 +5,8 @@ export class UIComponent<
 > extends EventEmitter<E> {
   private unlisteners: Set<() => void> = new Set();
 
-  protected parent: UIComponent | null = null;
-  protected children: UIComponent[] = [];
+  private parent: UIComponent | null = null;
+  private children: UIComponent[] = [];
 
   public constructor(
     protected el: H = null!,
@@ -63,20 +63,32 @@ export class UIComponent<
     this.children.forEach(child => child.addTo(el));
   }
 
-  protected appendChild(comp: UIComponent): void {
+  protected appendChild(comp: UIComponent, insert = true): void {
     comp.parent = this;
     this.children.push(comp);
-    this.el.appendChild(comp.el);
+    insert && this.el.appendChild(comp.el);
   }
 
-  protected insertChild(comp: UIComponent, index = this.children.length): void {
+  protected insertChild(
+    comp: UIComponent,
+    index = this.children.length,
+    insert = true
+  ): void {
     if (index === this.children.length) {
-      this.appendChild(comp);
+      this.appendChild(comp, insert);
     } else {
       comp.parent = this;
-      this.el.insertBefore(comp.el, this.children[index].el);
+      insert && this.el.insertBefore(comp.el, this.children[index].el);
       this.children.splice(index, 0, comp);
     }
+  }
+
+  protected insertBefore(
+    comp: UIComponent,
+    before: UIComponent,
+    insert = true
+  ): void {
+    this.insertChild(comp, this.children.indexOf(before), insert);
   }
 
   protected removeChild(comp: UIComponent | number, destroy = true): void {
@@ -86,13 +98,15 @@ export class UIComponent<
 
     if (comp > -1) {
       comp = this.children.splice(comp, 1)[0];
-      try { this.el.removeChild(comp.el); } catch (e) { /**/ }
+      try { this.el.removeChild(comp.el); } catch (e) {
+        console.warn('Failed to remove node');
+      }
       destroy && comp.destroy();
     }
   }
 
-  protected setChild(child: UIComponent, index: number): void {
-    this.removeChild(index);
-    this.insertChild(child, index);
+  protected setChild(child: UIComponent, index: number, insert = true): void {
+    this.removeChild(index, insert);
+    this.insertChild(child, index, insert);
   }
 }

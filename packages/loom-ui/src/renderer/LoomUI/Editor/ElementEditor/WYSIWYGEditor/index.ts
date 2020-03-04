@@ -108,13 +108,13 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
       // instead of in the event listener.
       // **********
       if (el) {
-        res = makeComponent(this.editor, el, node)
-        this.children.splice(this.children.indexOf(comp), 0, res);
+        res = makeComponent(this.editor, el, node);
+        this.insertBefore(res, comp, false);
       }
     } else {
       const el = this.data.children.addDef(def);
       res = makeComponent(this.editor, el, node)
-      this.children.push(res);
+      this.appendChild(res, false);
     }
     this.ignoreEvents = false;
     return res;
