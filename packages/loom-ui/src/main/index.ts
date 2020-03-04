@@ -28,6 +28,10 @@ function createWindow(): void {
   win.on('closed', () => win = null);
 }
 
-app.on('ready', createWindow);
+if (isDevelopment) {
+  app.commandLine.appendSwitch('remote-debugging-port', '9223');
+  app.commandLine.appendSwitch('userDataDir', 'true');
+}
 
+app.on('ready', createWindow);
 app.on('window-all-closed', () => app.quit());

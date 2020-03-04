@@ -1,0 +1,18 @@
+{
+  "configurations": [
+    {
+      "name": "Electron: Renderer",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9223,
+      "webRoot": "${workspaceFolder}/packages/loom-ui/",
+      "timeout": 30000,
+      "sourceMaps": true,
+      "showAsyncStacks": true,
+      "address": "127.0.0.1",
+      "smartStep": true,
+      "trace": "verbose",
+      "internalConsoleOptions": "openOnSessionStart",
+    }
+  ]
+}
