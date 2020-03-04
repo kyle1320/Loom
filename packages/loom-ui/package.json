@@ -13,7 +13,7 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@types/node": "^12.12.6",
-    "electron": "^7.1.1",
+    "electron": "8",
     "electron-builder": "^22.1.0",
     "electron-webpack": "^2.7.4",
     "electron-webpack-ts": "^3.2.0",
@@ -36,7 +36,8 @@
     "productName": "Loom",
     "appId": "com.kylecutler.loom",
     "mac": {
-      "identity": false
+      "identity": false,
+      "target": "dmg"
     }
   }
 }

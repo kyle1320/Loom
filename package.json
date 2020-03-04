@@ -21,7 +21,8 @@
     "test": "jest",
     "build-data": "cd packages/loom-data && yarn run build",
     "build-core": "cd packages/loom-core && yarn run build",
-    "ui": "cd packages/loom-ui && yarn run dev"
+    "ui": "cd packages/loom-ui && yarn run dev",
+    "ui-dist": "cd packages/loom-ui && yarn run dist"
   },
   "workspaces": [
     "packages/*"

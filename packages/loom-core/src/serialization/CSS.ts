@@ -1,6 +1,6 @@
-import fs = require('fs');
-import path = require('path');
-import cssparser = require('css');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as cssparser from 'css';
 
 import { SheetDef, StyleRuleDef } from '../definitions/CSS';
 

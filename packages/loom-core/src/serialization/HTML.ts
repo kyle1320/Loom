@@ -1,6 +1,6 @@
-import fs = require('fs');
-import path = require('path');
-import htmlparser = require('htmlparser2');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as htmlparser from 'htmlparser2';
 import {
   Node as DomNode,
   Element as DomElement,
@@ -11,7 +11,7 @@ import {
   PageDef,
   NodeDef,
   TextNodeDef,
-  ComponentDef } from '../Definitions/HTML';
+  ComponentDef } from '../definitions/HTML';
 import { Sources } from '../definitions';
 import { walkDir } from '.';
 

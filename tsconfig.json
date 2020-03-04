@@ -22,8 +22,8 @@
     "composite": true,
 
     "paths": {
-      "loom-core": ["loom-core/src"],
-      "loom-data": ["loom-data/src"]
+      "loom-core": ["loom-core/dist"],
+      "loom-data": ["loom-data/dist"]
     }
   },
   "include": [

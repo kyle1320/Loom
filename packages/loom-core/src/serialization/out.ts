@@ -1,4 +1,4 @@
-import path = require('path');
+import * as path from 'path';
 
 import { Sources, SourcesConfig } from '../definitions';
 import { writeSync, LoomConfig } from '.';
