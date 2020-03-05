@@ -6,20 +6,6 @@ import { makeElement, toggleClass } from '../util/dom';
 
 import './NameList.scss';
 
-class NameListHeader extends UIComponent<{
-  'add': void;
-  'remove': void;
-}> {
-  public constructor(title: string) {
-    super(
-      makeElement('div', { className: 'namelist__header' },
-        makeElement('div', { className: 'namelist__title' }, title)),
-      new IconButton('fa-plus').on('click', () => this.emit('add')),
-      new IconButton('fa-minus').on('click', () => this.emit('remove'))
-    );
-  }
-}
-
 class NameListContent<T> extends UIComponent {
   public constructor(
     data: WritableDictionary<T>,
@@ -35,24 +21,33 @@ class NameListContent<T> extends UIComponent {
   }
 }
 
-class NameListRow<T> extends UIComponent<{}, HTMLElement> {
+class NameListRow<T> extends UIComponent {
   public constructor(
     row: DictionaryRow<T>,
     selected: WritableValue<DictionaryRow<T> | null>
   ) {
-    super(makeElement('div', {
+    super();
+
+    const title = makeElement('div', { className: 'namelist__title' });
+    const el = makeElement('div', {
       className: 'namelist__row',
       onclick: () => selected.set(
         new DictionaryRow(row.map, row.key.get(), row.value.get())
       )
-    }));
+    }, title);
+
+    this.el = el;
+
+    this.appendChild(
+      new IconButton('fa fa-trash').on('click', () => row.delete())
+    );
 
     this.autoCleanup(row.watch(
-      key => this.el.textContent = key,
+      key => title.textContent = key,
       () => { /**/ },
       () => this.destroy()
     ), selected.watch(r => {
-      toggleClass(this.el, 'selected',
+      toggleClass(el, 'selected',
         !!(r && r.key.get() == row.key.get()));
     }), () => row.destroy());
   }
@@ -60,19 +55,11 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
 
 export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
-    title: string,
     data: WritableDictionary<T>,
     public readonly selected: WritableValue<DictionaryRow<T> | null>
     = new WritableValue<DictionaryRow<T> | null>(null)
   ) {
-    super(makeElement('div', { className: 'namelist' }),
-      new NameListHeader(title)
-        .on('add', () => this.emit('add'))
-        .on('remove', () => {
-          selected.get()?.delete();
-          selected.set(null);
-        })
-    );
+    super(makeElement('div', { className: 'namelist' }));
 
     this.appendChild(new NameListContent<T>(data, selected));
   }

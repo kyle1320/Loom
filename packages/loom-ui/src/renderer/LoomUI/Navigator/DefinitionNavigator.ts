@@ -11,7 +11,7 @@ type TabName = 'pages' | 'components';
 function iconForTab(tab: TabName): string {
   switch (tab) {
     case 'pages': return 'fa fa-file';
-    case 'components': return 'fa fa-copy';
+    case 'components': return 'fa fa-clone';
   }
 }
 
@@ -36,10 +36,9 @@ class DefinitionNavigatorContents extends UIComponent {
       this.selected = selected;
       this.empty();
       this.appendChild(selected === 'pages'
-        ? new NameList('Pages', this.ui.sources.pages, this.ui.selectedPage)
-        : new NameList(
-          'Components', this.ui.sources.components, this.ui.selectedComponent
-        ));
+        ? new NameList(this.ui.sources.pages, this.ui.selectedPage)
+        : new NameList(this.ui.sources.components, this.ui.selectedComponent)
+      );
     }
   }
 }
