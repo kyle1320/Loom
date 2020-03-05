@@ -108,6 +108,7 @@ export class UIComponent<
       try { this.el.removeChild(comp.el); } catch (e) {
         console.warn('Failed to remove node');
       }
+      comp.parent = null;
       destroy && comp.destroy();
     }
   }
