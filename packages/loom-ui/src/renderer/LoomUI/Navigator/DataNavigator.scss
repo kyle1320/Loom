@@ -13,14 +13,14 @@
     align-items: center;
     padding: 5px;
     height: 30px;
-    background-color: $primary-0;
+    background-color: $primary-1;
     border-bottom: 1px solid $primary-3;
   }
 
   &__location {
     padding-right: 20px;
-    font-weight: bold;
     text-align: center;
     flex-grow: 1;
+    color: $accent;
   }
 }
