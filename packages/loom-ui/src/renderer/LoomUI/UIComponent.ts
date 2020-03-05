@@ -6,7 +6,10 @@ export class UIComponent<
   private unlisteners: Set<() => void> = new Set();
 
   private parent: UIComponent | null = null;
-  private children: UIComponent[] = [];
+  private __children: UIComponent[] = [];
+
+  // TODO use in subclasses
+  protected children: Readonly<UIComponent[]> = this.__children;
 
   public constructor(
     protected el: H = null!,
@@ -35,7 +38,7 @@ export class UIComponent<
   }
 
   protected numChildren(): number {
-    return this.children.length;
+    return this.__children.length;
   }
 
   protected autoCleanup(...callbacks: (() => void)[]): () => void {
@@ -49,8 +52,8 @@ export class UIComponent<
   }
 
   protected empty(): void {
-    while (this.children.length) {
-      this.children[0].destroy();
+    while (this.__children.length) {
+      this.__children[0].destroy();
     }
   }
 
@@ -64,26 +67,26 @@ export class UIComponent<
 
     this.el = el;
 
-    this.children.forEach(child => child.addTo(el));
+    this.__children.forEach(child => child.addTo(el));
   }
 
   protected appendChild(comp: UIComponent, insert = true): void {
     comp.parent = this;
-    this.children.push(comp);
+    this.__children.push(comp);
     insert && this.el.appendChild(comp.el);
   }
 
   protected insertChild(
     comp: UIComponent,
-    index = this.children.length,
+    index = this.__children.length,
     insert = true
   ): void {
-    if (index === this.children.length) {
+    if (index === this.__children.length) {
       this.appendChild(comp, insert);
     } else {
       comp.parent = this;
-      insert && this.el.insertBefore(comp.el, this.children[index].el);
-      this.children.splice(index, 0, comp);
+      insert && this.el.insertBefore(comp.el, this.__children[index].el);
+      this.__children.splice(index, 0, comp);
     }
   }
 
@@ -92,16 +95,16 @@ export class UIComponent<
     before: UIComponent,
     insert = true
   ): void {
-    this.insertChild(comp, this.children.indexOf(before), insert);
+    this.insertChild(comp, this.__children.indexOf(before), insert);
   }
 
   protected removeChild(comp: UIComponent | number, destroy = true): void {
     if (typeof comp !== 'number') {
-      comp = this.children.indexOf(comp);
+      comp = this.__children.indexOf(comp);
     }
 
     if (comp > -1) {
-      comp = this.children.splice(comp, 1)[0];
+      comp = this.__children.splice(comp, 1)[0];
       try { this.el.removeChild(comp.el); } catch (e) {
         console.warn('Failed to remove node');
       }
