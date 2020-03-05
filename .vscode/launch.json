@@ -10,9 +10,7 @@
       "sourceMaps": true,
       "showAsyncStacks": true,
       "address": "127.0.0.1",
-      "smartStep": true,
-      "trace": "verbose",
-      "internalConsoleOptions": "openOnSessionStart",
+      "smartStep": true
     }
   ]
 }
