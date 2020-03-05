@@ -51,9 +51,9 @@ export class UIComponent<
     return remove;
   }
 
-  protected empty(): void {
+  protected empty(destroy = true): void {
     while (this.__children.length) {
-      this.__children[0].destroy();
+      this.removeChild(0, destroy);
     }
   }
 
