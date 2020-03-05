@@ -153,7 +153,6 @@ export default class PropertiesEditor extends UIComponent {
     if (allTabs.indexOf(this.selectedTab) < 0) {
       this.selectedTab = allTabs[0];
     }
-    this.contents.select(this.selectedTab);
     this.tabs.update(allTabs, this.selectedTab);
   }
 }

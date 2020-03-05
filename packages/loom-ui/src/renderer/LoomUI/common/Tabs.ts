@@ -59,6 +59,8 @@ export default class Tabs<T extends string> extends UIComponent<{
       this.tabs.push(tab);
       this.appendChild(tab);
     }
+
+    this.emit('select', selected);
   }
 
   private select = (tab: T): void => {
