@@ -3,8 +3,9 @@
 .data-nav {
   height: 100%;
   background-color: $primary-1;
-  border-top: 1px solid $primary-5;
   overflow-y: auto;
+  border-right: 1px solid $primary-5;
+  background-color: $primary-1;
 
   &__header {
     display: flex;

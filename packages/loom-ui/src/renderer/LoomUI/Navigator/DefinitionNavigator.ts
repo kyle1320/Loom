@@ -1,22 +1,60 @@
 import LoomUI from '..';
-import { makeElement } from '../util/dom';
-import NameList from '../common/NameList';
 import { UIComponent } from '../UIComponent';
+import { makeElement } from '../util/dom';
+import Tabs from '../common/Tabs';
+import NameList from '../common/NameList';
 
 import './DefinitionNavigator.scss';
+
+type TabName = 'pages' | 'components';
+
+function iconForTab(tab: TabName): string {
+  switch (tab) {
+    case 'pages': return 'fa fa-file';
+    case 'components': return 'fa fa-copy';
+  }
+}
+
+function nameForTab(tab: TabName): string {
+  switch (tab) {
+    case 'pages': return 'Pages';
+    case 'components': return 'Components';
+  }
+}
+
+class DefinitionNavigatorContents extends UIComponent {
+  private selected!: TabName;
+
+  public constructor(
+    private readonly ui: LoomUI,
+  ) {
+    super(makeElement('div', { className: 'definition-nav__content' }));
+  }
+
+  public select(selected: TabName): void {
+    if (this.selected !== selected) {
+      this.selected = selected;
+      this.empty();
+      this.appendChild(selected === 'pages'
+        ? new NameList('Pages', this.ui.sources.pages, this.ui.selectedPage)
+        : new NameList(
+          'Components', this.ui.sources.components, this.ui.selectedComponent
+        ));
+    }
+  }
+}
 
 export default class DefinitionNavigator extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'definition-nav' }));
 
-    const contentList = new NameList(
-      'Pages', ui.sources.pages, ui.selectedPage
-    );
-    const componentList = new NameList(
-      'Components', ui.sources.components, ui.selectedComponent
-    );
+    const content = new DefinitionNavigatorContents(ui);
+    const tabs = new Tabs(nameForTab, iconForTab)
+      .on('select', tab => content.select(tab));
 
-    this.appendChild(contentList);
-    this.appendChild(componentList);
+    tabs.update(['pages', 'components'], 'pages');
+
+    this.appendChild(tabs);
+    this.appendChild(content);
   }
 }
