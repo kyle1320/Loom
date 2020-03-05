@@ -73,15 +73,14 @@ class MultiSelectInput extends UIComponent<{
   }
 
   private change(): void {
-    if (this.el.value.endsWith(' ')) this.update();
+    if (this.el.value.match(/\s/)) this.update();
     else this.el.size = this.el.value.length + 1;
   }
 
   private update(): void {
-    const value = this.el.value.trim();
+    this.el.value.split(/\s/).forEach(val => val && this.emit('add', val));
     this.el.value = '';
     this.el.size = 1;
-    if (value) this.emit('add', value);
   }
 }
 
