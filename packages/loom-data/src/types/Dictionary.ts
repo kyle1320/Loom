@@ -1,6 +1,7 @@
 import { EventEmitter, PlainEmitter } from './EventEmitter';
 import { mapRecordKeys, doAll, Destroyable } from '../util';
 import { Value, WritableValue } from './Value';
+import { ComputedList } from './List';
 
 export namespace Dictionary {
   export interface Listeners<T> {
@@ -376,5 +377,18 @@ export class MappedDictionary<T, U> extends ComputedDictionary<U> {
       this.cleanup(this.data[key]);
     }
     this.allOff();
+  }
+}
+
+export class DictionaryKeys<T> extends ComputedList<string> {
+  public destroy: () => void;
+
+  public constructor(source: Dictionary<T>) {
+    super([]);
+
+    this.destroy = source.watch({
+      'add': k => this.add(k),
+      'delete': k => this.remove(k)
+    });
   }
 }
