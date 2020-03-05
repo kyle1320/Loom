@@ -63,6 +63,7 @@ class MultiSelectInput extends UIComponent<{
       oninput: () => this.change(),
       onkeydown: e => {
         if (e.keyCode === 8 && !this.el.value) this.emit('backspace');
+        else if (e.keyCode === 13) this.update();
       }
     }));
   }
