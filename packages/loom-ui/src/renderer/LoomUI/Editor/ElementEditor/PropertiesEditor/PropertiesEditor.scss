@@ -24,19 +24,19 @@
     }
   }
 
-  input, select, .multi-select {
+  input, select {
     min-width: 0;
     font-size: 12px;
     line-height: 14px;
     padding: 3px 6px;
     height: 22px;
-    border-radius: 5px;
   }
 
   .multi-select {
-    height: auto;
-    min-height: 36px;
-    padding: 3px;
+    border-radius: 5px;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 14px;
   }
 
   hr {

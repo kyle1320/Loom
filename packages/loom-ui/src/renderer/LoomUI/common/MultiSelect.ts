@@ -6,48 +6,103 @@ import { makeElement } from '../util/dom';
 
 import './MultiSelect.scss';
 
-class MultiSelectValue extends UIComponent {
-  public constructor(value: string) {
+class MultiSelectValue extends UIComponent<{ delete: void }> {
+  public constructor(public readonly value: string) {
     super(
-      makeElement('div', {
-        className: 'multi-select__value',
-        contentEditable: 'false'
-      }, value),
-      // TODO: update value on destroy
-      new IconButton('fa fa-times').on('click', () => this.destroy())
+      makeElement('div', { className: 'multi-select__value' }, value),
+      new IconButton('fa fa-times').on('click', () => this.emit('delete'))
     );
   }
 }
 
-export default class MultiSelect extends UIComponent {
+class MultiSelectValues extends UIComponent {
+  public constructor(private readonly values: WritableValue<string>) {
+    super(makeElement('div', { className: 'multi-select__values' }));
+
+    this.autoCleanup(values.watch(this.update));
+  }
+
+  public deleteLast(): void {
+    if (this.children.length > 0) {
+      this.children[this.children.length - 1].destroy();
+      this.recalc();
+    }
+  }
+
+  private recalc = (): void => {
+    this.values.set(
+      this.children.map(ch => (ch as MultiSelectValue).value).join(' ')
+    );
+  }
+
+  private update = (val: string): void => {
+    this.empty();
+    for (const part of val.split(' ')) {
+      if (part) {
+        const value = new MultiSelectValue(part)
+          .on('delete', () => {
+            value.destroy();
+            this.recalc();
+          });
+        this.appendChild(value);
+      }
+    }
+  }
+}
+
+class MultiSelectInput extends UIComponent<{
+  add: string;
+  backspace: void;
+}, HTMLInputElement> {
+  public constructor() {
+    super(makeElement('input', {
+      className: 'multi-select__input',
+      contentEditable: 'true',
+      size: 2,
+      onblur: () => this.update(),
+      oninput: () => this.change(),
+      onkeydown: e => {
+        if (e.keyCode === 8 && !this.el.value) this.emit('backspace');
+      }
+    }));
+  }
+
+  public select(): void {
+    this.el.select();
+  }
+
+  private change(): void {
+    if (this.el.value.endsWith(' ')) this.update();
+    else this.el.size = this.el.value.length + 1;
+  }
+
+  private update(): void {
+    const value = this.el.value.trim();
+    this.el.value = '';
+    this.el.size = 1;
+    if (value) this.emit('add', value);
+  }
+}
+
+export default class MultiSelect extends UIComponent<{}, HTMLDivElement> {
   public constructor(
     public readonly value: WritableValue<string>
   ) {
     super(makeElement('div', {
       className: 'multi-select',
-      contentEditable: 'true',
-      onblur: () => this.updateValue(),
-      onkeyup: e => e.keyCode === 32 && this.updateValue()
+      onclick: () => input.select()
     }));
 
-    this.autoCleanup(value.watch(this.refresh));
+    const values = new MultiSelectValues(value);
+    const input = new MultiSelectInput()
+      .on('add', this.addValue)
+      .on('backspace', () => values.deleteLast());
+
+    this.appendChild(values);
+    this.appendChild(input);
   }
 
-  private updateValue = (): void => {
-    // TODO: better whitespace handling, cursor replacement
-    const str = this.el.textContent || '';
-    this.value.set(str.trim());
-  }
-
-  private refresh = (val: string): void => {
-    this.empty();
-    this.el.textContent = '';
-    for (const part of val.split(' ')) {
-      if (part) {
-        this.el.appendChild(document.createTextNode(''));
-        this.appendChild(new MultiSelectValue(part));
-      }
-    }
-    this.el.appendChild(document.createTextNode(''));
+  private addValue = (value: string): void => {
+    this.value.set(this.value.get() + ' ' + value);
   }
 }
