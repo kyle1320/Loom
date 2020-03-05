@@ -9,10 +9,17 @@ import './Navigator.scss';
 export default class Navigator extends UIComponent {
   private showingData!: boolean;
 
+  private readonly dataNav: DataNavigator;
+  private readonly definitionNav: DefinitionNavigator;
+
   public constructor(
     private readonly ui: LoomUI
   ) {
     super(makeElement('div', { className: 'navigator' }));
+
+    this.dataNav = new DataNavigator(this.ui)
+      .on('back', () => this.showData(false));
+    this.definitionNav = new DefinitionNavigator(this.ui);
 
     this.autoCleanup(ui.content.watch(content => this.showData(!!content)));
   }
@@ -21,12 +28,9 @@ export default class Navigator extends UIComponent {
     if (this.showingData !== showingData) {
       this.showingData = showingData;
 
-      this.empty();
+      this.empty(false);
 
-      this.appendChild(this.showingData
-        ? new DataNavigator(this.ui)
-          .on('back', () => this.showData(false))
-        : new DefinitionNavigator(this.ui));
+      this.appendChild(this.showingData ? this.dataNav : this.definitionNav);
     }
   }
 }
