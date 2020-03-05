@@ -1,4 +1,4 @@
-import { List } from 'loom-data';
+import { List, DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
 import StylesEditor from './StylesEditor';
@@ -85,7 +85,10 @@ class PropertyContents extends UIComponent {
           this.appendChild(new UIComponent(makeElement('hr')));
           this.addField('Attributes', new KeyValueList(data.source.attrs));
         } else if (data instanceof loom.Component) {
-          this.addField('Name', new Input(data.source.name));
+          this.addField('Name', new ComboBox(
+            new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
+            data.source.name
+          ));
         } else if (content instanceof loom.Element) {
           this.addField('Tag', new Input(content.source.tag));
           this.addField('Id',
