@@ -24,6 +24,14 @@ function iconForTab(tab: TabName): string {
   }
 }
 
+function nameForTab(tab: TabName): string {
+  switch (tab) {
+    case 'page': return 'Page';
+    case 'element': return 'Element';
+    case 'style': return 'Styles';
+  }
+}
+
 class PropertyTab extends UIComponent<{
   'select': void;
 }, HTMLElement> {
@@ -32,9 +40,12 @@ class PropertyTab extends UIComponent<{
     private selected: boolean
   ) {
     super(makeElement('div', {
-      className: 'property-tab ' + iconForTab(name),
+      className: 'property-tab',
       onclick: () => this.select()
-    }));
+    },
+    makeElement('div', { className: 'property-tab__title' }, nameForTab(name)),
+    makeElement('i', { className: iconForTab(name) }))
+    );
 
     this.select(selected);
   }
