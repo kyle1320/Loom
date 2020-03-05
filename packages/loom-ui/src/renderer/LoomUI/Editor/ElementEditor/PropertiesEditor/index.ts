@@ -6,6 +6,7 @@ import LoomUI from '../../..';
 import { UIComponent } from '../../../UIComponent';
 import { LookupValue } from '../../../util';
 import { makeElement, basicTags } from '../../../util/dom';
+import Tabs from '../../../common/Tabs';
 import Input from '../../../common/Input';
 import ComboBox from '../../../common/ComboBox';
 import TextArea from '../../../common/TextArea';
@@ -29,61 +30,6 @@ function nameForTab(tab: TabName): string {
     case 'page': return 'Page';
     case 'element': return 'Element';
     case 'style': return 'Styles';
-  }
-}
-
-class PropertyTab extends UIComponent<{
-  'select': void;
-}, HTMLElement> {
-  public constructor(
-    public readonly name: TabName,
-    private selected: boolean
-  ) {
-    super(makeElement('div', {
-      className: 'property-tab',
-      onclick: () => this.select()
-    },
-    makeElement('div', { className: 'property-tab__title' }, nameForTab(name)),
-    makeElement('i', { className: iconForTab(name) }))
-    );
-
-    this.select(selected);
-  }
-
-  public select(selected = true): void {
-    this.el.classList.toggle('selected', selected);
-    const wasSelected = this.selected;
-    this.selected = selected;
-    if (selected && selected !== wasSelected) {
-      this.emit('select');
-    }
-  }
-}
-
-class PropertyTabHeader extends UIComponent<{
-  'select': [TabName];
-}> {
-  private tabs: PropertyTab[] = [];
-
-  public constructor() {
-    super(makeElement('div', { className: 'properties-editor__header' }));
-  }
-
-  public update(tabs: TabName[], selected: TabName): void {
-    this.empty();
-    this.tabs = [];
-
-    for (const name of tabs) {
-      const tab = new PropertyTab(name, name === selected)
-        .on('select', () => this.select(name));
-      this.tabs.push(tab);
-      this.appendChild(tab);
-    }
-  }
-
-  private select = (name: TabName): void => {
-    this.tabs.forEach(t => t.select(t.name === name));
-    this.emit('select', name);
   }
 }
 
@@ -166,13 +112,13 @@ class PropertyContents extends UIComponent {
 
 export default class PropertiesEditor extends UIComponent {
   private selectedTab!: TabName;
-  private tabHeader: PropertyTabHeader;
+  private tabs: Tabs<TabName>;
   private contents: PropertyContents;
 
   public constructor(private readonly ui: LoomUI) {
     super(makeElement('div', { className: 'properties-editor' }));
 
-    this.appendChild(this.tabHeader = new PropertyTabHeader()
+    this.appendChild(this.tabs = new Tabs(nameForTab, iconForTab)
       .on('select', name => {
         this.selectedTab = name;
         this.contents.select(name);
@@ -208,6 +154,6 @@ export default class PropertiesEditor extends UIComponent {
       this.selectedTab = allTabs[0];
     }
     this.contents.select(this.selectedTab);
-    this.tabHeader.update(allTabs, this.selectedTab);
+    this.tabs.update(allTabs, this.selectedTab);
   }
 }
