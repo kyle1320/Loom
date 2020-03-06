@@ -167,7 +167,7 @@ export class WYSIWYGTextNode extends UIComponent {
 }
 
 export class WYSIWYGComponent extends UIComponent {
-  private node!: WYSIWYGNode;
+  public node!: WYSIWYGNode;
 
   public constructor(
     private readonly editor: WYSIWYGEditor,
@@ -287,7 +287,9 @@ export default class WYSIWYGEditor extends UIComponent<{
   private onEdit = (records: MutationRecord[]): void => {
     records.forEach(record => {
       const node = record.target;
-      const comp = this.nodes.get(node);
+      const _comp = this.nodes.get(node);
+      const comp = _comp instanceof WYSIWYGComponent
+        ? _comp.node : _comp;
       if (!comp) return;
 
       // TODO: just do this once outside of the loop?
