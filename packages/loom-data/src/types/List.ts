@@ -9,10 +9,14 @@ export namespace List {
 }
 
 export class List<T> extends EventEmitter<List.Events<T>> {
+  protected readonly data: T[] = [];
+
   public constructor(
-    protected readonly data: T[] = []
+    data: T[] = []
   ) {
     super();
+
+    data.forEach(x => this.add(x));
   }
 
   public get(index: number): T {

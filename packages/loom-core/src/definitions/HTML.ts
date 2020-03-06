@@ -12,15 +12,29 @@ import {
   Attributes,
   Children,
   HeadElement,
-  BodyElement } from '../build/HTML';
+  BodyElement,
+  Node } from '../build/HTML';
 
-export type NodeDef =
-  TextNodeDef | ElementDef | ComponentDef;
+const nodeParentMap: WeakMap<NodeDef, ChildrenDef> = new WeakMap();
+export abstract class NodeDef implements Definition {
+  public delete(): boolean {
+    const parent = nodeParentMap.get(this);
+    if (parent) {
+      nodeParentMap.delete(this);
+      return parent.remove(this);
+    }
+    return false;
+  }
 
-export class TextNodeDef implements Definition {
+  public abstract build(sources: Sources): Node;
+  public abstract serialize(): string;
+}
+
+export class TextNodeDef extends NodeDef {
   public readonly content: WritableValue<string>;
 
   public constructor(content: string) {
+    super();
     this.content = new WritableValue(content);
   }
 
@@ -61,15 +75,21 @@ export class ChildrenDef extends WritableList<NodeDef> implements Definition {
     return new Children(this, sources);
   }
 
+  public add(value: NodeDef, index?: number): void {
+    nodeParentMap.set(value, this);
+    super.add(value, index);
+  }
+
   public serialize(): string {
     return this.asArray().map(obj => obj.serialize()).join('');
   }
 }
 
-export class ComponentDef implements Definition {
+export class ComponentDef extends NodeDef {
   public readonly name: WritableValue<string>;
 
   public constructor(name: string) {
+    super();
     this.name = new WritableValue(name);
   }
 
@@ -82,7 +102,7 @@ export class ComponentDef implements Definition {
   }
 }
 
-export class ElementDef implements Definition {
+export class ElementDef extends NodeDef {
   public readonly tag: WritableValue<string>;
   public readonly attrs: AttributesDef;
   public readonly children: ChildrenDef;
@@ -92,6 +112,7 @@ export class ElementDef implements Definition {
     attrs: AttributesDef | Record<string, string>,
     children: ChildrenDef | NodeDef[],
   ) {
+    super();
     this.tag = new WritableValue(tag);
     this.attrs = attrs instanceof AttributesDef
       ? attrs : new AttributesDef(attrs);

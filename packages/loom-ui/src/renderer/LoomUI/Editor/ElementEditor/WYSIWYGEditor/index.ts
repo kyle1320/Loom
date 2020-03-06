@@ -39,7 +39,7 @@ function makeAttributes(attrs: NamedNodeMap): loom.AttributesDef {
 
 function makeComponent(
   editor: WYSIWYGEditor,
-  node: loom.Node,
+  node: loom.Node | loom.UnknownComponent,
   attach?: Node
 ): WYSIWYGNode {
   if (node instanceof loom.Element) {
@@ -180,7 +180,7 @@ export class WYSIWYGComponent extends UIComponent {
     editor.addNode(this);
   }
 
-  private update = (node: loom.Node): void => {
+  private update = (node: loom.Element | loom.UnknownComponent): void => {
     this.el = this.node && this.node.getEl();
     const newNode = makeComponent(this.editor, node);
     this.editor.removeNode(this);

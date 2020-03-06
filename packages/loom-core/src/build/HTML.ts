@@ -17,7 +17,7 @@ import {
   ComponentDef,
   NodeDef} from '../definitions/HTML';
 
-export type Node = TextNode | Element | UnknownComponent;
+export type Node = TextNode | Element | Component;
 
 export class TextNode implements BuildResult<TextNodeDef> {
   public readonly content: Value<string>;
