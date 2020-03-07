@@ -4,6 +4,7 @@ import * as loom from 'loom-core';
 import LoomUI, { DataTypes } from '..';
 import { UIComponent } from '../UIComponent';
 import { makeElement, toggleClass } from '../util/dom';
+import IconButton from '../common/IconButton';
 
 import './NodeNavigator.scss';
 
@@ -57,6 +58,11 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     this.titleEl =
       makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
+
+    if (node.source.hasParent()) {
+      this.appendChild(new IconButton('fa fa-trash')
+        .on('click', () => node.source.delete()));
+    }
 
     this.autoCleanup(ui.data.watch(this.updateSelected));
     title.on('change', this.setTitle);

@@ -25,6 +25,9 @@ export abstract class NodeDef implements Definition {
     }
     return false;
   }
+  public hasParent(): boolean {
+    return !!nodeParentMap.get(this);
+  }
 
   public abstract build(sources: Sources): Node;
   public abstract serialize(): string;
