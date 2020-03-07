@@ -12,8 +12,5 @@
     "clean": "rm -rf ./dist ./*.tsbuildinfo",
     "compile": "tsc -p tsconfig.build.json",
     "watch": "tsc --watch"
-  },
-  "devDependencies": {
-    "typescript": "^3.7.5"
   }
 }
