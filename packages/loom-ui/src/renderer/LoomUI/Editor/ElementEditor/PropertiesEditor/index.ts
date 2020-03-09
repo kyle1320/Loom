@@ -15,11 +15,12 @@ import KeyValueList from '../../../common/KeyValueList';
 
 import './PropertiesEditor.scss';
 
-type TabName = 'page' | 'element' | 'style';
+type TabName = 'page' | 'component' | 'element' | 'style';
 
 function iconForTab(tab: TabName): string {
   switch (tab) {
     case 'page': return 'fa fa-file';
+    case 'component': return 'fa fa-clone';
     case 'element': return 'fa fa-code';
     case 'style': return 'fa fa-brush';
   }
@@ -28,6 +29,7 @@ function iconForTab(tab: TabName): string {
 function nameForTab(tab: TabName): string {
   switch (tab) {
     case 'page': return 'Page';
+    case 'component': return 'Component';
     case 'element': return 'Element';
     case 'style': return 'Styles';
   }
@@ -59,15 +61,13 @@ class PropertyContents extends UIComponent {
     this.empty();
 
     const data = this.ui.data.get();
-    const content = this.ui.content.get();
 
     switch (this.selectedTab) {
       case 'page':
-        if (content instanceof loom.Page) {
-          this.addField('Location', new Input(this.ui.contentDef.get()!.key));
-        } else if (content instanceof loom.Element) {
-          this.addField('Name', new Input(this.ui.contentDef.get()!.key));
-        }
+        this.addField('Location', new Input(this.ui.contentDef.get()!.key));
+        break;
+      case 'component':
+        this.addField('Name', new Input(this.ui.contentDef.get()!.key));
         break;
       case 'element':
         if (data instanceof loom.TextNode) {
@@ -89,13 +89,6 @@ class PropertyContents extends UIComponent {
             new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
             data.source.name
           ));
-        } else if (content instanceof loom.Element) {
-          this.addField('Tag', new Input(content.source.tag));
-          this.addField('Id',
-            new Input(new LookupValue(content.source.attrs, 'id')));
-          this.addField('Class',
-            new MultiSelect(new LookupValue(content.source.attrs, 'class')));
-          this.addField('Attributes',  new KeyValueList(content.source.attrs));
         }
         break;
       case 'style':
@@ -140,14 +133,11 @@ export default class PropertiesEditor extends UIComponent {
     const data = this.ui.data.get();
     const allTabs: TabName[] = [];
 
-    if (data === null) {
-      allTabs.push('page');
+    if (content && data === null) {
+      allTabs.push(content instanceof loom.Element ? 'component' : 'page');
     }
 
-    if (content instanceof loom.Element ||
-        data instanceof loom.TextNode ||
-        data instanceof loom.Element ||
-        data instanceof loom.Component) {
+    if (data) {
       allTabs.push('element');
     }
 

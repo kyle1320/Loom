@@ -11,7 +11,6 @@ export type DataTypes
   = loom.Element
   | loom.TextNode
   | loom.Component
-  | loom.Rule;
 export type ContentTypes = loom.Page | loom.Element;
 export type ContentDefTypes = loom.PageDef | loom.ElementDef;
 
