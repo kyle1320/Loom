@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./packages",
-
     "module": "esnext",
     "target": "es2017",
     "jsx": "react",
@@ -18,12 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "newLine": "lf",
-    "noEmitOnError": true,
-
-    "paths": {
-      "loom-core": ["loom-core/dist"],
-      "loom-data": ["loom-data/dist"]
-    }
+    "noEmitOnError": true
   },
   "include": [
     "packages/**/*"
