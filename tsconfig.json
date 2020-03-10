@@ -19,7 +19,6 @@
     "experimentalDecorators": true,
     "newLine": "lf",
     "noEmitOnError": true,
-    "composite": true,
 
     "paths": {
       "loom-core": ["loom-core/dist"],
