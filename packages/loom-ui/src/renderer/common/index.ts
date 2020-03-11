@@ -5,6 +5,7 @@ import Frame from './Frame';
 import IconButton from './IconButton';
 import Input from './Input';
 import KeyValueList from './KeyValueList';
+import MultiInput from './MultiInput';
 import MultiSelect from './MultiSelect';
 import NameList from './NameList';
 import Select from './Select';
@@ -19,6 +20,7 @@ export {
   IconButton,
   Input,
   KeyValueList,
+  MultiInput,
   MultiSelect,
   NameList,
   Select,

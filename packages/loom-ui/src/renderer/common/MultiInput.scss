@@ -1,0 +1,17 @@
+.multi-input {
+  display: flex;
+  flex-flow: row nowrap;
+
+  input, select {
+    &:not(:last-child) {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+
+    &:not(:first-child) {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      margin-left: -1px;
+    }
+  }
+}
