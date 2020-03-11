@@ -1,7 +1,7 @@
 import * as loom from 'loom-core';
 
 import EditFrame from './EditFrame';
-import LoomUI, { DataTypes } from '../../..';
+import LoomUI, { DataTypes } from '../../../LoomUI';
 import Floating from '../../../common/Floating';
 import Frame from '../../../common/Frame';
 import { addStyles } from '../../../util/css';

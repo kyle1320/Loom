@@ -1,6 +1,6 @@
 import DefinitionNavigator from './DefinitionNavigator';
 import DataNavigator from './DataNavigator';
-import LoomUI from '..';
+import LoomUI from '../LoomUI';
 import { makeElement } from '../util/dom';
 import { UIComponent } from '../UIComponent';
 

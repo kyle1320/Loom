@@ -1,7 +1,7 @@
 import * as loom from 'loom-core';
 
 import NodeNavigator from './NodeNavigator';
-import LoomUI from '..';
+import LoomUI from '../LoomUI';
 import { makeElement } from '../util/dom';
 import { UIComponent } from '../UIComponent';
 import IconButton from '../common/IconButton';

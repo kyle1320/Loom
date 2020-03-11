@@ -2,7 +2,7 @@ import { List, DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
 import StylesEditor from './StylesEditor';
-import LoomUI from '../../..';
+import LoomUI from '../../../LoomUI';
 import { UIComponent } from '../../../UIComponent';
 import { LookupValue } from '../../../util';
 import { makeElement, basicTags } from '../../../util/dom';

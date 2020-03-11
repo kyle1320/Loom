@@ -1,7 +1,7 @@
 import { Value } from 'loom-data';
 import * as loom from 'loom-core';
 
-import LoomUI, { DataTypes } from '..';
+import LoomUI, { DataTypes } from '../LoomUI';
 import { UIComponent } from '../UIComponent';
 import { makeElement, toggleClass } from '../util/dom';
 import IconButton from '../common/IconButton';
