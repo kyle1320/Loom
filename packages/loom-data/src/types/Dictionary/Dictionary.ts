@@ -1,9 +1,7 @@
-import { EventEmitter, PlainEmitter } from './EventEmitter';
-import { mapRecordKeys, doAll, Destroyable } from '../util';
-import { Value, WritableValue } from './Value';
-import { ComputedList } from './List';
+import { EventEmitter, PlainEmitter } from '../EventEmitter';
+import { mapRecordKeys, doAll } from '../../util';
 
-export namespace Dictionary {
+namespace Dictionary {
   export interface Listeners<T> {
     /** Additions / updates / deletions, including moves */
     change: (
@@ -69,7 +67,7 @@ export namespace Dictionary {
     KeyListeners<T>
 }
 
-export class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
+class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
   protected readonly data: Record<string, T> = {};
 
   private readonly keyListeners: {
@@ -235,160 +233,4 @@ export class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
   }
 }
 
-export class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
-  public readonly key: WritableValue<string>;
-  public readonly value: WritableValue<T>;
-
-  public destroy: () => void;
-
-  public constructor(
-    public readonly map: WritableDictionary<T>,
-    key: string,
-    defaultValue: T
-  ) {
-    super();
-
-    key = map.normalizeKey(key);
-
-    const keyVal = this.key = new class extends WritableValue<string> {
-      public set(key: string): boolean {
-        const oldKey = this.get();
-        const res = map.changeKey(oldKey, key);
-        return res !== false && super.set(res);
-      }
-
-      public update = (key: string): void => {
-        super.set(key);
-      }
-    }(key);
-    this.value = new class extends WritableValue<T> {
-      public set = (value: T): boolean => {
-        if (super.set(value)) {
-          const key = keyVal.get();
-          map.has(key) && map.set(key, value);
-          return true;
-        }
-        return false;
-      }
-    }(defaultValue);
-
-    this.destroy = keyVal.watch(key => map.watchKey(key, {
-      addRow: this.value.set,
-      move: keyVal.update,
-      update: this.value.set,
-      deleteRow: () => this.emit('delete')
-    }));
-  }
-
-  public exists(): boolean {
-    return this.map.has(this.key.get());
-  }
-
-  public insert(): void {
-    this.map.set(this.key.get(), this.value.get());
-  }
-
-  public delete(): void {
-    this.map.delete(this.key.get());
-  }
-
-  public watch(
-    onKeyChange: (key: string, oldKey: string | undefined) => void,
-    onValueChange: (value: T, oldValue: T | undefined) => void,
-    onDelete: () => void
-  ): () => void {
-    return doAll(
-      this.key.watch(onKeyChange),
-      this.value.watch(onValueChange),
-      this.onOff('delete', onDelete)
-    );
-  }
-}
-
-export class DictionaryValue<T> extends WritableValue<T | undefined> {
-  public destroy: () => void;
-
-  public constructor(
-    public readonly map: WritableDictionary<T>,
-    private readonly key: Value<string>
-  ) {
-    super(undefined);
-
-    this.destroy = key.watch(key => this.map.watchKey(key, {
-      change: val => super.set(val)
-    }));
-  }
-
-  public set = (value: T): boolean => {
-    if (super.set(value)) {
-      this.map.set(this.key.get(), value);
-      return true;
-    }
-    return false;
-  }
-}
-
-export class WritableDictionary<T> extends Dictionary<T> {
-  public set(key: string, value: T): string {
-    return super.set(key, value);
-  }
-
-  public delete(key: string): T | undefined {
-    return super.delete(key);
-  }
-
-  public changeKey(oldKey: string, newKey: string): string | false {
-    return super.changeKey(oldKey, newKey);
-  }
-}
-
-export abstract class ComputedDictionary<T>
-  extends Dictionary<T>
-  implements Destroyable {
-
-  public abstract destroy(): void;
-}
-
-export class MappedDictionary<T, U> extends ComputedDictionary<U> {
-  private unwatch: () => void;
-
-  public constructor(
-    sourceMap: Dictionary<T>,
-    transform: (val: T, key: string, oldValue?: U) => U,
-    private readonly cleanup: (val: U) => void
-  ) {
-    super();
-
-    this.unwatch = sourceMap.watch({
-      addRow: (key, value) => this.set(key, transform(value, key, undefined)),
-      deleteRow: key => this.cleanup(this.delete(key)!),
-      move: (oldKey, newKey) => this.changeKey(oldKey, newKey),
-      update: (key, value) => {
-        const oldValue = this.data[key];
-        this.cleanup(oldValue);
-        this.set(key, transform(value, key, oldValue));
-      }
-    });
-  }
-
-  public destroy(): void {
-    this.unwatch();
-    for (const key in this.data) {
-      this.cleanup(this.data[key]);
-    }
-    this.allOff();
-  }
-}
-
-export class DictionaryKeys<T> extends ComputedList<string> {
-  public destroy: () => void;
-
-  public constructor(source: Dictionary<T>) {
-    super([]);
-
-    this.destroy = source.watch({
-      'add': k => this.add(k),
-      'delete': k => this.remove(k)
-    });
-  }
-}
+export default Dictionary;
