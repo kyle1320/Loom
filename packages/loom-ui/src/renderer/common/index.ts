@@ -1,3 +1,4 @@
+import ColorPicker from './ColorPicker';
 import ComboBox from './ComboBox';
 import Floating from './Floating';
 import Frame from './Frame';
@@ -11,6 +12,7 @@ import Tabs from './Tabs';
 import TextArea from './TextArea';
 
 export {
+  ColorPicker,
   ComboBox,
   Floating,
   Frame,

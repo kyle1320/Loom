@@ -3,7 +3,7 @@ import { Sheet, StyleRule } from 'loom-core';
 
 import PropertyField from './PropertyField';
 import { UIComponent } from '@/UIComponent';
-import { Select, KeyValueList, Input } from '@/common';
+import { Select, KeyValueList, Input, ColorPicker } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 
@@ -33,6 +33,8 @@ class RuleEditor extends UIComponent {
 
   private getEditor(key: string, value: WritableValue<string>): UIComponent {
     switch (key) {
+      case 'color':
+        return new PropertyField('Font Color', new ColorPicker(value), key);
       default:
         return new PropertyField(key, new Input(value));
     }

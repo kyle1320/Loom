@@ -1,0 +1,47 @@
+@import "~@/variables";
+@import '~@simonwep/pickr/dist/themes/nano.min.css';
+
+.color-picker {
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+
+  input {
+    margin-left: -1px;
+    border-radius: inherit !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    flex-grow: 1;
+
+    &:focus {
+      z-index: 1;
+    }
+  }
+
+  .pcr-button, .pcr-button:before, .pcr-button:after {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none !important;
+  }
+
+  .pickr {
+    border: 1px solid $primary-5;
+    border-radius: inherit !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    overflow: hidden;
+    width: 30px;
+    height: 100%;
+
+    &:focus-within {
+      border-color: $accent;
+      z-index: 1;
+    }
+  }
+
+  &:focus-within {
+    border-color: $accent;
+  }
+}
