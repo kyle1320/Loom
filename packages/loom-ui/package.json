@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "dev": "electron-webpack dev",
-    "dist": "electron-webpack && electron-builder"
+    "dist": "electron-webpack && electron-builder",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

@@ -11,18 +11,25 @@
     "@typescript-eslint/parser": "^2.17.0",
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
+    "npm-run-all": "^4.1.5",
     "ts-jest": "^25.0.0",
     "typescript": "^3.8.3"
   },
   "scripts": {
     "lint": "eslint packages --ext js,ts,jsx,tsx",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm-run-all -p core-typecheck data-typecheck ui-typecheck",
     "verify": "yarn run typecheck && yarn run lint",
     "test": "jest",
-    "build-data": "cd packages/loom-data && yarn run build",
-    "build-core": "cd packages/loom-core && yarn run build",
-    "ui": "cd packages/loom-ui && yarn run dev",
-    "ui-dist": "cd packages/loom-ui && yarn run dist"
+
+    "core-typecheck": "yarn workspace loom-core run typecheck",
+    "build-core": "yarn workspace loom-core run build",
+
+    "data-typecheck": "yarn workspace loom-data run typecheck",
+    "build-data": "yarn workspace loom-data run build",
+
+    "ui": "yarn workspace loom-ui run dev",
+    "ui-dist": "yarn workspace loom-ui run dist",
+    "ui-typecheck": "yarn workspace loom-ui run typecheck"
   },
   "workspaces": [
     "packages/*"

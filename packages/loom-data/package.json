@@ -10,7 +10,8 @@
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist ./*.tsbuildinfo",
-    "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc --watch"
+    "compile": "tsc -b tsconfig.build.json",
+    "watch": "tsc --watch",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
   }
 }

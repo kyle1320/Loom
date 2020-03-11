@@ -11,7 +11,8 @@
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist ./*.tsbuildinfo",
     "compile": "tsc -b tsconfig.build.json",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
   },
   "devDependencies": {
     "@types/css": "^0.0.31",

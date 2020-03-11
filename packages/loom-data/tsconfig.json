@@ -1,11 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
     "module": "CommonJS",
-    "lib": ["ES7"],
     "composite": true
   },
-  "include": ["src/**/*"]
 }
