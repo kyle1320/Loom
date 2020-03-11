@@ -1,6 +1,7 @@
 import { List, DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
+import PropertyField from './PropertyField';
 import StylesEditor from './StylesEditor';
 import LoomUI from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
@@ -99,11 +100,7 @@ class PropertyContents extends UIComponent {
   }
 
   private addField(title: string, input: UIComponent): void {
-    this.appendChild(new UIComponent(
-      makeElement('label', { className: 'property-field' },
-        makeElement('div', { className: 'property-field__title' }, title)),
-      input
-    ));
+    this.appendChild(new PropertyField(title, input));
   }
 }
 
