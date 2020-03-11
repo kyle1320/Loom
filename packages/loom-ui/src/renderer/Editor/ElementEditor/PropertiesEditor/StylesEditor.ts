@@ -1,8 +1,10 @@
-import { Value } from 'loom-data';
+import { Value, DictionaryKeys, WritableValue } from 'loom-data';
 import { Sheet, StyleRule } from 'loom-core';
 
+import PropertyField from './PropertyField';
 import { UIComponent } from '@/UIComponent';
-import { Select, KeyValueList } from '@/common';
+import { Select, KeyValueList, Input } from '@/common';
+import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 
 import './StylesEditor.scss';
@@ -11,14 +13,28 @@ class RuleEditor extends UIComponent {
   public constructor(rule: Value<StyleRule | null>) {
     super(makeElement('div', { className: 'rule-editor' }));
 
-    this.autoCleanup(rule.watch(this.refresh));
+    this.autoCleanup(rule.watch(rule => {
+      this.empty();
+
+      if (rule) {
+        const rows = new DictionaryKeys<string>(rule.style.source, true);
+        rows.watch(
+          (i, k) => this.insertChild(
+            this.getEditor(k, new LookupValue(rule.style.source, k)), i
+          ),
+          i => this.removeChild(i)
+        );
+        return () => rows.destroy();
+      }
+
+      return null;
+    }));
   }
 
-  private refresh = (rule: StyleRule | null): void => {
-    this.empty();
-
-    if (rule) {
-      this.appendChild(new KeyValueList(rule.style.source));
+  private getEditor(key: string, value: WritableValue<string>): UIComponent {
+    switch (key) {
+      default:
+        return new PropertyField(key, new Input(value));
     }
   }
 }
@@ -38,5 +54,15 @@ export default class StylesEditor extends UIComponent {
 
     this.appendChild(selector);
     this.appendChild(new RuleEditor(selector.selected));
+    this.appendChild(new UIComponent(makeElement('hr')));
+
+    selector.selected.watch(rule => {
+      if (rule) {
+        const list = new KeyValueList(rule.style.source);
+        this.appendChild(list);
+        return () => list.destroy();
+      }
+      return null;
+    });
   }
 }
