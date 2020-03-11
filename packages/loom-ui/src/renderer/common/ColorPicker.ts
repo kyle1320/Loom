@@ -42,15 +42,9 @@ export default class ColorPicker extends UIComponent<{}, HTMLElement> {
       );
       ignoreEvent = false;
     });
-    const input: HTMLInputElement = makeElement('input', {
-      value: value.get(),
-      oninput: () => value.set(input.value)
-    });
-    this.el.appendChild(input);
 
     this.autoCleanup(value.watch(v => {
       if (!ignoreEvent) pickr.setColor(v);
-      input.value = v;
     }));
   }
 }
