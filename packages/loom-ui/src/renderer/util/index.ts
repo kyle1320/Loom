@@ -5,16 +5,18 @@ export class LookupValue extends WritableValue<string> {
 
   public constructor(
     private readonly sourceMap: WritableDictionary<string>,
-    private readonly key: string
+    private readonly key: string,
+    private readonly defaultValue?: string
   ) {
-    super(sourceMap.get(key) || '');
+    super(sourceMap.get(key) || defaultValue || '');
 
     this.unwatch = sourceMap.watchKey(key, { change: this.setFromSource });
   }
 
   public set = (value: string | undefined): boolean => {
+    value = value || this.defaultValue;
     if (super.set(value || '')) {
-      if (value) this.sourceMap.set(this.key, value);
+      if (typeof value !== 'undefined') this.sourceMap.set(this.key, value);
       else this.sourceMap.delete(this.key);
       return true;
     }

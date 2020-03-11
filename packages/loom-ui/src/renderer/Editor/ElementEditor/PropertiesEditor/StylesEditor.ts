@@ -20,7 +20,7 @@ class RuleEditor extends UIComponent {
         const rows = new DictionaryKeys<string>(rule.style.source, true);
         rows.watch(
           (i, k) => this.insertChild(
-            this.getEditor(k, new LookupValue(rule.style.source, k)), i
+            this.getEditor(k, new LookupValue(rule.style.source, k, '')), i
           ),
           i => this.removeChild(i)
         );
