@@ -1,8 +1,8 @@
 import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
 import IconButton from './IconButton';
-import { UIComponent } from '../UIComponent';
-import { makeElement, toggleClass } from '../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement, toggleClass } from '@/util/dom';
 
 import './NameList.scss';
 

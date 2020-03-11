@@ -1,10 +1,9 @@
 import { Value } from 'loom-data';
 import { Sheet, StyleRule } from 'loom-core';
 
-import { UIComponent } from '../../../UIComponent';
-import { makeElement } from '../../../util/dom';
-import Select from '../../../common/Select';
-import KeyValueList from '../../../common/KeyValueList';
+import { UIComponent } from '@/UIComponent';
+import { Select, KeyValueList } from '@/common';
+import { makeElement } from '@/util/dom';
 
 import './StylesEditor.scss';
 

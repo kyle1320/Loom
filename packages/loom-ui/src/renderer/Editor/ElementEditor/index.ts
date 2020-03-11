@@ -1,8 +1,8 @@
 import WYSIWYGEditor from './WYSIWYGEditor';
 import PropertiesEditor from './PropertiesEditor';
-import { UIComponent } from '../../UIComponent';
-import { makeElement } from '../../util/dom';
-import LoomUI from '../../LoomUI';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 import './ElementEditor.scss';
 

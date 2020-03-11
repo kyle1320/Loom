@@ -1,7 +1,7 @@
 import { WritableValue } from 'loom-data';
 
-import { UIComponent } from '../UIComponent';
-import { makeElement } from '../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 export default class Input extends UIComponent<{}, HTMLInputElement> {
   public constructor(

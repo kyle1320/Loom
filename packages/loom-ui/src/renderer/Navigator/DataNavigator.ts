@@ -1,10 +1,10 @@
 import * as loom from 'loom-core';
 
 import NodeNavigator from './NodeNavigator';
-import LoomUI from '../LoomUI';
-import { makeElement } from '../util/dom';
-import { UIComponent } from '../UIComponent';
-import IconButton from '../common/IconButton';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import { IconButton } from '@/common';
+import { makeElement } from '@/util/dom';
 
 import './DataNavigator.scss';
 

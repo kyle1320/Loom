@@ -1,5 +1,5 @@
-import { UIComponent } from '../UIComponent';
-import { makeElement } from '../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 import './Tabs.scss';
 

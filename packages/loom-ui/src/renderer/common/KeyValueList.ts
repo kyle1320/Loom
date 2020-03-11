@@ -1,7 +1,7 @@
 import { WritableDictionary, DictionaryRow } from 'loom-data';
 
-import { UIComponent } from '../UIComponent';
-import { makeElement, toggleClass } from '../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement, toggleClass } from '@/util/dom';
 
 import './KeyValueList.scss';
 

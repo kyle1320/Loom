@@ -1,8 +1,7 @@
-import LoomUI from '../LoomUI';
-import { UIComponent } from '../UIComponent';
-import { makeElement } from '../util/dom';
-import Tabs from '../common/Tabs';
-import NameList from '../common/NameList';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import { NameList, Tabs } from '@/common';
+import { makeElement } from '@/util/dom';
 
 import './DefinitionNavigator.scss';
 

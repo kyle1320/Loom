@@ -2,16 +2,17 @@ import { List, DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
 import StylesEditor from './StylesEditor';
-import LoomUI from '../../../LoomUI';
-import { UIComponent } from '../../../UIComponent';
-import { LookupValue } from '../../../util';
-import { makeElement, basicTags } from '../../../util/dom';
-import Tabs from '../../../common/Tabs';
-import Input from '../../../common/Input';
-import ComboBox from '../../../common/ComboBox';
-import TextArea from '../../../common/TextArea';
-import MultiSelect from '../../../common/MultiSelect';
-import KeyValueList from '../../../common/KeyValueList';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import {
+  Input,
+  TextArea,
+  ComboBox,
+  MultiSelect,
+  KeyValueList,
+  Tabs } from '@/common';
+import { LookupValue } from '@/util';
+import { makeElement, basicTags } from '@/util/dom';
 
 import './PropertiesEditor.scss';
 

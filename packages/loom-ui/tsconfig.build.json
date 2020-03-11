@@ -3,7 +3,11 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "lib": ["ES6", "DOM"]
+    "lib": ["ES6", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/renderer/*"]
+    }
   },
   "include": ["src/**/*"]
 }

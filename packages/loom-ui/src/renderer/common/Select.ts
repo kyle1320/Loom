@@ -1,7 +1,7 @@
 import { List, WritableValue } from 'loom-data';
 
-import { UIComponent } from '../UIComponent';
-import { makeElement } from '../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
   public constructor(

@@ -1,6 +1,6 @@
-import LoomUI from '../../LoomUI';
-import { UIComponent } from '../../UIComponent';
-import { makeElement } from '../../util/dom';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 import './StyleEditor.scss';
 

@@ -1,9 +1,9 @@
 import * as loom from 'loom-core';
 
 import ElementEditor from './ElementEditor';
-import LoomUI from '../LoomUI';
-import { makeElement } from '../util/dom';
-import { UIComponent } from '../UIComponent';
+import LoomUI from '@/LoomUI';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 import './Editor.scss';
 

@@ -1,6 +1,6 @@
 import WYSIWYGEditor, { WYSIWYGNode } from '.';
-import { UIComponent } from '../../../UIComponent';
-import { makeElement } from '../../../util/dom';
+import { UIComponent } from '@/UIComponent';
+import { makeElement } from '@/util/dom';
 
 import './EditFrame.scss';
 
