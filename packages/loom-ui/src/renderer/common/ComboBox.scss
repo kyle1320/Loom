@@ -5,6 +5,13 @@
   width: 100%;
   line-height: 0;
   z-index: 0;
+  background-color: $primary-0;
+  border: 1px solid $primary-5;
+
+  &:focus-within {
+    border-color: $accent;
+    z-index: 1;
+  }
 
   input {
     position: absolute;
@@ -13,7 +20,8 @@
     width: calc(100% - 15px);
     height: 100%;
     z-index: 1;
-    background-color: $primary-0;
+    background: none;
+    border: none;
   }
 
   select {
