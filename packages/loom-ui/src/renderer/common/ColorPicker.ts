@@ -22,6 +22,8 @@ export default class ColorPicker extends UIComponent<{}, HTMLElement> {
       el: pickerEl,
       theme: 'nano',
       comparison: false,
+      default: value.get(),
+      defaultRepresentation: 'HEXA',
       components: {
         preview: true,
         opacity: true,
