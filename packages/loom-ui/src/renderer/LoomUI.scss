@@ -31,6 +31,7 @@ input, textarea, select {
   &:focus {
     outline: none;
     border-color: $accent;
+    z-index: 1;
   }
 
   &:disabled {
