@@ -16,11 +16,11 @@
   input {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 1px;
     width: calc(100% - 15px);
     height: 100%;
     z-index: 1;
-    background: none;
+    background-color: $primary-0;
     border: none;
   }
 
