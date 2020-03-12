@@ -37,7 +37,10 @@ export class EventEmitter<T> implements Destroyable {
     if (registered) {
       // "save" the current listeners so that modifications to the listeners
       // inside of callbacks does not affect this emit
-      [...registered.values()].forEach(cb => cb.apply(this, args));
+      const callbacks = [...registered.values()];
+      for (let i = 0; i < callbacks.length; i++) {
+        callbacks[i].apply(this, args);
+      }
     }
 
     return this;
