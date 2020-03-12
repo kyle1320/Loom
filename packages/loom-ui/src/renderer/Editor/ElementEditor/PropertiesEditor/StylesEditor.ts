@@ -3,7 +3,12 @@ import { Sheet, StyleRule } from 'loom-core';
 
 import PropertyField from './PropertyField';
 import { UIComponent } from '@/UIComponent';
-import { Select, KeyValueList, Input, ColorPicker, MultiInput } from '@/common';
+import {
+  Select,
+  KeyValueList,
+  Input,
+  ColorPicker,
+  MultiInput } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 
@@ -58,6 +63,7 @@ export default class StylesEditor extends UIComponent {
     }
 
     this.appendChild(selector);
+    this.appendChild(new UIComponent(makeElement('hr')));
     this.appendChild(new RuleEditor(selector.selected));
     this.appendChild(new UIComponent(makeElement('hr')));
 

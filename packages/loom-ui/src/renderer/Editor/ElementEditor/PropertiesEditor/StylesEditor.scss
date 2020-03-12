@@ -1,6 +1,5 @@
 .styles-editor {
-  select {
+  & > select {
     width: 100%;
-    margin-bottom: 10px;
   }
 }
