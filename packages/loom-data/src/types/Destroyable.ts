@@ -1,27 +1,31 @@
-export namespace Destroyable {
+namespace Destroyable {
+  export type DestroyValue = Destroyable | (() => void) | null | undefined;
+
   export interface DestroyFunction {
     (): void;
-    do: (...callbacks: ((() => void) | null | undefined)[]) => void;
+    do: (...data: DestroyValue[]) => void;
   }
 
-  export const make = (
-    ...callbacks: ((() => void) | null | undefined)[]
-  ): DestroyFunction => {
+  export const make = (...data: DestroyValue[]): DestroyFunction => {
     let unlisteners: Set<() => void>;
 
     function destroy(): void {
       unlisteners.forEach(cb => cb());
     }
 
-    destroy.do = (...callbacks: ((() => void) | null | undefined)[]): void => {
+    destroy.do = (...data:  DestroyValue[]): void => {
       if (!unlisteners) unlisteners = new Set();
 
-      callbacks.forEach(cb => cb && unlisteners.add(function remove() {
-        unlisteners.delete(remove) && cb();
-      }));
+      data.forEach(d => {
+        if (!d) return;
+        const cb = typeof d === 'object' ? d.destroy : d;
+        unlisteners.add(function remove() {
+          unlisteners.delete(remove) && cb();
+        });
+      });
     };
 
-    destroy.do(...callbacks);
+    destroy.do(...data);
 
     return destroy;
   };
