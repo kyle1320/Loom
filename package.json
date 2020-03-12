@@ -17,19 +17,20 @@
   },
   "scripts": {
     "lint": "eslint packages --ext js,ts,jsx,tsx",
-    "typecheck": "npm-run-all -p core-typecheck data-typecheck ui-typecheck",
-    "verify": "yarn run typecheck && yarn run lint",
+    "verify": "npm-run-all -p typecheck lint",
     "test": "jest",
 
-    "core-typecheck": "yarn workspace loom-core run typecheck",
-    "build-core": "yarn workspace loom-core run build",
+    "typecheck": "npm-run-all -p core-typecheck data-typecheck ui-typecheck",
+    "typecheck-core": "yarn workspace loom-core run typecheck",
+    "typecheck-data": "yarn workspace loom-data run typecheck",
+    "typecheck-ui": "yarn workspace loom-ui run typecheck",
 
-    "data-typecheck": "yarn workspace loom-data run typecheck",
+    "build": "yarn run build-core && yarn run build-data",
+    "build-core": "yarn workspace loom-core run build",
     "build-data": "yarn workspace loom-data run build",
 
     "ui": "yarn workspace loom-ui run dev",
-    "ui-dist": "yarn workspace loom-ui run dist",
-    "ui-typecheck": "yarn workspace loom-ui run typecheck"
+    "ui-dist": "yarn workspace loom-ui run dist"
   },
   "workspaces": [
     "packages/*"
