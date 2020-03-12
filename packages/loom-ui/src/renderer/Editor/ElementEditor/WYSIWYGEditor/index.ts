@@ -69,7 +69,7 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
     super();
     this.el = this.makeEl(el);
 
-    this.autoCleanup(
+    this.destroy.do(
       data.tag.onOff('change', () => {
         editor.removeNode(this);
         this.changeEl(this.makeEl());
@@ -83,7 +83,8 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
         (index, value) => !this.ignoreEvents &&
           this.insertChild(makeComponent(editor, value), index),
         index => !this.ignoreEvents && this.removeChild(index)
-      )
+      ),
+      () => editor.removeNode(this)
     );
 
     editor.addNode(this);
@@ -123,11 +124,6 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
     comp.data && this.data.source.children.remove(comp.data.source);
   }
 
-  public destroy(): void {
-    this.editor.removeNode(this);
-    super.destroy();
-  }
-
   private makeEl(el?: HTMLElement): HTMLElement {
     el = el || document.createElement(this.data.tag.get() || 'div');
 
@@ -146,22 +142,20 @@ export class WYSIWYGElement extends UIComponent<{}, HTMLElement> {
 
 export class WYSIWYGTextNode extends UIComponent {
   public constructor(
-    private readonly editor: WYSIWYGEditor,
+    editor: WYSIWYGEditor,
     public readonly data: loom.TextNode,
     el?: Text
   ) {
     super(el || document.createTextNode(data.content.get()));
 
-    this.autoCleanup(data.content.onOff('change', content => {
-      if (content !== this.el.textContent) this.el.textContent = content;
-    }));
+    this.destroy.do(
+      data.content.onOff('change', content => {
+        if (content !== this.el.textContent) this.el.textContent = content;
+      }),
+      () => editor.removeNode(this)
+    );
 
     editor.addNode(this);
-  }
-
-  public destroy(): void {
-    this.editor.removeNode(this);
-    super.destroy();
   }
 }
 
@@ -174,7 +168,13 @@ export class WYSIWYGComponent extends UIComponent {
   ) {
     super(null!);
 
-    this.autoCleanup(data.element.watch(this.update));
+    this.destroy.do(
+      data.element.watch(this.update),
+      () => {
+        this.node.destroy();
+        editor.removeNode(this);
+      }
+    );
 
     editor.addNode(this);
   }
@@ -188,11 +188,6 @@ export class WYSIWYGComponent extends UIComponent {
     if (this.node) this.node.destroy();
     this.node = newNode;
     this.editor.addNode(this);
-  }
-
-  public destroy(): void {
-    this.node.destroy();
-    super.destroy();
   }
 }
 
@@ -259,7 +254,7 @@ export default class WYSIWYGEditor extends UIComponent<{
         new EditFrame(this)
       )));
 
-    this.autoCleanup(ui.data.watch(data => {
+    this.destroy.do(ui.data.watch(data => {
       const comp = data && this.data.get(data) || null;
       if (comp) {
         const el = comp.getEl();

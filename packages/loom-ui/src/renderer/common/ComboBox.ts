@@ -19,6 +19,6 @@ export default class ComboBox extends UIComponent {
     const select = new Select(options, undefined, selectValue);
     super(makeElement('div', { className: 'combo-box' }), select, input);
 
-    this.autoCleanup(() => selectValue.destroy());
+    this.destroy.do(() => selectValue.destroy());
   }
 }

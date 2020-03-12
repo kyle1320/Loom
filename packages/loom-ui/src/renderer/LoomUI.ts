@@ -66,6 +66,6 @@ export default class LoomUI extends UIComponent {
     this.appendChild(new Navigator(this));
     this.appendChild(new Editor(this));
 
-    this.autoCleanup(() => content.set(null));
+    this.destroy.do(() => content.set(null));
   }
 }

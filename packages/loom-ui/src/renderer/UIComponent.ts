@@ -3,8 +3,6 @@ import { EventEmitter } from 'loom-data';
 export class UIComponent<
   E = {}, H extends Node = Node
 > extends EventEmitter<E> {
-  private unlisteners: Set<() => void> = new Set();
-
   private parent: UIComponent | null = null;
   private __children: UIComponent[] = [];
 
@@ -18,15 +16,12 @@ export class UIComponent<
     super();
 
     children.forEach(comp => this.appendChild(comp));
-  }
-
-  public destroy(): void {
-    this.empty();
-    this.allOff();
-    this.unlisteners.forEach(cb => cb());
-    if (this.parent) {
-      this.parent.removeChild(this, false);
-    }
+    this.destroy.do(() => {
+      this.empty();
+      if (this.parent) {
+        this.parent.removeChild(this, false);
+      }
+    });
   }
 
   public addTo(node: Node): void {
@@ -39,16 +34,6 @@ export class UIComponent<
 
   protected numChildren(): number {
     return this.__children.length;
-  }
-
-  protected autoCleanup(...callbacks: (() => void)[]): () => void {
-    const remove = (): void => {
-      if (this.unlisteners.delete(remove)) {
-        callbacks.forEach(cb => cb());
-      }
-    }
-    this.unlisteners.add(remove);
-    return remove;
   }
 
   protected empty(destroy = true): void {

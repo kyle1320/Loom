@@ -18,7 +18,7 @@ class RuleEditor extends UIComponent {
   public constructor(rule: Value<StyleRule | null>) {
     super(makeElement('div', { className: 'rule-editor' }));
 
-    this.autoCleanup(rule.watch(rule => {
+    this.destroy.do(rule.watch(rule => {
       this.empty();
 
       if (rule) {

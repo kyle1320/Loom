@@ -13,7 +13,7 @@ class NameListContent<T> extends UIComponent {
   ) {
     super(makeElement('div', { className: 'namelist__content' }));
 
-    this.autoCleanup(data.watch({
+    this.destroy.do(data.watch({
       addRow: key => this.appendChild(
         new NameListRow(new DictionaryRow(data, key, null!), selected)
       )
@@ -42,7 +42,7 @@ class NameListRow<T> extends UIComponent {
       new IconButton('fa fa-trash').on('click', () => row.delete())
     );
 
-    this.autoCleanup(row.watch(
+    this.destroy.do(row.watch(
       key => title.textContent = key,
       () => { /**/ },
       () => this.destroy()

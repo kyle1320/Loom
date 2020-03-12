@@ -1,10 +1,10 @@
 import {
-  ComputedValue,
   MappedList,
   MappedDictionary,
   MappedValue,
   DictionaryValue,
-  Value } from 'loom-data';
+  Value,
+  Destroyable } from 'loom-data';
 
 import { BuildResult } from '.';
 import { Sources } from '../definitions';
@@ -21,6 +21,7 @@ export type Node = TextNode | Element | Component;
 
 export class TextNode implements BuildResult<TextNodeDef> {
   public readonly content: Value<string>;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: TextNodeDef,
@@ -31,10 +32,6 @@ export class TextNode implements BuildResult<TextNodeDef> {
 
   public serialize(): string {
     return this.content.get();
-  }
-
-  public destroy(): void {
-    //
   }
 }
 
@@ -102,14 +99,17 @@ export class Element implements BuildResult<ElementDef> {
   public readonly tag: Value<string>;
   public readonly attrs: Attributes;
   public readonly children: Children;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: ElementDef,
     public readonly sources: Sources
   ) {
     this.tag = source.tag;
-    this.attrs = source.attrs.build(sources);
-    this.children = source.children.build(sources);
+    this.destroy.do(
+      this.attrs = source.attrs.build(sources),
+      this.children = source.children.build(sources)
+    );
   }
 
   public serialize(): string {
@@ -117,11 +117,6 @@ export class Element implements BuildResult<ElementDef> {
     const attrs = this.attrs.serialize();
     const content = this.children.serialize();
     return `<${tag}${attrs}>${content}</${tag}>`;
-  }
-
-  public destroy(): void {
-    this.attrs.destroy();
-    this.children.destroy();
   }
 }
 
@@ -134,6 +129,8 @@ export class BodyElement extends Element {
 }
 
 export class UnknownComponent implements BuildResult<ComponentDef> {
+  public readonly destroy = Destroyable.make();
+
   public constructor(
     public readonly source: ComponentDef,
     public readonly sources: Sources
@@ -142,50 +139,47 @@ export class UnknownComponent implements BuildResult<ComponentDef> {
   public serialize(): string {
     return '';
   }
-
-  public destroy(): void {
-    //
-  }
 }
 
 export class Component implements BuildResult<ComponentDef> {
   private readonly component: DictionaryValue<ElementDef>;
-  public readonly element: ComputedValue<Element | UnknownComponent>;
+  public readonly element: Value<Element | UnknownComponent>;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: ComponentDef,
     public readonly sources: Sources
   ) {
-    this.component = new DictionaryValue(sources.components, source.name);
-    this.element = new MappedValue(
-      this.component,
-      component => component
-        ? component.build(this.sources)
-        : new UnknownComponent(this.source, this.sources),
-      el => el.destroy()
+    this.destroy.do(
+      this.component = new DictionaryValue(sources.components, source.name),
+      this.element = new MappedValue(
+        this.component,
+        component => component
+          ? component.build(this.sources)
+          : new UnknownComponent(this.source, this.sources),
+        el => el.destroy()
+      )
     );
   }
 
   public serialize(): string {
     return this.element.get().serialize();
   }
-
-  public destroy(): void {
-    this.component.destroy();
-    this.element.destroy();
-  }
 }
 
 export class Page implements BuildResult<PageDef> {
   public readonly head: HeadElement;
   public readonly body: BodyElement;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: PageDef,
     public readonly sources: Sources
   ) {
-    this.head = source.head.build(this.sources);
-    this.body = source.body.build(this.sources);
+    this.destroy.do(
+      this.head = source.head.build(this.sources),
+      this.body = source.body.build(this.sources)
+    );
   }
 
   public serialize(): string {
@@ -193,10 +187,5 @@ export class Page implements BuildResult<PageDef> {
       this.head.serialize() +
       this.body.serialize() +
       '</html>';
-  }
-
-  public destroy(): void {
-    this.head.destroy();
-    this.body.destroy();
   }
 }

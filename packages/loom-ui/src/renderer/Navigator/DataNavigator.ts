@@ -20,7 +20,7 @@ class DataNavigatorHeader extends UIComponent<{ back: void }> {
     ));
 
     let cleanup: (() => void) | null = null;
-    this.autoCleanup(ui.contentDef.watch(row => {
+    this.destroy.do(ui.contentDef.watch(row => {
       cleanup && cleanup();
       cleanup = row && row.key.watch(this.setTitle.bind(this, row.value.get()));
     }), () => cleanup && cleanup());
@@ -42,7 +42,7 @@ class DataNavigatorContent extends UIComponent {
   public constructor(ui: LoomUI) {
     super(makeElement('div', { className: 'data-nav__content' }));
 
-    this.autoCleanup(ui.content.watch(content => {
+    this.destroy.do(ui.content.watch(content => {
       this.empty();
 
       if (content instanceof loom.Element) {

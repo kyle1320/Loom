@@ -43,7 +43,7 @@ export default class ColorPicker extends UIComponent<{}, HTMLElement> {
       ignoreEvent = false;
     });
 
-    this.autoCleanup(value.watch(v => {
+    this.destroy.do(value.watch(v => {
       if (!ignoreEvent) pickr.setColor(v);
     }));
   }

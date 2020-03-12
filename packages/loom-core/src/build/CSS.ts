@@ -1,7 +1,8 @@
 import {
   MappedList,
   Value,
-  MappedDictionary } from 'loom-data';
+  MappedDictionary,
+  Destroyable } from 'loom-data';
 
 import { BuildResult } from '.';
 import {
@@ -9,25 +10,24 @@ import {
   StyleDeclarationDef,
   RuleListDef,
   SheetDef,
-  RuleDef} from '../definitions/CSS';
+  RuleDef } from '../definitions/CSS';
 import { Sources } from '../Definitions';
 
 export class Sheet implements BuildResult<SheetDef> {
   public readonly rules: RuleList;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: SheetDef,
     public readonly sources: Sources
   ) {
-    this.rules = source.rules.build(this.sources);
+    this.destroy.do(
+      this.rules = source.rules.build(this.sources)
+    );
   }
 
   public serialize(): string {
     return this.rules.serialize();
-  }
-
-  public destroy(): void {
-    this.rules.destroy();
   }
 }
 
@@ -44,14 +44,12 @@ export class RuleList
       def => def.build(sources),
       b => b.destroy()
     );
+
+    this.destroy.do(() => this.data.forEach(d => d.destroy()));
   }
 
   public serialize(): string {
     return this.data.map(obj => obj.serialize()).join('\n');
-  }
-
-  public destroy(): void {
-    this.data.forEach(d => d.destroy());
   }
 }
 
@@ -60,21 +58,20 @@ export type Rule = StyleRule;
 export class StyleRule implements BuildResult<StyleRuleDef> {
   public readonly selector: Value<string>;
   public readonly style: StyleDeclaration;
+  public readonly destroy = Destroyable.make();
 
   public constructor(
     public readonly source: StyleRuleDef,
     public readonly sources: Sources
   ) {
     this.selector = source.selector;
-    this.style = source.style.build(sources);
+    this.destroy.do(
+      this.style = source.style.build(sources)
+    );
   }
 
   public serialize(): string {
     return this.selector.get() + '{' + this.style.serialize() + '}';
-  }
-
-  public destroy(): void {
-    //
   }
 }
 

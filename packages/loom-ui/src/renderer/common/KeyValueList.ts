@@ -14,7 +14,7 @@ class KeyValueListContent extends UIComponent {
     super(makeElement('div', { className: 'keyvaluelist__content' }));
 
     this.addNewRow();
-    this.autoCleanup(data.watch({ addRow: this.addRow }));
+    this.destroy.do(data.watch({ addRow: this.addRow }));
   }
 
   private addNewRow = (): void => {
@@ -75,7 +75,7 @@ class KeyValueListRow extends UIComponent<{}, HTMLElement> {
       valueInput.disabled = disableValue;
     };
 
-    this.autoCleanup(row.watch(
+    this.destroy.do(row.watch(
       key => keyInput.value = key,
       value => valueInput.value = value || '',
       () => this.destroy()

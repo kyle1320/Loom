@@ -41,7 +41,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     ui: LoomUI,
     protected readonly node: N,
     type: string,
-    private readonly title: Value<string>,
+    title: Value<string>,
     depth = 0
   ) {
     super(makeElement('div', {
@@ -64,8 +64,10 @@ abstract class SingleNodeNavigator<N extends Node = Node>
         .on('click', () => node.source.delete()));
     }
 
-    this.autoCleanup(ui.data.watch(this.updateSelected));
-    title.on('change', this.setTitle);
+    this.destroy.do(
+      ui.data.watch(this.updateSelected),
+      title.onOff('change', this.setTitle)
+    );
   }
 
   private updateSelected = (data: DataTypes | null): void => {
@@ -80,11 +82,6 @@ abstract class SingleNodeNavigator<N extends Node = Node>
 
   protected setIcon(icon: string | null = null): void {
     this.iconEl.className = icon || this.getIcon();
-  }
-
-  public destroy(): void {
-    this.title.off('change', this.setTitle);
-    super.destroy();
   }
 }
 
@@ -150,7 +147,7 @@ class ElementChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    this.autoCleanup(node.children.watch(
+    this.destroy.do(node.children.watch(
       (index, value) =>
         this.insertChild(new NodeNavigator(ui, value, depth + 1), index),
       index => this.removeChild(index)
@@ -186,7 +183,7 @@ class ComponentChildrenNavigator extends UIComponent {
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
 
-    this.autoCleanup(node.element.watch(el => {
+    this.destroy.do(node.element.watch(el => {
       this.empty();
       if (!(el instanceof loom.UnknownComponent)) {
         this.insertChild(new NodeNavigator(ui, el, depth + 1));

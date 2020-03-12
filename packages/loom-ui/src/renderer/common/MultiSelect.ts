@@ -19,7 +19,7 @@ class MultiSelectValues extends UIComponent {
   public constructor(private readonly values: WritableValue<string>) {
     super(makeElement('div', { className: 'multi-select__values' }));
 
-    this.autoCleanup(values.watch(this.update));
+    this.destroy.do(values.watch(this.update));
   }
 
   public deleteLast(): void {

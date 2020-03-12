@@ -44,7 +44,7 @@ class PropertyContents extends UIComponent {
   ) {
     super(makeElement('div', { className: 'properties-editor__content' }));
 
-    this.autoCleanup(
+    this.destroy.do(
       ui.data.watch(this.update),
       ui.content.watch(this.update)
     );
@@ -120,7 +120,7 @@ export default class PropertiesEditor extends UIComponent {
     this.appendChild(
       this.contents = new PropertyContents(ui, this.selectedTab));
 
-    this.autoCleanup(
+    this.destroy.do(
       ui.data.watch(this.build),
       ui.content.onOff('change', this.build)
     );

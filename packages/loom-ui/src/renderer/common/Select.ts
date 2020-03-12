@@ -10,7 +10,7 @@ class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
   ) {
     super(makeElement('option'));
 
-    watch && this.autoCleanup(watch(
+    watch && this.destroy.do(watch(
       source,
       name => this.el.textContent = name
     ));
@@ -36,7 +36,7 @@ export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
     };
     this.el.addEventListener('change', update);
 
-    this.autoCleanup(source.watch(
+    this.destroy.do(source.watch(
       (index, value) => this.insertChild(new SelectOption(value, watch), index),
       index => this.removeChild(index)
     ), selected.watch(value => {

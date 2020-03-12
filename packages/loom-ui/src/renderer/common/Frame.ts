@@ -16,13 +16,7 @@ export default class Frame extends UIComponent<{}, HTMLIFrameElement> {
         this.cleanup = onload(this.el.contentDocument!);
       }
     }));
-  }
 
-  public destroy(): void {
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
-    }
-    super.destroy();
+    this.destroy.do(this.cleanup);
   }
 }

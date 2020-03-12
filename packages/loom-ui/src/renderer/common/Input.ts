@@ -14,6 +14,6 @@ export default class Input extends UIComponent<{}, HTMLInputElement> {
       oninput: () => value.set(this.el.value)
     }));
 
-    this.autoCleanup(value.watch(x => void (this.el.value = x)));
+    this.destroy.do(value.watch(x => void (this.el.value = x)));
   }
 }

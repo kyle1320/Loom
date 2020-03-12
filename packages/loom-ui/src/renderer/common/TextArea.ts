@@ -14,6 +14,6 @@ export default class TextArea extends UIComponent<{}, HTMLTextAreaElement> {
       oninput: () => value.set(this.el.value)
     }));
 
-    this.autoCleanup(value.watch(val => void (this.el.value = val)));
+    this.destroy.do(value.watch(val => void (this.el.value = val)));
   }
 }
