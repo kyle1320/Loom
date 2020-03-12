@@ -1,7 +1,7 @@
-import ComputedList from './ComputedList';
+import List from './List';
 import WritableList from './WritableList';
 
-export default class MappedList<T, U> extends ComputedList<U> {
+export default class MappedList<T, U> extends List<U> {
   private ignoreEvents = false;
 
   public constructor(
@@ -11,7 +11,10 @@ export default class MappedList<T, U> extends ComputedList<U> {
   ) {
     super();
 
-    sourceList.watch(this.sourceAdd, this.sourceRemove);
+    this.destroy.do(
+      sourceList.watch(this.sourceAdd, this.sourceRemove),
+      cleanup && (() => this.data.forEach(cleanup))
+    );
   }
 
   public addThrough(src: T, index: number = this.data.length): U {
@@ -36,16 +39,5 @@ export default class MappedList<T, U> extends ComputedList<U> {
       this.cleanup && this.cleanup(this.data[index]);
     }
     this.removeIndex(index);
-  }
-
-  public destroy(): void {
-    this.sourceList.off('add', this.sourceAdd);
-    this.sourceList.off('remove', this.sourceRemove);
-    if (this.cleanup) {
-      for (const value of this.data) {
-        this.cleanup(value);
-      }
-    }
-    this.allOff();
   }
 }

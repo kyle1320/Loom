@@ -1,7 +1,3 @@
-export interface Destroyable {
-  destroy(): void;
-}
-
 export const doAll = (
   ...callbacks: (null | undefined | (() => void))[]
 ): () => void => {

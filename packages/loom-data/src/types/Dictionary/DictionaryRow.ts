@@ -7,8 +7,6 @@ export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
   public readonly key: WritableValue<string>;
   public readonly value: WritableValue<T>;
 
-  public destroy: () => void;
-
   public constructor(
     public readonly map: WritableDictionary<T>,
     key: string,
@@ -40,12 +38,12 @@ export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
       }
     }(defaultValue);
 
-    this.destroy = keyVal.watch(key => map.watchKey(key, {
+    this.destroy.do(keyVal.watch(key => map.watchKey(key, {
       addRow: this.value.set,
       move: keyVal.update,
       update: this.value.set,
       deleteRow: () => this.emit('delete')
-    }));
+    })));
   }
 
   public exists(): boolean {

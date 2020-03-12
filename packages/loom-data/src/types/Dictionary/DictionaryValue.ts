@@ -2,17 +2,15 @@ import WritableDictionary from './WritableDictionary';
 import { WritableValue, Value } from '../Value';
 
 export default class DictionaryValue<T> extends WritableValue<T | undefined> {
-  public destroy: () => void;
-
   public constructor(
     public readonly map: WritableDictionary<T>,
     private readonly key: Value<string>
   ) {
     super(undefined);
 
-    this.destroy = key.watch(key => this.map.watchKey(key, {
+    this.destroy.do(key.watch(key => this.map.watchKey(key, {
       change: val => super.set(val)
-    }));
+    })));
   }
 
   public set = (value: T): boolean => {

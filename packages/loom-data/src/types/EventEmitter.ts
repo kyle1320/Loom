@@ -1,9 +1,12 @@
+import Destroyable from './Destroyable';
+
 type AsArray<T> = T extends unknown[] ? T : [T];
 type Callback<T, K extends keyof T> = (...args: AsArray<T[K]>) => unknown
 type Listeners<T> = { [K in keyof T]?: Set<Callback<T, K>> };
 
-export class EventEmitter<T> {
+export class EventEmitter<T> implements Destroyable {
   private _listeners: Listeners<T> = {};
+  public readonly destroy = Destroyable.make(() => this.allOff());
 
   public on<K extends keyof T>(type: K, callback: Callback<T, K>): this {
     let registered = this._listeners[type];
