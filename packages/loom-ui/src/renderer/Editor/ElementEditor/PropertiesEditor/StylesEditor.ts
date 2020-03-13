@@ -1,4 +1,8 @@
-import { Value, DictionaryKeys, WritableValue } from 'loom-data';
+import {
+  Value,
+  DictionaryKeys,
+  WritableValue,
+  ParsedValue } from 'loom-data';
 import { Sheet, StyleRule } from 'loom-core';
 
 import PropertyField from './PropertyField';
@@ -8,9 +12,11 @@ import {
   KeyValueList,
   Input,
   ColorPicker,
-  MultiInput } from '@/common';
+  MultiInput,
+  ComboBox } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
+import C from '@/util/constants';
 
 import './StylesEditor.scss';
 
@@ -24,9 +30,16 @@ class RuleEditor extends UIComponent {
       if (rule) {
         const rows = new DictionaryKeys<string>(rule.style.source, true);
         rows.watch(
-          (i, k) => this.insertChild(
-            this.getEditor(k, new LookupValue(rule.style.source, k, '')), i
-          ),
+          (i, k) => {
+            const value = new LookupValue(rule.style.source, k, '');
+            const comp = new PropertyField(
+              this.getFriendlyName(k),
+              this.getEditor(k, value),
+              k
+            );
+            comp.destroy.do(value);
+            this.insertChild(comp, i);
+          },
           i => this.removeChild(i)
         );
         return () => rows.destroy();
@@ -36,16 +49,51 @@ class RuleEditor extends UIComponent {
     }));
   }
 
+  private getFriendlyName(key: string): string {
+    switch (key) {
+      case 'border-bottom': return 'Border (bottom)';
+      case 'color': return 'Font Color';
+      case 'font-size': return 'Font Size';
+      case 'white-space': return 'Whitespace';
+      default: return key;
+    }
+  }
+
   private getEditor(key: string, value: WritableValue<string>): UIComponent {
     switch (key) {
       case 'color':
-        return new PropertyField('Font Color', new MultiInput(
+        return new MultiInput(
           new ColorPicker(value),
-          new Input(value)
-        ), key);
+          new ComboBox(C.css.colors, value)
+        );
+      case 'font-size':
+        return new UnitInput(value, C.css.units.all);
+      case 'white-space':
+        return new ComboBox(C.css.values.whiteSpace, value);
       default:
-        return new PropertyField(key, new Input(value));
+        return new Input(value);
     }
+  }
+}
+
+class UnitInput extends MultiInput {
+  public constructor(value: WritableValue<string>, units: string[]) {
+    const parsed = new ParsedValue(
+      value,
+      v => {
+        const parts = v.match(/^(.*?)([a-z%]*)$/i) || [];
+        return {
+          value: parts[1] || '',
+          unit: parts[2] || ''
+        };
+      },
+      data => data.value + data.unit
+    );
+    super(
+      new Input(parsed.data.value, { type: 'number' }),
+      new ComboBox(units, parsed.data.unit)
+    );
+    this.destroy.do(parsed);
   }
 }
 
