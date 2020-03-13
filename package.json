@@ -20,7 +20,7 @@
     "verify": "npm-run-all -p typecheck lint",
     "test": "jest",
 
-    "typecheck": "npm-run-all -p core-typecheck data-typecheck ui-typecheck",
+    "typecheck": "npm-run-all -p typecheck-core typecheck-data typecheck-ui",
     "typecheck-core": "yarn workspace loom-core run typecheck",
     "typecheck-data": "yarn workspace loom-data run typecheck",
     "typecheck-ui": "yarn workspace loom-ui run typecheck",
