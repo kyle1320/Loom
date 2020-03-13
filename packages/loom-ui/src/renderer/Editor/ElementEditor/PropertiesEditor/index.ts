@@ -13,7 +13,8 @@ import {
   KeyValueList,
   Tabs } from '@/common';
 import { LookupValue } from '@/util';
-import { makeElement, basicTags } from '@/util/dom';
+import { makeElement } from '@/util/dom';
+import C from '@/util/constants';
 
 import './PropertiesEditor.scss';
 
@@ -76,7 +77,7 @@ class PropertyContents extends UIComponent {
           this.addField('Content', new TextArea(data.source.content));
         } else if (data instanceof loom.Element) {
           this.addField('Tag', new ComboBox(
-            basicTags,
+            C.html.basicTags,
             data.source.tag,
             data instanceof loom.HeadElement ||
             data instanceof loom.BodyElement));
