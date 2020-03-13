@@ -4,11 +4,14 @@ export const doAll = (
   return () => callbacks.forEach(cb => cb && cb());
 }
 
-export const mapRecord = <K extends string | number | symbol, T, U>(
-  data: Record<K, T>,
-  transform: (val: T, key: string) => U
-): Record<K, U> => {
-  const res: Record<K, U> = {} as Record<K, U>;
+export const mapRecord = <
+  T extends Record<string, unknown>,
+  U extends Record<keyof T, unknown>
+>(
+  data: T,
+  transform: <K extends keyof T>(val: T[K], key: K) => U[K]
+): U => {
+  const res: U = {} as U;
 
   for (const key in data) {
     res[key] = transform(data[key], key);
