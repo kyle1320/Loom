@@ -29,27 +29,3 @@ export class LookupValue extends WritableValue<string> {
     this.sourceMap.delete(this.key);
   }
 }
-
-export class NullableValue<T> extends WritableValue<T | null> {
-  public constructor(
-    private readonly source: WritableValue<T>,
-    private readonly defaultValue: T
-  ) {
-    super(source.get() || defaultValue);
-
-    this.destroy.do(source.watch(this.setFromSource));
-  }
-
-  public set = (value: T | null): boolean => {
-    value = value || this.defaultValue;
-    if (super.set(value)) {
-      this.source.set(value);
-      return true;
-    }
-    return false;
-  }
-
-  private setFromSource = (value: T | undefined): void => {
-    super.set(value || this.defaultValue);
-  }
-}

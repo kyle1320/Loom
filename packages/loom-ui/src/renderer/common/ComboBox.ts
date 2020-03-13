@@ -1,9 +1,8 @@
-import { List, WritableValue } from 'loom-data';
+import { List, WritableValue, NullableValue } from 'loom-data';
 
 import Input from './Input';
 import Select from './Select';
 import { UIComponent } from '@/UIComponent';
-import { NullableValue } from '@/util';
 import { makeElement } from '@/util/dom';
 
 import './ComboBox.scss';
