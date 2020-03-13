@@ -14,7 +14,7 @@ export default class ComboBox extends UIComponent {
     value: WritableValue<string>,
     disabled?: boolean
   ) {
-    const input = new Input(value, disabled);
+    const input = new Input(value, { disabled });
     const selectValue = new NullableValue(value, '');
     const select = new Select(options, undefined, selectValue);
     super(makeElement('div', { className: 'combo-box' }), select, input);

@@ -6,11 +6,12 @@ import { makeElement } from '@/util/dom';
 export default class Input extends UIComponent<{}, HTMLInputElement> {
   public constructor(
     public readonly value: WritableValue<string>,
-    disabled = false
+    options: { disabled?: boolean; type?: 'text' | 'number' } = {}
   ) {
     super(makeElement('input', {
       value: value.get(),
-      disabled,
+      disabled: options.disabled || false,
+      type: options.type || 'text',
       oninput: () => value.set(this.el.value)
     }));
 
