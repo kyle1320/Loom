@@ -9,7 +9,7 @@ namespace List {
 }
 
 class List<T> extends EventEmitter<List.Events<T>> {
-  protected readonly data: T[] = [];
+  protected data: T[] = [];
 
   public constructor(
     data: T[] = []
@@ -28,7 +28,12 @@ class List<T> extends EventEmitter<List.Events<T>> {
   }
 
   protected add(value: T, index: number = this.data.length): void {
-    this.data.splice(index, 0, value);
+    if (index === this.data.length) this.data.push(value);
+    else this.data = [
+      ...this.data.slice(0, index),
+      value,
+      ...this.data.slice(index)
+    ];
     this.emit('add', index, value);
   }
 
