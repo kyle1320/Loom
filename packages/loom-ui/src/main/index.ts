@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import { format as formatUrl } from 'url';
-import path from 'path';
+import * as path from 'path';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
