@@ -1,7 +1,9 @@
 import Value from './Value';
 
-export default class WritableValue<T> extends Value<T> {
-  public set(value: T): boolean {
-    return super.set(value);
-  }
+// https://github.com/microsoft/TypeScript/issues/11315#issuecomment-265231028
+class WritableValue<T> extends Value<T> {}
+interface WritableValue<T> {
+  set(value: T): boolean;
 }
+
+export default WritableValue;
