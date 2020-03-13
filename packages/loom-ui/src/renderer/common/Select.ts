@@ -19,7 +19,7 @@ class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
 
 export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
   public constructor(
-    source: List<T>,
+    source: List<T> | T[],
     watch: (value: T, cb: (name: string) => void) => () => void
     = (val, cb) => {
       cb(String(val));
@@ -30,18 +30,20 @@ export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
   ) {
     super(makeElement('select'));
 
+    const lst = source instanceof List ? source : new List(source);
+
     const update = (): void => {
       const index = this.el.selectedIndex;
-      selected.set(index < 0 ? null : source.get(index));
+      selected.set(index < 0 ? null : lst.get(index));
     };
     this.el.addEventListener('change', update);
 
-    this.destroy.do(source.watch(
+    this.destroy.do(lst.watch(
       (index, value) => this.insertChild(new SelectOption(value, watch), index),
       index => this.removeChild(index)
     ), selected.watch(value => {
       this.el.selectedIndex = value === null
-        ? -1 : source.asArray().indexOf(value);
+        ? -1 : lst.asArray().indexOf(value);
     }));
   }
 }

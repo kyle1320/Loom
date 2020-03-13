@@ -1,4 +1,4 @@
-import { List, DictionaryKeys } from 'loom-data';
+import { DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
 import PropertyField from './PropertyField';
@@ -76,7 +76,7 @@ class PropertyContents extends UIComponent {
           this.addField('Content', new TextArea(data.source.content));
         } else if (data instanceof loom.Element) {
           this.addField('Tag', new ComboBox(
-            new List(basicTags),
+            basicTags,
             data.source.tag,
             data instanceof loom.HeadElement ||
             data instanceof loom.BodyElement));
