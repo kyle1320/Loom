@@ -1,7 +1,5 @@
 Ability to add & remove style fields
 Ability to create & delete elements from UI
-Add Application Menu
-  - Load / Save, Export, etc.
 Add advanced controls to WYSIWYG
 Make styles show only relevant rules
   - Root UI maintains built document?
