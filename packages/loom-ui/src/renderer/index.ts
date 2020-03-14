@@ -1,6 +1,17 @@
+import * as electron from 'electron';
 import * as loom from 'loom-core';
 
 import LoomUI from './LoomUI';
+
+electron.ipcRenderer.on('open', (_, message) => {
+  console.log('open', message);
+});
+electron.ipcRenderer.on('save', (_, message) => {
+  console.log('save', message);
+});
+electron.ipcRenderer.on('export', (_, message) => {
+  console.log('export', message);
+});
 
 window.addEventListener('load', function () {
   const sources = new loom.Sources(null);

@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 import { format as formatUrl } from 'url';
 import * as path from 'path';
+import { makeMenu } from './menu';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -26,6 +27,8 @@ function createWindow(): void {
   }
 
   win.on('closed', () => win = null);
+
+  Menu.setApplicationMenu(makeMenu());
 }
 
 if (isDevelopment) {
