@@ -1,11 +1,9 @@
-Make styles show only relevant rules
-  - Root UI maintains built document?
+Ability to add & remove style fields
 Ability to create & delete elements from UI
-  - WYSIWYG controls
-Add advanced controls to WYSIWYG
-Make field editors context-aware
-  - e.g. a "Location" field for anchor elements
-Create style fields
-  - Ability to add & remove fields
 Add Application Menu
   - Load / Save, Export, etc.
+Add advanced controls to WYSIWYG
+Make styles show only relevant rules
+  - Root UI maintains built document?
+Make field editors context-aware
+  - e.g. a "Location" field for anchor elements
