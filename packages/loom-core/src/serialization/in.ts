@@ -20,7 +20,7 @@ export function importSources(rootDir: string): Sources {
 
   importComponents(componentsRoot, res);
 
-  importStylesheet(sourcesRoot, 'site.css', res.styles);
+  importStylesheet(rootDir, 'site.css', res.styles);
 
   walkDir(sourcesRoot, rel => {
     switch (path.parse(rel).ext) {
