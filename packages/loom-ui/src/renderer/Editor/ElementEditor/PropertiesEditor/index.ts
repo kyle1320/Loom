@@ -95,7 +95,7 @@ class PropertyContents extends UIComponent {
         }
         break;
       case 'style':
-        this.appendChild(new StylesEditor(this.ui.globalStyles));
+        this.appendChild(new StylesEditor(this.ui.results.styles));
         break;
     }
   }

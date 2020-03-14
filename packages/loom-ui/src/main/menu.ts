@@ -1,4 +1,4 @@
-import { app, Menu, dialog } from 'electron';
+import { app, Menu } from 'electron';
 
 export function makeMenu(): Menu {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -8,17 +8,7 @@ export function makeMenu(): Menu {
         {
           label: 'Open...',
           accelerator: 'CmdOrCtrl+O',
-          click: (_, win) => {
-            dialog.showOpenDialog({
-              title: 'Open Project',
-              filters: [{ name: 'Loom project', extensions: ['json'] }],
-              properties: ['openFile', 'openDirectory']
-            }).then(res => {
-              if (!res.canceled) {
-                win.webContents.send('open', res.filePaths);
-              }
-            });
-          }
+          click: (_, win) => win.webContents.send('open')
         },
         {
           label: 'Save',
@@ -27,17 +17,7 @@ export function makeMenu(): Menu {
         },
         {
           label: 'Export...',
-          click: (_, win) => {
-            dialog.showSaveDialog({
-              title: 'Export Project',
-              properties: ['createDirectory'],
-              nameFieldLabel: 'Export As:'
-            }).then(res => {
-              if (!res.canceled) {
-                win.webContents.send('export', res.filePath);
-              }
-            });
-          }
+          click: (_, win) => win.webContents.send('export')
         }
       ]
     },

@@ -225,7 +225,7 @@ export default class WYSIWYGEditor extends UIComponent<{
             body.addTo(doc.body);
           }
 
-          const removeStyles = addStyles(doc, ui.globalStyles);
+          const removeStyles = addStyles(doc, ui.results.styles);
 
           doc.addEventListener('selectionchange', () => {
             const selection = doc.getSelection() || null;
