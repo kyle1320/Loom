@@ -1,4 +1,3 @@
-import * as electron from 'electron';
 import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
 import IconButton from './IconButton';
@@ -6,6 +5,7 @@ import { UIComponent } from '@/UIComponent';
 import { makeElement, toggleClass } from '@/util/dom';
 
 import './NameList.scss';
+import { showMenu } from '@/util/electron';
 
 class NameListContent<T> extends UIComponent {
   public constructor(
@@ -79,7 +79,7 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
         ),
         oncontextmenu: e => {
           e.preventDefault();
-          electron.remote.Menu.buildFromTemplate([
+          showMenu([
             {
               label: 'Rename',
               click: () => title.edit()
@@ -88,7 +88,7 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
               label: 'Delete',
               click: () => row.delete()
             }
-          ]).popup();
+          ]);
         }
       }),
       title,
