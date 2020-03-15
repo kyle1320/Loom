@@ -1,11 +1,10 @@
 import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
-import IconButton from './IconButton';
 import { UIComponent } from '@/UIComponent';
 import { makeElement, toggleClass } from '@/util/dom';
+import { showMenu } from '@/util/electron';
 
 import './NameList.scss';
-import { showMenu } from '@/util/electron';
 
 class NameListContent<T> extends UIComponent {
   public constructor(
@@ -91,8 +90,7 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
           ]);
         }
       }),
-      title,
-      new IconButton('fa fa-trash').on('click', () => row.delete())
+      title
     );
 
     this.destroy.do(

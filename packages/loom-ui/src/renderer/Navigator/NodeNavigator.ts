@@ -3,8 +3,8 @@ import * as loom from 'loom-core';
 
 import LoomUI, { DataTypes } from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
-import { IconButton } from '@/common';
 import { makeElement, toggleClass } from '@/util/dom';
+import { showMenu } from '@/util/electron';
 
 import './NodeNavigator.scss';
 
@@ -50,6 +50,15 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       onclick: e => {
         e.stopPropagation();
         ui.data.set(node);
+      },
+      oncontextmenu: e => {
+        e.stopPropagation();
+        showMenu([
+          ...(node.source.hasParent() ? [{
+            label: 'Delete',
+            click: () => node.source.delete()
+          }] : [])
+        ]);
       }
     }));
 
@@ -58,11 +67,6 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     this.titleEl =
       makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
-
-    if (node.source.hasParent()) {
-      this.appendChild(new IconButton('fa fa-trash')
-        .on('click', () => node.source.delete()));
-    }
 
     this.destroy.do(
       ui.data.watch(this.updateSelected),

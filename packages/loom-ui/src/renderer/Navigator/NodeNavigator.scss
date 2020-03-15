@@ -13,29 +13,16 @@
   display: flex;
   flex-flow: row nowrap;
 
-  .icon-btn {
-    display: none;
-    color: currentColor;
-    margin-left: auto;
-    font-size: 10px;
-    opacity: 0.5;
-
-    &:hover {
-      color: #FF4040;
-      opacity: 1;
-    }
-  }
-
-  &:hover .icon-btn {
-    display: block;
-  }
-
   &__text i      { color: #CCCCCC; }
   &__element i   { color: #60A060; }
   &__component i { color: #FFA060; }
 
   &__container--component .node-nav {
     background-color: #FFE8D0;
+  }
+
+  &:hover {
+    background-color: $primary-hl-0;
   }
 
   &__title {
