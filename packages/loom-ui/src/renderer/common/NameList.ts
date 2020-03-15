@@ -1,3 +1,4 @@
+import * as electron from 'electron';
 import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
 import IconButton from './IconButton';
@@ -21,35 +22,87 @@ class NameListContent<T> extends UIComponent {
   }
 }
 
-class NameListRow<T> extends UIComponent {
+class EditableName extends UIComponent {
+  private editing = false;
+
+  public constructor(private readonly value: WritableValue<string>) {
+    super(makeElement('div', { className: 'namelist__title' }));
+
+    this.destroy.do(value.watch(this.set));
+  }
+
+  private set = (value: string): void => {
+    if (this.el instanceof HTMLInputElement) {
+      this.el.value = value;
+    } else {
+      this.el.textContent = value;
+    }
+  }
+
+  public edit(editing = true): void {
+    if (this.editing === editing) return;
+
+    this.editing = editing;
+    if (editing) {
+      const el: HTMLInputElement = makeElement('input', {
+        value: this.value.get(),
+        className: 'namelist__title',
+        onchange: () => {
+          if (!this.value.set(el.value || '')) {
+            this.set(this.value.get());
+          }
+        },
+        onclick: e => e.stopPropagation(),
+        onblur: () => this.edit(false)
+      });
+      this.changeEl(el);
+      el.select();
+    } else {
+      this.changeEl(
+        makeElement('div', { className: 'namelist__title' }, this.value.get())
+      );
+    }
+  }
+}
+
+class NameListRow<T> extends UIComponent<{}, HTMLElement> {
   public constructor(
     row: DictionaryRow<T>,
     selected: WritableValue<DictionaryRow<T> | null>
   ) {
-    super();
-
-    const title = makeElement('div', { className: 'namelist__title' });
-    const el = makeElement('div', {
-      className: 'namelist__row',
-      onclick: () => selected.set(
-        new DictionaryRow(row.map, row.key.get(), row.value.get())
-      )
-    }, title);
-
-    this.el = el;
-
-    this.appendChild(
+    const title = new EditableName(row.key);
+    super(
+      makeElement('div', {
+        className: 'namelist__row',
+        onclick: () => selected.set(
+          new DictionaryRow(row.map, row.key.get(), row.value.get())
+        ),
+        oncontextmenu: e => {
+          e.preventDefault();
+          electron.remote.Menu.buildFromTemplate([
+            {
+              label: 'Rename',
+              click: () => title.edit()
+            },
+            {
+              label: 'Delete',
+              click: () => row.delete()
+            }
+          ]).popup();
+        }
+      }),
+      title,
       new IconButton('fa fa-trash').on('click', () => row.delete())
     );
 
-    this.destroy.do(row.watch(
-      key => title.textContent = key,
-      () => { /**/ },
-      () => this.destroy()
-    ), selected.watch(r => {
-      toggleClass(el, 'selected',
-        !!(r && r.key.get() == row.key.get()));
-    }), () => row.destroy());
+    this.destroy.do(
+      row.onOff('delete', this.destroy),
+      selected.watch(r => {
+        toggleClass(this.el, 'selected',
+          !!(r && r.key.get() == row.key.get()));
+      }),
+      () => row.destroy()
+    );
   }
 }
 

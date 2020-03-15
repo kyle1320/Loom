@@ -17,11 +17,12 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
+    justify-content: space-between;
 
     .icon-btn {
-      display: none;
+      visibility: hidden;
       color: currentColor;
-      margin-left: auto;
+      margin-left: 5px;
       font-size: 10px;
       opacity: 0.5;
 
@@ -35,13 +36,20 @@
       background-color: $primary-hl-0;
 
       .icon-btn {
-        display: block;
+        visibility: visible;
       }
     }
 
     &.selected {
       background-color: $accent;
       color: white;
+    }
+
+    input {
+      margin: 0 !important;
+      padding: 0 0 0 2px !important;
+      font-size: inherit !important;
+      border: none !important;
     }
   }
 }
