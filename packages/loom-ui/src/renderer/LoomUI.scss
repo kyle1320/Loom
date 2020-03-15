@@ -82,10 +82,18 @@ input, textarea, select {
       border-radius: 10px;
       text-align: center;
 
-      &:nth-child(2) {
+      &:nth-child(2n) {
         border-color: $primary-8;
         background-color: $primary-0;
         color: inherit;
+
+        &:active {
+          background-color: darken($primary-0, 20%);
+        }
+      }
+
+      &:active {
+        background-color: darken($accent, 20%);
       }
     }
   }
