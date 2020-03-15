@@ -6,6 +6,10 @@ export function makeMenu(): Menu {
       label: 'File',
       submenu: [
         {
+          label: 'New Project',
+          click: (_, win) => win.webContents.send('new')
+        },
+        {
           label: 'Open...',
           accelerator: 'CmdOrCtrl+O',
           click: (_, win) => win.webContents.send('open')
@@ -18,7 +22,11 @@ export function makeMenu(): Menu {
         {
           label: 'Export...',
           click: (_, win) => win.webContents.send('export')
-        }
+        },
+        {
+          label: 'Close Project',
+          click: (_, win) => win.webContents.send('close')
+        },
       ]
     },
     {

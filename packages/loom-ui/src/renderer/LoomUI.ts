@@ -66,7 +66,7 @@ export default class LoomUI extends UIComponent {
 
     this.setSources(sources);
 
-    this.destroy.do(() => this.setSources(null));
+    this.destroy.do(() => this.close());
   }
 
   public get sources(): loom.Sources {
@@ -142,6 +142,11 @@ export default class LoomUI extends UIComponent {
         this.results.exportTo(res.filePath);
       }
     });
+  }
+
+  public close(): void {
+    // TODO: alert user to save before closing
+    this.setSources(null);
   }
 }
 
