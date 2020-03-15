@@ -66,7 +66,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
 
     this.destroy.do(
       ui.data.watch(this.updateSelected),
-      title.onOff('change', this.setTitle)
+      title.onOff('change', this.update)
     );
   }
 
@@ -74,15 +74,12 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     toggleClass(this.el, 'selected', data === this.node);
   }
 
-  protected setTitle = (title: string): void => {
+  protected update = (title: string): void => {
     this.titleEl.textContent = title;
+    this.iconEl.className = this.getIcon();
   }
 
   protected abstract getIcon(): string;
-
-  protected setIcon(icon: string | null = null): void {
-    this.iconEl.className = icon || this.getIcon();
-  }
 }
 
 class TextNodeNavigator extends SingleNodeNavigator<loom.TextNode> {
@@ -132,11 +129,6 @@ class ElementNavigator extends SingleNodeNavigator<loom.Element> {
     }
     return 'fa fa-code';
   }
-
-  protected tagChanged = (tag: string): void => {
-    this.setIcon();
-    this.setTitle(tag);
-  }
 }
 
 class ElementChildrenNavigator extends UIComponent {
@@ -165,13 +157,8 @@ class ComponentNavigator extends SingleNodeNavigator<loom.Component> {
   }
 
   protected getIcon(): string {
-    return this.node.element instanceof loom.UnknownComponent
+    return this.node.element.get() instanceof loom.UnknownComponent
       ? 'fa fa-question' : 'fa fa-clone';
-  }
-
-  protected nameChanged = (name: string): void => {
-    this.setIcon();
-    this.setTitle(name);
   }
 }
 
