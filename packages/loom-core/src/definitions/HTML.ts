@@ -101,14 +101,14 @@ export class ComponentDef extends NodeDef {
   }
 
   public serialize(): string {
-    return `<loom:${this.name.get()} />`;
+    return `<loom:${this.name.get()}></loom:${this.name.get()}>`;
   }
 }
 
 export class ElementDef extends NodeDef {
-  public readonly tag: WritableValue<string>;
-  public readonly attrs: AttributesDef;
-  public readonly children: ChildrenDef;
+  public readonly tag!: WritableValue<string>;
+  public readonly attrs!: AttributesDef;
+  public readonly children!: ChildrenDef;
 
   public constructor(
     tag: string,
@@ -116,6 +116,14 @@ export class ElementDef extends NodeDef {
     children: ChildrenDef | NodeDef[],
   ) {
     super();
+
+    tag = tag.toLowerCase();
+
+    if (this.constructor === ElementDef) {
+      if (tag === 'head') return new HeadDef(attrs, children);
+      if (tag === 'body') return new BodyDef(attrs, children);
+    }
+
     this.tag = new WritableValue(tag);
     this.attrs = attrs instanceof AttributesDef
       ? attrs : new AttributesDef(attrs);

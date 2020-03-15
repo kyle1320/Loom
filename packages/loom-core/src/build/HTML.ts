@@ -113,15 +113,21 @@ export class Element implements BuildResult<ElementDef> {
   }
 
   public serialize(): string {
+    return this._serialize();
+  }
+
+  protected _serialize(additionalContent = ''): string {
     const tag = this.tag.get();
     const attrs = this.attrs.serialize();
     const content = this.children.serialize();
-    return `<${tag}${attrs}>${content}</${tag}>`;
+    return `<${tag}${attrs}>${content}${additionalContent}</${tag}>`;
   }
 }
 
 export class HeadElement extends Element {
-  // TODO: inject styles
+  public serialize(): string {
+    return this._serialize('<link rel="stylesheet" href="/site.css">');
+  }
 }
 
 export class BodyElement extends Element {

@@ -11,7 +11,9 @@ import {
   PageDef,
   NodeDef,
   TextNodeDef,
-  ComponentDef } from '../definitions/HTML';
+  ComponentDef,
+  HeadDef,
+  BodyDef } from '../definitions/HTML';
 import { Sources } from '../definitions';
 import { walkDir } from '.';
 
@@ -20,27 +22,27 @@ export function importPage(
   file: string
 ): PageDef {
   return (function getPage(els: DomNode[]): PageDef {
-    let head: ElementDef = null!;
-    let body: ElementDef = null!;
+    let head: HeadDef = null!;
+    let body: BodyDef = null!;
     for (const node of els) {
       if (node instanceof DomElement) {
         if (node.name.toLowerCase() === 'html') {
           return getPage(node.children);
         } else if (node.name.toLowerCase() === 'head') {
-          head = parseElement(node);
+          head = new HeadDef(node.attribs, mapChildren(node.childNodes));
         } else if (node.name.toLowerCase() === 'body') {
-          body = parseElement(node);
+          body = new BodyDef(node.attribs, mapChildren(node.childNodes));
         }
       }
     }
     if (!head) {
-      head = new ElementDef('head', {}, []);
+      head = new HeadDef({}, []);
       if (!body) {
-        body = new ElementDef('body', {}, mapChildren(els))
+        body = new BodyDef({}, mapChildren(els))
       }
     }
     if (!body) {
-      body = new ElementDef('body', {}, [])
+      body = new BodyDef({}, []);
     }
     return new PageDef(head, body);
   }(htmlparser.parseDOM(
