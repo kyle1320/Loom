@@ -18,7 +18,7 @@ export default class ComboBox extends UIComponent {
     const select = new Select(options, undefined, selectValue);
     super(makeElement('div', {
       className: 'combo-box' + (disabled ? ' disabled' : '')
-    }), select, input);
+    }), input, select);
 
     this.destroy.do(() => selectValue.destroy());
   }

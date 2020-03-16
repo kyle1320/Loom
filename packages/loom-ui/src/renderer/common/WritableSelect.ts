@@ -13,17 +13,17 @@ export default class WritableSelect<T> extends UIComponent {
   ) {
     super(makeElement('div', { className: 'combo-box' }));
 
+    // string value
+    const value = new ProxyValue('');
+    const input = new Input(value);
+    this.appendChild(input);
+
     // selected value
     this.selected = new WritableValue<T | null>(null);
     const select = new Select(
       options, (v, cb) => getValue(v).watch(cb), this.selected
     );
     this.appendChild(select);
-
-    // string value
-    const value = new ProxyValue('');
-    const input = new Input(value);
-    this.appendChild(input);
 
     this.destroy.do(this.selected.watch(
       v => {
