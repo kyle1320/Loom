@@ -71,17 +71,23 @@ export default class PropertiesEditor extends UIComponent {
     this.toolbar.empty();
     this.contents.empty();
 
+    const content = this.ui.contentDef.get();
     const data = this.ui.data.get();
 
     switch (this.selectedTab) {
       case 'page':
-        this.addField('Location', new Input(this.ui.contentDef.get()!.key));
+        this.toolbar.appendChild(new Input(content!.key));
         this.toolbar.appendChild(
           new IconButton('sep fa fa-trash')
             .on('click', () => this.ui.contentDef.get()!.delete()));
         break;
       case 'component':
-        this.addField('Name', new Input(this.ui.contentDef.get()!.key));
+        this.toolbar.appendChild(new ComboBox(
+          new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
+          data instanceof loom.Component
+            ? data.source.name
+            : content!.key
+        ));
         this.toolbar.appendChild(
           new IconButton('sep fa fa-trash')
             .on('click', () => this.ui.contentDef.get()!.delete()));
@@ -90,7 +96,7 @@ export default class PropertiesEditor extends UIComponent {
         if (data instanceof loom.TextNode) {
           this.addField('Content', new TextArea(data.source.content));
         } else if (data instanceof loom.Element) {
-          this.addField('Tag', new ComboBox(
+          this.toolbar.appendChild(new ComboBox(
             C.html.basicTags,
             data.source.tag,
             data instanceof loom.HeadElement ||
@@ -101,11 +107,6 @@ export default class PropertiesEditor extends UIComponent {
             new MultiSelect(new LookupValue(data.source.attrs, 'class')));
           this.contents.appendChild(new UIComponent(makeElement('hr')));
           this.addField('Attributes', new KeyValueList(data.source.attrs));
-        } else if (data instanceof loom.Component) {
-          this.addField('Name', new ComboBox(
-            new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
-            data.source.name
-          ));
         }
         if (data) {
           this.toolbar.appendChild(
@@ -153,7 +154,7 @@ export default class PropertiesEditor extends UIComponent {
     }
 
     if (data) {
-      allTabs.push('element');
+      allTabs.push(data instanceof loom.Component ? 'component' : 'element');
     }
 
     allTabs.push('style');

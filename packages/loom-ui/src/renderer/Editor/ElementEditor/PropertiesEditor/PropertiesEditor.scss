@@ -63,19 +63,19 @@
     margin-left: auto;
   }
 
-  .combo-box {
+  .combo-box, & > input {
     flex-grow: 1;
     background: none;
     border: none;
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
     margin-right: 3px;
-    font-size: 14px;
 
     border-radius: 0 !important;
     background-color: inherit;
 
-    &:focus-within {
+    &:focus, &:focus-within {
+      border-top-color: transparent;
       border-bottom-color: $accent;
     }
   }
