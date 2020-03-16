@@ -32,6 +32,11 @@ export class RuleListDef extends WritableList<RuleDef> implements Definition {
     return new RuleList(this, sources);
   }
 
+  public add(value: RuleDef, index?: number): void {
+    ruleParentMap.set(value, this);
+    super.add(value, index);
+  }
+
   public serialize(): string {
     return this.asArray().map(obj => obj.serialize()).join('\n');
   }
@@ -39,6 +44,7 @@ export class RuleListDef extends WritableList<RuleDef> implements Definition {
 
 export type RuleDef = StyleRuleDef;
 
+const ruleParentMap: WeakMap<RuleDef, RuleListDef> = new WeakMap();
 export class StyleRuleDef implements Definition {
   public readonly selector: WritableValue<string>;
   public readonly style: StyleDeclarationDef;
@@ -50,6 +56,19 @@ export class StyleRuleDef implements Definition {
     this.selector = new WritableValue(selector);
     this.style = style instanceof StyleDeclarationDef
       ? style : new StyleDeclarationDef(style);
+  }
+
+  public delete(): boolean {
+    const parent = ruleParentMap.get(this);
+    if (parent) {
+      ruleParentMap.delete(this);
+      return parent.remove(this);
+    }
+    return false;
+  }
+
+  public hasParent(): boolean {
+    return !!ruleParentMap.get(this);
   }
 
   public build(sources: Sources): StyleRule {
