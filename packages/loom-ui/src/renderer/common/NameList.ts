@@ -73,9 +73,12 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
     super(
       makeElement('div', {
         className: 'namelist__row',
-        onclick: () => selected.set(
-          new DictionaryRow(row.map, row.key.get(), row.value.get())
-        ),
+        onclick: e => {
+          e.stopPropagation();
+          selected.set(
+            new DictionaryRow(row.map, row.key.get(), row.value.get())
+          );
+        },
         oncontextmenu: e => {
           e.preventDefault();
           showMenu([
@@ -110,7 +113,10 @@ export default class NameList<T> extends UIComponent<{ add: void }> {
     public readonly selected: WritableValue<DictionaryRow<T> | null>
     = new WritableValue<DictionaryRow<T> | null>(null)
   ) {
-    super(makeElement('div', { className: 'namelist' }));
+    super(makeElement('div', {
+      className: 'namelist',
+      onclick: () => selected.set(null)
+    }));
 
     this.appendChild(new NameListContent<T>(data, selected));
   }
