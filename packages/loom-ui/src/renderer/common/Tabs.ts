@@ -14,7 +14,9 @@ class Tab<T extends string> extends UIComponent<{
   ) {
     super(makeElement('div', {
       className: 'tab',
-      onclick: () => this.select()
+      onclick: () => this.select(),
+      onkeydown: e => e.keyCode === 13 && this.select(),
+      tabIndex: 0
     },
     makeElement('div', { className: 'tab__title' }, name),
     makeElement('i', { className: icon }))

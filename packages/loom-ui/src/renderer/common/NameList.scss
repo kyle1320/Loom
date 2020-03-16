@@ -19,8 +19,9 @@
     align-items: center;
     justify-content: space-between;
 
-    &:hover {
+    &:hover, &:focus {
       background-color: $primary-hl-0;
+      outline: none;
     }
 
     &.selected {

@@ -30,6 +30,14 @@
     margin-right: 0;
   }
 
+  &:focus {
+    outline: none;
+
+    .tab__title {
+      text-decoration: underline;
+    }
+  }
+
   &__title {
     margin-right: auto;
   }

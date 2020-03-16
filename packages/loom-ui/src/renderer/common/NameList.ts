@@ -79,6 +79,7 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
             new DictionaryRow(row.map, row.key.get(), row.value.get())
           );
         },
+        onkeydown: e => e.keyCode === 13 && this.el.click(),
         oncontextmenu: e => {
           e.preventDefault();
           showMenu([
@@ -91,7 +92,8 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
               click: () => row.delete()
             }
           ]);
-        }
+        },
+        tabIndex: 0
       }),
       title
     );
