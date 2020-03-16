@@ -51,6 +51,6 @@ export default class ColorPicker extends UIComponent<{}, HTMLElement> {
         pickr.setColor(v, true);
         ignoreEvent = false;
       }
-    }));
+    }), () => pickr.destroyAndRemove());
   }
 }
