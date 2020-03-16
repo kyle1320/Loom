@@ -35,16 +35,22 @@ export default class ColorPicker extends UIComponent<{}, HTMLElement> {
         }
       }
     }).on('change', (color: Pickr.HSVaColor) => {
-      ignoreEvent = true;
-      const rgba = color.toRGBA();
-      this.value.set(
-        rgba[3] < 1 ? rgba.toString(0) : color.toHEXA().toString()
-      );
-      ignoreEvent = false;
+      if (!ignoreEvent) {
+        ignoreEvent = true;
+        const rgba = color.toRGBA();
+        this.value.set(
+          rgba[3] < 1 ? rgba.toString(0) : color.toHEXA().toString()
+        );
+        ignoreEvent = false;
+      }
     });
 
     this.destroy.do(value.watch(v => {
-      if (!ignoreEvent) pickr.setColor(v);
+      if (!ignoreEvent) {
+        ignoreEvent = true;
+        pickr.setColor(v, true);
+        ignoreEvent = false;
+      }
     }));
   }
 }
