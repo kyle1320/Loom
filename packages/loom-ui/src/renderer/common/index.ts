@@ -11,6 +11,7 @@ import NameList from './NameList';
 import Select from './Select';
 import Tabs from './Tabs';
 import TextArea from './TextArea';
+import WritableSelect from './WritableSelect';
 
 export {
   ColorPicker,
@@ -25,5 +26,6 @@ export {
   NameList,
   Select,
   Tabs,
-  TextArea
+  TextArea,
+  WritableSelect
 };
