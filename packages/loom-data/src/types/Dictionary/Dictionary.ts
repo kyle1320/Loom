@@ -190,13 +190,7 @@ class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
   }
 
   public watch(ls: Dictionary.CheckedListeners<T>): () => void {
-    for (const key in this.data) {
-      ls.change && ls.change(key, this.data[key], undefined);
-      ls.add && ls.add(key, this.data[key]);
-      ls.set && ls.set(key, this.data[key], undefined);
-      ls.addRow && ls.addRow(key, this.data[key]);
-    }
-    return doAll(
+    const cleanup = doAll(
       ls.change && this.onOff('change', ls.change),
       ls.add && this.onOff('add', ls.add),
       ls.set && this.onOff('set', ls.set),
@@ -206,6 +200,13 @@ class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
       ls.addRow && this.onOff('addRow', ls.addRow),
       ls.deleteRow && this.onOff('deleteRow', ls.deleteRow),
     );
+    for (const key in this.data) {
+      ls.change && ls.change(key, this.data[key], undefined);
+      ls.add && ls.add(key, this.data[key]);
+      ls.set && ls.set(key, this.data[key], undefined);
+      ls.addRow && ls.addRow(key, this.data[key]);
+    }
+    return cleanup;
   }
 
   public watchKey(
@@ -213,14 +214,7 @@ class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
     ls: Dictionary.CheckedKeyListeners<T>
   ): () => void {
     key = this.normalizeKey(key);
-
-    ls.change && ls.change(this.data[key], undefined);
-    if (key in this.data) {
-      ls.add && ls.add(this.data[key]);
-      ls.set && ls.set(this.data[key], undefined);
-      ls.addRow && ls.addRow(this.data[key]);
-    }
-    return doAll(
+    const cleanup = doAll(
       ls.change && this.keyListeners.change.onOff(key, ls.change),
       ls.add && this.keyListeners.add.onOff(key, ls.add),
       ls.set && this.keyListeners.set.onOff(key, ls.set),
@@ -230,6 +224,13 @@ class Dictionary<T> extends EventEmitter<Dictionary.Events<T>> {
       ls.addRow && this.keyListeners.addRow.onOff(key, ls.addRow),
       ls.deleteRow && this.keyListeners.deleteRow.onOff(key, ls.deleteRow),
     );
+    ls.change && ls.change(this.data[key], undefined);
+    if (key in this.data) {
+      ls.add && ls.add(this.data[key]);
+      ls.set && ls.set(this.data[key], undefined);
+      ls.addRow && ls.addRow(this.data[key]);
+    }
+    return cleanup;
   }
 }
 

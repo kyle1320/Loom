@@ -82,11 +82,12 @@ class List<T> extends EventEmitter<List.Events<T>> {
     onAdd: (index: number, value: T) => void,
     onRemove: (index: number, value: T) => void
   ): () => void {
-    this.data.forEach((value, index) => onAdd(index, value));
-    return doAll(
+    const cleanup = doAll(
       this.onOff('add', onAdd),
       this.onOff('remove', onRemove)
     );
+    this.data.forEach((value, index) => onAdd(index, value));
+    return cleanup;
   }
 }
 

@@ -36,11 +36,12 @@ class Value<T> extends EventEmitter<Value.Events<T>> {
   public watch(
     onChange: (value: T, oldValue: T | undefined) => (() => void) | null | void
   ): () => void {
-    let cleanup = onChange(this._value, undefined);
+    let cleanup: (() => void) | null | void = null;
     const off = this.onOff('change', (value: T, oldValue: T | undefined) => {
       typeof cleanup === 'function' && cleanup();
       cleanup = onChange(value, oldValue);
     });
+    cleanup = onChange(this._value, undefined);
     return () => {
       typeof cleanup === 'function' && cleanup();
       off();
