@@ -14,7 +14,8 @@ export default class Frame extends UIComponent<{}, HTMLIFrameElement> {
       frameBorder: '0',
       onload: () => {
         this.cleanup = onload(this.el.contentDocument!);
-      }
+      },
+      tabIndex: -1
     }));
 
     this.destroy.do(this.cleanup);

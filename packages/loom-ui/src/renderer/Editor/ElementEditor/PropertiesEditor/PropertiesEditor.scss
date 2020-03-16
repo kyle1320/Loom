@@ -48,15 +48,15 @@
 }
 
 .properties-toolbar {
-  border-bottom: 1px solid $primary-5;
-  background-color: $primary-1;
+  border-bottom: 1px solid $primary-3;
+  background-color: $primary-0;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-start;
   font-size: 10px;
   padding: 0 2px;
-  height: 24px;
+  height: 28px;
   margin-bottom: 3px;
 
   .sep {
@@ -67,11 +67,17 @@
     flex-grow: 1;
     background: none;
     border: none;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
     margin-right: 3px;
     font-size: 14px;
 
     border-radius: 0 !important;
     background-color: inherit;
+
+    &:focus-within {
+      border-bottom-color: $accent;
+    }
   }
 
   .icon-btn {
