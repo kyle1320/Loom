@@ -1,4 +1,5 @@
 import { EventEmitter } from 'loom-data';
+import { makeElement } from './util/dom';
 
 export class UIComponent<
   E = {}, H extends Node = Node
@@ -112,5 +113,8 @@ export interface UIContainer {
   removeChild(comp: UIComponent | number, destroy?: boolean): void;
   setChild(child: UIComponent, index: number): void;
 }
-export class UIContainer<H extends Node = HTMLElement>
-  extends UIComponent<{}, H> {}
+export class UIContainer extends UIComponent<{}, HTMLDivElement> {
+  public constructor(className?: string, ...children: UIComponent[]) {
+    super(makeElement('div', className ? { className } : {}), ...children);
+  }
+}

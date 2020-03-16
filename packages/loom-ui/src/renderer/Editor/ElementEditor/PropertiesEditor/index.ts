@@ -54,12 +54,10 @@ export default class PropertiesEditor extends UIComponent {
         this.selectedTab = name;
         this.update();
       }));
-    this.appendChild(this.toolbar = new UIContainer(
-      makeElement('div', { className: 'properties-toolbar' })
-    ));
-    this.appendChild(this.contents = new UIContainer(
-      makeElement('div', { className: 'properties-editor__content' })
-    ));
+    this.appendChild(
+      this.toolbar = new UIContainer('properties-toolbar'));
+    this.appendChild(
+      this.contents = new UIContainer('properties-editor__content'));
 
     this.destroy.do(
       ui.data.watch(this.build),
