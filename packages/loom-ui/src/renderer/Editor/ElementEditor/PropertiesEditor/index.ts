@@ -2,16 +2,18 @@ import { DictionaryKeys } from 'loom-data';
 import * as loom from 'loom-core';
 
 import PropertyField from './PropertyField';
-import StylesEditor from './StylesEditor';
+import { RuleEditor } from './RuleEditor';
 import LoomUI from '@/LoomUI';
-import { UIComponent } from '@/UIComponent';
+import { UIComponent, UIContainer } from '@/UIComponent';
 import {
   Input,
   TextArea,
   ComboBox,
   MultiSelect,
   KeyValueList,
-  Tabs } from '@/common';
+  Tabs,
+  IconButton,
+  WritableSelect } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 import C from '@/util/constants';
@@ -38,39 +40,51 @@ function nameForTab(tab: TabName): string {
   }
 }
 
-class PropertyContents extends UIComponent {
-  public constructor(
-    private readonly ui: LoomUI,
-    private selectedTab: TabName
-  ) {
-    super(makeElement('div', { className: 'properties-editor__content' }));
+export default class PropertiesEditor extends UIComponent {
+  private selectedTab!: TabName;
+  private tabs: Tabs<TabName>;
+  private toolbar: UIContainer;
+  private contents: UIContainer;
+
+  public constructor(private readonly ui: LoomUI) {
+    super(makeElement('div', { className: 'properties-editor' }));
+
+    this.appendChild(this.tabs = new Tabs(nameForTab, iconForTab)
+      .on('select', name => {
+        this.selectedTab = name;
+        this.update();
+      }));
+    this.appendChild(this.toolbar = new UIContainer(
+      makeElement('div', { className: 'properties-toolbar' })
+    ));
+    this.appendChild(this.contents = new UIContainer(
+      makeElement('div', { className: 'properties-editor__content' })
+    ));
 
     this.destroy.do(
-      ui.data.watch(this.update),
-      ui.content.watch(this.update)
+      ui.data.watch(this.build),
+      ui.content.onOff('change', this.build)
     );
-
-    this.update();
   }
 
-  public select(name: TabName): void {
-    if (this.selectedTab !== name) {
-      this.selectedTab = name;
-      this.update();
-    }
-  }
-
-  public update = (): void => {
-    this.empty();
+  private update(): void {
+    this.toolbar.empty();
+    this.contents.empty();
 
     const data = this.ui.data.get();
 
     switch (this.selectedTab) {
       case 'page':
         this.addField('Location', new Input(this.ui.contentDef.get()!.key));
+        this.toolbar.appendChild(
+          new IconButton('sep fa fa-trash')
+            .on('click', () => this.ui.contentDef.get()!.delete()));
         break;
       case 'component':
         this.addField('Name', new Input(this.ui.contentDef.get()!.key));
+        this.toolbar.appendChild(
+          new IconButton('sep fa fa-trash')
+            .on('click', () => this.ui.contentDef.get()!.delete()));
         break;
       case 'element':
         if (data instanceof loom.TextNode) {
@@ -85,7 +99,7 @@ class PropertyContents extends UIComponent {
             new LookupValue(data.source.attrs, 'id')));
           this.addField('Class',
             new MultiSelect(new LookupValue(data.source.attrs, 'class')));
-          this.appendChild(new UIComponent(makeElement('hr')));
+          this.contents.appendChild(new UIComponent(makeElement('hr')));
           this.addField('Attributes', new KeyValueList(data.source.attrs));
         } else if (data instanceof loom.Component) {
           this.addField('Name', new ComboBox(
@@ -93,38 +107,40 @@ class PropertyContents extends UIComponent {
             data.source.name
           ));
         }
+        if (data) {
+          this.toolbar.appendChild(
+            new IconButton('sep fa fa-trash')
+              .on('click', () => data.source.delete()));
+        }
         break;
       case 'style':
-        this.appendChild(new StylesEditor(this.ui.results.styles));
+        (() => {
+          const sheet = this.ui.results.styles;
+          const selector = new WritableSelect(
+            sheet.source.rules,
+            rule => rule.selector
+          );
+          const rule = selector.selected;
+
+          this.toolbar.appendChild(selector);
+          this.toolbar.appendChild(new IconButton('fa fa-trash')
+            .on('click', () => {
+              selector.selected.get()?.delete();
+            }));
+          this.toolbar.appendChild(new IconButton('fa fa-plus')
+            .on('click', () => {
+              const newRule = new loom.StyleRuleDef('*', {});
+              sheet.source.rules.add(newRule);
+              selector.selected.set(newRule);
+            }));
+          this.contents.appendChild(new RuleEditor(rule));
+        })();
         break;
     }
   }
 
   private addField(title: string, input: UIComponent): void {
-    this.appendChild(new PropertyField(title, input));
-  }
-}
-
-export default class PropertiesEditor extends UIComponent {
-  private selectedTab!: TabName;
-  private tabs: Tabs<TabName>;
-  private contents: PropertyContents;
-
-  public constructor(private readonly ui: LoomUI) {
-    super(makeElement('div', { className: 'properties-editor' }));
-
-    this.appendChild(this.tabs = new Tabs(nameForTab, iconForTab)
-      .on('select', name => {
-        this.selectedTab = name;
-        this.contents.select(name);
-      }));
-    this.appendChild(
-      this.contents = new PropertyContents(ui, this.selectedTab));
-
-    this.destroy.do(
-      ui.data.watch(this.build),
-      ui.content.onOff('change', this.build)
-    );
+    this.contents.appendChild(new PropertyField(title, input));
   }
 
   private build = (): void => {

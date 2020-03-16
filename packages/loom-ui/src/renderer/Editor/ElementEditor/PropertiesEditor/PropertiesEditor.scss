@@ -6,19 +6,13 @@
   border-left: 1px solid $primary-5;
   border-top-left-radius: 8px;
   overflow: hidden;
+  display: flex;
+  flex-flow: column nowrap;
 
   .tabs {
     height: 30px;
     background-color: $primary-4;
     font-size: 12px;
-  }
-
-  &__content {
-    padding: 6px 4px;
-
-    & > * {
-      margin-bottom: 5px;
-    }
   }
 
   input, select, textarea {
@@ -46,15 +40,47 @@
 
   hr {
     width: 100%;
-    margin: 6px 0;
+    margin: 8px 0;
     padding: 0;
     border: 0px solid $primary-5;
     border-bottom-width: 1px;
   }
 }
 
+.properties-toolbar {
+  border-bottom: 1px solid $primary-5;
+  background-color: $primary-1;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 10px;
+  padding: 0 2px;
+  height: 24px;
+  margin-bottom: 3px;
+
+  .sep {
+    margin-left: auto;
+  }
+
+  .combo-box {
+    flex-grow: 1;
+    background: none;
+    border: none;
+    margin-right: 3px;
+    font-size: 14px;
+
+    border-radius: 0 !important;
+    background-color: inherit;
+  }
+
+  .icon-btn {
+    padding: 5px;
+  }
+}
+
 .property-field {
-  margin: 3px;
+  margin: 5px 6px;
   display: flex;
   flex-flow: row wrap;
   align-items: flex-start;
