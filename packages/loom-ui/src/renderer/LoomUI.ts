@@ -4,7 +4,8 @@ import * as loom from 'loom-core';
 
 import Editor from './Editor';
 import Navigator from './Navigator';
-import { UIComponent } from './UIComponent';
+import { UIComponent, UIContainer } from './UIComponent';
+import { Button } from './common';
 import { makeElement } from './util/dom';
 
 import './LoomUI.scss';
@@ -160,17 +161,13 @@ class WelcomePage extends UIComponent {
       ),
       makeElement('div', { className: 'welcome-page__subtitle' },
         'One Web Development Tool for Everyone'
-      ),
-      makeElement('div', { className: 'welcome-page__actions'},
-        makeElement('div', {
-          className: 'welcome-page__actions__btn',
-          onclick: () => ui.create()
-        }, 'Create a New Project'),
-        makeElement('div', {
-          className: 'welcome-page__actions__btn',
-          onclick: () => ui.open()
-        }, 'Open an Existing Project')
       )
+    ), new UIContainer(
+      'welcome-page__actions',
+      new Button('Create a New Project', 'primary', 'large')
+        .on('click', () => ui.create()),
+      new Button('Open an Existing Project', 'large')
+        .on('click', () => ui.open()),
     ));
   }
 }

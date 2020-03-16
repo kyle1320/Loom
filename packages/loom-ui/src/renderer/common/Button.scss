@@ -1,0 +1,32 @@
+@import "~@/variables";
+
+.btn {
+  border: 1px solid $primary-8;
+  background-color: $primary-0;
+  padding: 2px 5px;
+  border-radius: 10px;
+  text-align: center;
+
+  &:active {
+    background-color: darken($primary-0, 20%);
+  }
+
+  &:focus {
+    text-decoration: underline;
+    outline: none;
+  }
+
+  &--primary {
+    border-color: $accent;
+    background-color: $accent;
+    color: white;
+
+    &:active {
+      background-color: darken($accent, 20%);
+    }
+  }
+
+  &--large {
+    padding: 9px 14px;
+  }
+}

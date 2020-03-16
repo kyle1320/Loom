@@ -1,3 +1,4 @@
+import Button from './Button';
 import ColorPicker from './ColorPicker';
 import ComboBox from './ComboBox';
 import Floating from './Floating';
@@ -14,6 +15,7 @@ import TextArea from './TextArea';
 import WritableSelect from './WritableSelect';
 
 export {
+  Button,
   ColorPicker,
   ComboBox,
   Floating,
