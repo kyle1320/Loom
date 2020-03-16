@@ -103,3 +103,14 @@ export class UIComponent<
     this.insertChild(child, index, insert);
   }
 }
+
+export interface UIContainer {
+  empty(): void;
+  appendChild(comp: UIComponent): void;
+  insertChild(comp: UIComponent, index?: number): void;
+  insertBefore(comp: UIComponent, before: UIComponent): void;
+  removeChild(comp: UIComponent | number, destroy?: boolean): void;
+  setChild(child: UIComponent, index: number): void;
+}
+export class UIContainer<H extends Node = HTMLElement>
+  extends UIComponent<{}, H> {}
