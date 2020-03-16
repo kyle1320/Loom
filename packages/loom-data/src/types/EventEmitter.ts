@@ -6,6 +6,7 @@ type Listeners<T> = { [K in keyof T]?: Set<Callback<T, K>> };
 
 export class EventEmitter<T> implements Destroyable {
   private _listeners: Listeners<T> = {};
+  private _emitting: Partial<Record<keyof T, boolean>> = {};
   public readonly destroy = Destroyable.make(() => this.allOff());
 
   public on<K extends keyof T>(type: K, callback: Callback<T, K>): this {
@@ -33,6 +34,7 @@ export class EventEmitter<T> implements Destroyable {
 
   protected emit<K extends keyof T>(type: K, ...args: AsArray<T[K]>): this {
     const registered = this._listeners[type];
+    this._emitting[type] = true;
 
     if (registered) {
       // "save" the current listeners so that modifications to the listeners
@@ -40,10 +42,19 @@ export class EventEmitter<T> implements Destroyable {
       const callbacks = [...registered.values()];
       for (let i = 0; i < callbacks.length; i++) {
         callbacks[i].apply(this, args);
+
+        // if a callback triggered another emit of the same type,
+        // or this event was cancelled via stopEmit, stop.
+        if (!this._emitting[type]) break;
       }
     }
 
+    this._emitting[type] = false;
     return this;
+  }
+
+  protected stopEmit(type: keyof T): void {
+    this._emitting[type] = false;
   }
 
   public off<K extends keyof T>(type: K, callback: Callback<T, K>): this {
