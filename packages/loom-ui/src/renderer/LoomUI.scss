@@ -73,28 +73,5 @@ input, textarea, select {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-
-    &__btn {
-      background-color: $accent;
-      border: 1px solid $accent;
-      color: white;
-      padding: 9px 14px;
-      border-radius: 10px;
-      text-align: center;
-
-      &:nth-child(2n) {
-        border-color: $primary-8;
-        background-color: $primary-0;
-        color: inherit;
-
-        &:active {
-          background-color: darken($primary-0, 20%);
-        }
-      }
-
-      &:active {
-        background-color: darken($accent, 20%);
-      }
-    }
   }
 }
