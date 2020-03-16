@@ -40,7 +40,10 @@ export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
 
     this.destroy.do(lst.watch(
       (index, value) => this.insertChild(new SelectOption(value, watch), index),
-      index => this.removeChild(index)
+      (index, value) => {
+        this.removeChild(index);
+        if (value === selected.get()) selected.set(null);
+      }
     ), selected.watch(value => {
       this.el.selectedIndex = value === null
         ? -1 : lst.asArray().indexOf(value);
