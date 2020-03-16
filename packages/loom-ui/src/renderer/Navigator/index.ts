@@ -21,7 +21,7 @@ export default class Navigator extends UIComponent {
       .on('back', () => this.showData(false));
     this.definitionNav = new DefinitionNavigator(this.ui);
 
-    this.destroy.do(ui.content.watch(content => this.showData(!!content)));
+    this.destroy.do(ui.contentDef.watch(def => this.showData(!!def)));
   }
 
   public showData = (showingData: boolean): void => {

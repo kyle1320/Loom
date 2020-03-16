@@ -58,6 +58,7 @@ export default class LoomUI extends UIComponent {
       contentDef.set(def);
     });
     contentDef.watch((def, oldDef) => {
+      if (def?.key.get() === oldDef?.key.get()) return;
       oldDef && oldDef.destroy();
       content.set(
         def && this.sources && def.value.get()?.build(this.sources) || null
