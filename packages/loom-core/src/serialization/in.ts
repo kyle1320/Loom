@@ -4,9 +4,13 @@ import * as path from 'path';
 import { Sources } from '../definitions';
 import { importPage, importComponents } from './HTML';
 import { importStylesheet } from './CSS';
-import { walkDir, LoomConfig } from '.';
+import { walkDir, LoomConfig, isDirectory } from '.';
 
 export function importSources(rootDir: string): Sources {
+  if (!isDirectory(rootDir)) {
+    rootDir = path.dirname(rootDir);
+  }
+
   const config = JSON.parse(
     fs.readFileSync(path.join(rootDir, 'loom.json')).toString()
   ) as LoomConfig;
