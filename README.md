@@ -6,3 +6,5 @@
 * From the root project directory, run:
   * `yarn install` (this only needs to be done once)
   * `yarn run ui`
+
+The `examples` directory contains sample projects. These can be opened in Loom by selecting either the parent folder (such as `examples/simple`) or the `loom.json` file within.
