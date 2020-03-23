@@ -55,7 +55,8 @@ export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
   }
 
   public delete(): void {
-    this.map.delete(this.key.get());
+    if (this.exists()) this.map.delete(this.key.get());
+    else this.emit('delete');
   }
 
   public watch(
