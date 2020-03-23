@@ -3,8 +3,8 @@
 .btn {
   border: 1px solid $primary-8;
   background-color: $primary-0;
-  padding: 2px 5px;
-  border-radius: 10px;
+  padding: 3px 6px;
+  border-radius: 5px;
   text-align: center;
 
   &:active {
@@ -14,6 +14,11 @@
   &:focus {
     text-decoration: underline;
     outline: none;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.7;
   }
 
   &--primary {
@@ -28,5 +33,6 @@
 
   &--large {
     padding: 9px 14px;
+    border-radius: 10px;
   }
 }
