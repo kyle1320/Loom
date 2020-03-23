@@ -1,4 +1,4 @@
-type JSXChild = HTMLElement | string | number | boolean | null | undefined;
+type JSXChild = Node | string | number | boolean | null | undefined;
 export type ElementContent = JSXChild | JSXChild[];
 
 type ElementProps<T extends keyof HTMLElementTagNameMap> = {
@@ -60,4 +60,51 @@ export function toggleClass(
   } else {
     el.className = el.className.replace(regexp, '');
   }
+}
+
+export function parseDescriptor(descriptor: string): HTMLElement {
+  let tag = '';
+  let id = '';
+  const classes = [];
+  let pushClass = false, pushId = false;
+
+  for (const part of descriptor.split(/([.#])/g)) {
+    switch (part) {
+      case '.': pushClass = true; break;
+      case '#': pushId = true; break;
+      default:
+        if (pushClass) classes.push(part);
+        else if (pushId) id = part;
+        else tag = part;
+        pushClass = pushId = false;
+    }
+  }
+
+  const el = document.createElement(tag || 'div');
+  if (id) el.id = id;
+  if (classes) el.className = classes.join(' ');
+  return el;
+}
+
+export function parseContents(contents: string): Node[] {
+  // TODO: support nested elements?
+  return contents.split(/(\{.*?\})/g).map(s => {
+    if (s[0] === '{' && s[s.length - 1] === '}') {
+      return parseElement(s.substring(1, s.length - 1));
+    } else {
+      return document.createTextNode(s);
+    }
+  });
+}
+
+export function parseElement(str: string): HTMLElement {
+  const space = str.indexOf(' ');
+  const el = parseDescriptor(space < 0 ? str : str.substring(0, space));
+  const contents = space < 0 ? '' : str.substring(space + 1);
+
+  for (const child of parseContents(contents)) {
+    el.appendChild(child);
+  }
+
+  return el;
 }
