@@ -139,10 +139,15 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
   }
 }
 
+interface NameListOptions {
+  addButtonText?: string;
+}
+
 export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
     data: WritableDictionary<T>,
     factory: () => T,
+    options: NameListOptions = {},
     public readonly selected: WritableValue<DictionaryRow<T> | null>
     = new WritableValue<DictionaryRow<T> | null>(null)
   ) {
@@ -154,7 +159,9 @@ export default class NameList<T> extends UIComponent<{ add: void }> {
     const content = new NameListContent<T>(data, selected);
 
     this.appendChild(content);
-    this.appendChild(new Button('{i.fa.fa-plus} New')
-      .on('click', () => content.add(factory())));
+    this.appendChild(
+      new Button('{i.fa.fa-plus} ' + (options.addButtonText || 'New'))
+        .on('click', () => content.add(factory()))
+    );
   }
 }

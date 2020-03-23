@@ -13,7 +13,11 @@
   & > .btn {
     border: none;
     border-radius: 0;
-    padding: 5px;
+    padding: 10px 5px;
+
+    .fa {
+      margin-right: 3px;
+    }
 
     &:hover {
       background-color: $primary-hl-0;

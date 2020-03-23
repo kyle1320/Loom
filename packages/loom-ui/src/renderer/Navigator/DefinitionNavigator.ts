@@ -37,10 +37,18 @@ class DefinitionNavigatorContents extends UIComponent {
       this.selected = selected;
       this.empty();
       this.appendChild(selected === 'pages'
-        ? new NameList(this.ui.sources.pages,
-          () => new loom.PageDef(), this.ui.selectedPage)
-        : new NameList(this.ui.sources.components,
-          () => new loom.ElementDef('div'), this.ui.selectedComponent)
+        ? new NameList(
+          this.ui.sources.pages,
+          () => new loom.PageDef(),
+          { addButtonText: 'New Page' },
+          this.ui.selectedPage
+        )
+        : new NameList(
+          this.ui.sources.components,
+          () => new loom.ElementDef('div'),
+          { addButtonText: 'New Component' },
+          this.ui.selectedComponent
+        )
       );
     }
   }
