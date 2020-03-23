@@ -112,8 +112,8 @@ export class ElementDef extends NodeDef {
 
   public constructor(
     tag: string,
-    attrs: AttributesDef | Record<string, string>,
-    children: ChildrenDef | NodeDef[],
+    attrs: AttributesDef | Record<string, string> = {},
+    children: ChildrenDef | NodeDef[] = [],
   ) {
     super();
 
@@ -145,8 +145,8 @@ export class ElementDef extends NodeDef {
 
 export class HeadDef extends ElementDef {
   public constructor(
-    attrs: AttributesDef | Record<string, string>,
-    children: ChildrenDef | NodeDef[],
+    attrs: AttributesDef | Record<string, string> = {},
+    children: ChildrenDef | NodeDef[] = [],
   ) {
     super('head', attrs, children);
     this.tag.freeze();
@@ -159,8 +159,8 @@ export class HeadDef extends ElementDef {
 
 export class BodyDef extends ElementDef {
   public constructor(
-    attrs: AttributesDef | Record<string, string>,
-    children: ChildrenDef | NodeDef[],
+    attrs: AttributesDef | Record<string, string> = {},
+    children: ChildrenDef | NodeDef[] = [],
   ) {
     super('body', attrs, children);
     this.tag.freeze();
@@ -173,8 +173,8 @@ export class BodyDef extends ElementDef {
 
 export class PageDef implements Definition {
   public constructor(
-    public readonly head: HeadDef,
-    public readonly body: BodyDef,
+    public readonly head: HeadDef = new HeadDef(),
+    public readonly body: BodyDef = new BodyDef(),
   ) { }
 
   public build(sources: Sources): Page {
