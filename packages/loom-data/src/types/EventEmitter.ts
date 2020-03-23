@@ -32,6 +32,18 @@ export class EventEmitter<T> implements Destroyable {
     return () => this.off(type, callback);
   }
 
+  public once<K extends keyof T>(
+    type: K,
+    callback: Callback<T, K>
+  ): () => void {
+    const remove = this.onOff(type, doOnce);
+    function doOnce(...args: AsArray<T[K]>): void {
+      callback(...args);
+      remove();
+    }
+    return remove;
+  }
+
   protected emit<K extends keyof T>(type: K, ...args: AsArray<T[K]>): this {
     const registered = this._listeners[type];
     this._emitting[type] = true;
