@@ -3,7 +3,10 @@ import { EventEmitter } from '../EventEmitter';
 import { WritableValue } from '../Value';
 import { doAll } from '../../util';
 
-export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
+export default class DictionaryRow<T> extends EventEmitter<{
+  insert: void;
+  delete: void;
+}> {
   public readonly key: WritableValue<string>;
   public readonly value: WritableValue<T>;
 
@@ -39,7 +42,10 @@ export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
     }(defaultValue);
 
     this.destroy.do(keyVal.watch(key => map.watchKey(key, {
-      addRow: this.value.set,
+      addRow: (val) => {
+        this.value.set(val);
+        this.emit('insert');
+      },
       move: keyVal.update,
       update: this.value.set,
       deleteRow: () => this.emit('delete')
@@ -51,7 +57,9 @@ export default class DictionaryRow<T> extends EventEmitter<{ delete: void }> {
   }
 
   public insert(): void {
-    this.map.set(this.key.get(), this.value.get());
+    if (!this.exists()) {
+      this.map.set(this.key.get(), this.value.get());
+    }
   }
 
   public delete(): void {
