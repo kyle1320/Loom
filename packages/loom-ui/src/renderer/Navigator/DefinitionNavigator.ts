@@ -1,3 +1,5 @@
+import * as loom from 'loom-core';
+
 import LoomUI from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { NameList, Tabs } from '@/common';
@@ -35,8 +37,10 @@ class DefinitionNavigatorContents extends UIComponent {
       this.selected = selected;
       this.empty();
       this.appendChild(selected === 'pages'
-        ? new NameList(this.ui.sources.pages, this.ui.selectedPage)
-        : new NameList(this.ui.sources.components, this.ui.selectedComponent)
+        ? new NameList(this.ui.sources.pages,
+          () => new loom.PageDef(), this.ui.selectedPage)
+        : new NameList(this.ui.sources.components,
+          () => new loom.ElementDef('div'), this.ui.selectedComponent)
       );
     }
   }

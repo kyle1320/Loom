@@ -1,13 +1,28 @@
 @import "~@/variables";
 
 .namelist {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
   &__title {
     flex-grow: 1;
     padding-left: 2px;
   }
 
+  & > .btn {
+    border: none;
+    border-radius: 0;
+    padding: 5px;
+
+    &:hover {
+      background-color: $primary-hl-0;
+    }
+  }
+
   &__content {
     overflow-y: auto;
+    align-self: stretch;
   }
 
   &__row {

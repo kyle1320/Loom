@@ -1,5 +1,6 @@
 import { DictionaryRow, WritableDictionary, WritableValue } from 'loom-data';
 
+import Button from './Button';
 import { UIComponent } from '@/UIComponent';
 import { makeElement, toggleClass } from '@/util/dom';
 import { showMenu } from '@/util/electron';
@@ -7,21 +8,34 @@ import { showMenu } from '@/util/electron';
 import './NameList.scss';
 
 class NameListContent<T> extends UIComponent {
+  private newRow: DictionaryRow<T> | null = null;
+
   public constructor(
-    data: WritableDictionary<T>,
-    selected: WritableValue<DictionaryRow<T> | null>
+    private readonly data: WritableDictionary<T>,
+    private readonly selected: WritableValue<DictionaryRow<T> | null>
   ) {
     super(makeElement('div', { className: 'namelist__content' }));
 
     this.destroy.do(data.watch({
-      addRow: key => this.appendChild(
-        new NameListRow(new DictionaryRow(data, key, null!), selected)
-      )
+      addRow: key => {
+        if (!this.newRow || this.newRow.key.get() !== key) {
+          this.appendChild(
+            new NameListRow(new DictionaryRow(data, key, null!), selected)
+          )
+        }
+      }
     }));
+  }
+
+  public add(val: T): void {
+    this.newRow = new DictionaryRow(this.data, '', val);
+    const row = new NameListRow(this.newRow, this.selected);
+    this.appendChild(row);
+    row.edit();
   }
 }
 
-class EditableName extends UIComponent {
+class EditableName extends UIComponent<{ blur: void }> {
   private editing = false;
 
   public constructor(private readonly value: WritableValue<string>) {
@@ -40,6 +54,10 @@ class EditableName extends UIComponent {
 
   public edit(editing = true): void {
     if (this.editing === editing) return;
+
+    if (this.el instanceof HTMLInputElement) {
+      this.el.blur(); // save value
+    }
 
     this.editing = editing;
     if (editing) {
@@ -60,11 +78,14 @@ class EditableName extends UIComponent {
       this.changeEl(
         makeElement('div', { className: 'namelist__title' }, this.value.get())
       );
+      this.emit('blur');
     }
   }
 }
 
 class NameListRow<T> extends UIComponent<{}, HTMLElement> {
+  private readonly title: EditableName;
+
   public constructor(
     row: DictionaryRow<T>,
     selected: WritableValue<DictionaryRow<T> | null>
@@ -75,7 +96,8 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
         className: 'namelist__row',
         onclick: e => {
           e.stopPropagation();
-          selected.set(
+          this.title.edit(false);
+          row.exists() && selected.set(
             new DictionaryRow(row.map, row.key.get(), row.value.get())
           );
         },
@@ -97,9 +119,13 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
       }),
       title
     );
+    this.title = title;
 
     this.destroy.do(
       row.onOff('delete', this.destroy),
+      title.onOff('blur', () => {
+        if (!row.exists()) row.key.get() ? row.insert() : row.delete();
+      }),
       selected.watch(r => {
         toggleClass(this.el, 'selected',
           !!(r && r.key.get() == row.key.get()));
@@ -107,11 +133,16 @@ class NameListRow<T> extends UIComponent<{}, HTMLElement> {
       () => row.destroy()
     );
   }
+
+  public edit(editing = true): void {
+    this.title.edit(editing);
+  }
 }
 
 export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
     data: WritableDictionary<T>,
+    factory: () => T,
     public readonly selected: WritableValue<DictionaryRow<T> | null>
     = new WritableValue<DictionaryRow<T> | null>(null)
   ) {
@@ -120,6 +151,10 @@ export default class NameList<T> extends UIComponent<{ add: void }> {
       onclick: () => selected.set(null)
     }));
 
-    this.appendChild(new NameListContent<T>(data, selected));
+    const content = new NameListContent<T>(data, selected);
+
+    this.appendChild(content);
+    this.appendChild(new Button('{i.fa.fa-plus} New')
+      .on('click', () => content.add(factory())));
   }
 }
