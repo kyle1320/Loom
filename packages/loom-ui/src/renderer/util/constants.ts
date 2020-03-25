@@ -15,11 +15,9 @@ type Constants = Readonly<{
     colors: string[];
     properties: Record<string, {
       type: 'any' | 'color' | 'number';
-      name?: string;
     } | {
       type: 'select';
       values: string[];
-      name?: string;
     }>;
   };
   html: {
@@ -92,7 +90,7 @@ const constants: Constants = {
       'border-block-start-color': { type: 'any' },
       'border-block-start-style': { type: 'any' },
       'border-block-start-width': { type: 'any' },
-      'border-bottom': { type: 'any', name: 'Border (bottom)' },
+      'border-bottom': { type: 'any' },
       'border-bottom-color': { type: 'any' },
       'border-bottom-left-radius': { type: 'any' },
       'border-bottom-right-radius': { type: 'any' },
@@ -177,7 +175,7 @@ const constants: Constants = {
         values: ['none', 'left', 'right', 'both', 'inline-start', 'inline-end', 'initial', 'inherit'] },
       'clip': { type: 'any' },
       'clip-path': { type: 'any' },
-      'color': { type: 'color', name: 'Font Color' },
+      'color': { type: 'color' },
       'color-adjust': { type: 'select',
         values: ['economy', 'exact', 'initial', 'inherit'] },
       'column-count': { type: 'any' },
@@ -225,7 +223,7 @@ const constants: Constants = {
       'font-optical-sizing': { type: 'select',
         values: ['auto', 'none', 'initial', 'inherit'] },
       'font-variation-settings': { type: 'any' },
-      'font-size': { type: 'any', name: 'Font Size' },
+      'font-size': { type: 'any' },
       'font-size-adjust': { type: 'any' },
       'font-stretch': { type: 'any' },
       'font-style': { type: 'any' },
@@ -518,7 +516,7 @@ const constants: Constants = {
       'vertical-align': { type: 'any' },
       'visibility': { type: 'select',
         values: ['visible', 'hidden', 'collapse', 'initial', 'inherit'] },
-      'white-space': { type: 'select', name: 'Whitespace',
+      'white-space': { type: 'select',
         values: ['normal', 'pre', 'nowrap', 'pre-wrap', 'pre-line', 'break-spaces', 'initial', 'inherit'] },
       'widows': { type: 'any' },
       'width': { type: 'any' },
