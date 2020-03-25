@@ -1,6 +1,7 @@
 import * as loom from 'loom-core';
 
-import ElementEditor from './ElementEditor';
+import WYSIWYGEditor from './WYSIWYGEditor';
+import PropertiesEditor from './PropertiesEditor';
 import LoomUI from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { makeElement } from '@/util/dom';
@@ -27,6 +28,15 @@ class UnknownSelection extends UIComponent {
         'Unexpected Selection!'
       )
     ));
+  }
+}
+
+class ElementEditor extends UIComponent {
+  public constructor(ui: LoomUI) {
+    super(makeElement('div', { className: 'element-editor' }),
+      new WYSIWYGEditor(ui),
+      new PropertiesEditor(ui)
+    );
   }
 }
 
