@@ -9,7 +9,7 @@ import './ComboBox.scss';
 
 export default class ComboBox extends UIComponent {
   public constructor(
-    options: List<string> | string[],
+    options: List<string> | Readonly<string[]>,
     value: WritableValue<string>,
     disabled?: boolean
   ) {

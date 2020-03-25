@@ -12,7 +12,7 @@ class List<T> extends EventEmitter<List.Events<T>> {
   protected data: T[] = [];
 
   public constructor(
-    data: T[] = []
+    data: Readonly<T[]> = []
   ) {
     super();
 

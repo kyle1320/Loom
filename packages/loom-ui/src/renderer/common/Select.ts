@@ -19,7 +19,7 @@ class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
 
 export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
   public constructor(
-    source: List<T> | T[],
+    source: List<T> | Readonly<T[]>,
     watch: (value: T, cb: (name: string) => void) => () => void
     = (val, cb) => {
       cb(String(val));
