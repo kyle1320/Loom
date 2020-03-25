@@ -11,6 +11,7 @@ import MultiInput from './MultiInput';
 import MultiSelect from './MultiSelect';
 import NameList from './NameList';
 import Select from './Select';
+import SuggestiveInput from './SuggestiveInput';
 import Tabs from './Tabs';
 import TextArea from './TextArea';
 import WritableSelect from './WritableSelect';
@@ -29,6 +30,7 @@ export {
   MultiSelect,
   NameList,
   Select,
+  SuggestiveInput,
   Tabs,
   TextArea,
   WritableSelect

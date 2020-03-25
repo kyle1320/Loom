@@ -1,0 +1,56 @@
+@import "~@/variables";
+
+.suggestive-input {
+  position: relative;
+  border-radius: 0 !important;
+
+  .highlight {
+    span {
+      font-weight: bold;
+    }
+  }
+
+  input {
+    flex-grow: 1;
+  }
+
+  &:focus-within &__suggestions {
+    display: flex;
+  }
+
+  &__suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-flow: column nowrap;
+    max-height: 100px;
+    overflow-y: auto;
+    background-color: $primary-0;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+
+    .suggestion {
+      padding: 5px;
+      border-bottom: 1px solid $primary-2;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
+
+      &.highlight {
+        background-color: $primary-hl-0;
+      }
+
+      &:focus {
+        background-color: $accent;
+        color: white;
+        outline: none;
+      }
+
+      &:last-child {
+        border: none;
+      }
+    }
+  }
+}
