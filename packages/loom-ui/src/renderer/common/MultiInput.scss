@@ -2,7 +2,7 @@
   display: flex;
   flex-flow: row nowrap;
 
-  input, select, .color-picker, .combo-box {
+  input, select, .color-picker, .combo-box, .btn {
     &:not(:last-child) {
       border-top-right-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
