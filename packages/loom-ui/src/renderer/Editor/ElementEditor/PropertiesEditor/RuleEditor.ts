@@ -11,14 +11,23 @@ import {
   Input,
   ColorPicker,
   MultiInput,
-  ComboBox } from '@/common';
+  ComboBox,
+  SuggestiveInput } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 import C from '@/util/constants';
 
 import './RuleEditor.scss';
 
-export class RuleEditor extends UIComponent {
+const styleSuggestions: SuggestiveInput.SuggestionValue[] = [];
+for (const key in C.css.properties) {
+  styleSuggestions.push({
+    value: key,
+    name: C.css.properties[key].name
+  });
+}
+
+export class RuleEditor extends UIComponent<{}, HTMLElement> {
   public constructor(rule: Value<StyleRuleDef | null>) {
     super(makeElement('div', { className: 'rule-editor' }));
 
@@ -26,6 +35,19 @@ export class RuleEditor extends UIComponent {
       this.empty();
 
       if (rule) {
+        this.appendChild(new UIComponent(makeElement('hr')));
+        this.appendChild(
+          new SuggestiveInput(
+            styleSuggestions,
+            'New Style Rule...',
+            '{.fa.fa-plus}'
+          ).on('submit', k => {
+            // TODO: get current value from WYSIWYG editor
+            const value = '';
+            rule.style.has(k) || rule.style.set(k, value);
+            this.select(k);
+          })
+        );
         const rows = new DictionaryKeys<string>(rule.style, true);
         rows.watch(
           (i, k) => {
@@ -52,6 +74,11 @@ export class RuleEditor extends UIComponent {
 
       return null;
     }));
+  }
+
+  private select(key: string): void {
+    const el = this.el.querySelector('[data-key='+key+']');
+    if (el instanceof HTMLElement) el.click();
   }
 
   private getFriendlyName(key: string): string {
