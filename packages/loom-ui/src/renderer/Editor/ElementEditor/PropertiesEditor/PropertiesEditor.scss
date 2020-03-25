@@ -89,10 +89,11 @@
   display: flex;
   flex-flow: row wrap;
   align-items: flex-start;
+  justify-content: space-between;
 
   & > * {
     flex-grow: 1;
-    flex-basis: 100px;
+    flex-basis: 80px;
   }
 
   &__title {
