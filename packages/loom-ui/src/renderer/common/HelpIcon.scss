@@ -1,0 +1,56 @@
+@import "~@/variables";
+
+.help-icon {
+  position: relative;
+  display: inline-block;
+  max-width: 20px;
+
+  .icon-btn {
+    border: none;
+    padding: 0;
+    opacity: 0.6;
+
+    &:focus {
+      color: $accent;
+    }
+  }
+
+  &__tooltip {
+    display: none;
+    position: absolute;
+    padding: 5px 7px;
+    border-radius: 4px;
+    background-color: $primary-0;
+    font-size: 11px;
+    z-index: 1000;
+    width: 200px;
+    white-space: normal;
+    border: 1px solid $primary-3;
+
+    &::after {
+      content: '';
+      position: absolute;
+      border: 5px solid $primary-0;
+      border-left-color: transparent;
+      border-top-color: transparent;
+      z-index: -1;
+      box-shadow: 1px 1px $primary-3;
+    }
+
+    &--left {
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+
+      &:after {
+        top: 50%;
+        right: 0;
+        transform: translate(50%, -50%) rotate(-45deg);
+      }
+    }
+  }
+
+  &:focus-within .help-icon__tooltip {
+    display: block;
+  }
+}

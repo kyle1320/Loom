@@ -3,6 +3,7 @@ import ColorPicker from './ColorPicker';
 import ComboBox from './ComboBox';
 import Floating from './Floating';
 import Frame from './Frame';
+import HelpIcon from './HelpIcon';
 import IconButton from './IconButton';
 import Input from './Input';
 import KeyValueList from './KeyValueList';
@@ -20,6 +21,7 @@ export {
   ComboBox,
   Floating,
   Frame,
+  HelpIcon,
   IconButton,
   Input,
   KeyValueList,
