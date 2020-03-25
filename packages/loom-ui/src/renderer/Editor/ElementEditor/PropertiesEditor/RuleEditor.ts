@@ -55,28 +55,28 @@ export class RuleEditor extends UIComponent {
   }
 
   private getFriendlyName(key: string): string {
-    switch (key) {
-      case 'border-bottom': return 'Border (bottom)';
-      case 'color': return 'Font Color';
-      case 'font-size': return 'Font Size';
-      case 'white-space': return 'Whitespace';
-      default: return key;
-    }
+    const data = C.css.properties[key];
+    return (data && data.name) || key;
   }
 
   private getEditor(key: string, value: WritableValue<string>): UIComponent {
+    const info = C.css.properties[key] || { type: 'any' };
     switch (key) {
-      case 'color':
-        return new MultiInput(
-          new ColorPicker(value),
-          new ComboBox(C.css.colors, value)
-        );
       case 'font-size':
-        return new UnitInput(value, C.css.units.all);
+        return new UnitInput(value, C.css.units.lengths);
       case 'white-space':
-        return new ComboBox(C.css.values.whiteSpace, value);
       default:
-        return new Input(value);
+        switch (info.type) {
+          case 'color':
+            return new MultiInput(
+              new ColorPicker(value),
+              new ComboBox(C.css.colors, value)
+            );
+          case 'select':
+            return new ComboBox(info.values, value);
+          default:
+            return new Input(value);
+        }
     }
   }
 }
