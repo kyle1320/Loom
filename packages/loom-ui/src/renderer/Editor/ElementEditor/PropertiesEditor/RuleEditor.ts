@@ -22,8 +22,7 @@ import './RuleEditor.scss';
 const styleSuggestions: SuggestiveInput.SuggestionValue[] = [];
 for (const key in C.css.properties) {
   styleSuggestions.push({
-    value: key,
-    name: C.css.properties[key].name
+    value: key
   });
 }
 
@@ -56,13 +55,7 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
               k,
               this.getEditor(k, value),
               {
-                helpText: () => fetch(
-                  `https://developer.mozilla.org/en-US/docs/Web/CSS/${k}$json`
-                ).then(res => res.ok && res.json())
-                  .then(json => json
-                    ? json.summary.replace(/<a.*?>(.*?)<\/a>/g, '$1')
-                    : 'Help info not found'
-                  ),
+                helpText: C.css.properties[k]?.summary,
                 key: k,
                 canDelete: true
               }
@@ -107,7 +100,7 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
 }
 
 class UnitInput extends MultiInput {
-  public constructor(value: WritableValue<string>, units: string[]) {
+  public constructor(value: WritableValue<string>, units: Readonly<string[]>) {
     const parsed = new ParsedValue(
       value,
       v => {
