@@ -33,6 +33,13 @@ export class RuleEditor extends UIComponent {
             const comp = new PropertyField(
               this.getFriendlyName(k),
               this.getEditor(k, value),
+              () => fetch(
+                `https://developer.mozilla.org/en-US/docs/Web/CSS/${k}$json`
+              ).then(res => res.ok && res.json())
+                .then(json => json
+                  ? json.summary.replace(/<a.*?>(.*?)<\/a>/g, '$1')
+                  : 'Help info not found'
+                ),
               k
             );
             comp.destroy.do(value);
