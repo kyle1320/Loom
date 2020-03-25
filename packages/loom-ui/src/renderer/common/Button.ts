@@ -3,7 +3,7 @@ import { makeElement, toggleClass, parseContents } from '@/util/dom';
 
 import './Button.scss';
 
-type ButtonStyle = 'primary' | 'large';
+type ButtonStyle = 'primary' | 'large' | 'small';
 export default class Button extends UIComponent<{ click: void }, HTMLElement> {
   public constructor(contents: string, ...styles: ButtonStyle[]) {
     super(makeElement('div', {
