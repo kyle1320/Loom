@@ -3,16 +3,11 @@
         "node": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
+        "eslint:recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 2017,
-        "sourceType": "module"
+        "ecmaVersion": 2017
     },
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
     "rules": {
         "no-console": "off",
         "linebreak-style": [
@@ -67,23 +62,6 @@
             }
         ],
         "space-before-blocks": "error",
-        "block-spacing": "error",
-        "@typescript-eslint/indent": [
-            "error",
-            2
-        ],
-        "@typescript-eslint/explicit-function-return-type": [
-            "error",
-            {
-                "allowExpressions": true,
-                "allowTypedFunctionExpressions": true,
-                "allowHigherOrderFunctions": true
-            }
-        ],
-        "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-parameter-properties": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-use-before-define": "off"
+        "block-spacing": "error"
     }
 }

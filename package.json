@@ -11,6 +11,7 @@
     "@typescript-eslint/parser": "^2.17.0",
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
+    "node-fetch": "^2.6.0",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^25.0.0",
     "typescript": "^3.8.3"
@@ -19,18 +20,16 @@
     "lint": "eslint packages --ext js,ts,jsx,tsx",
     "verify": "npm-run-all -p typecheck lint",
     "test": "jest",
-
     "typecheck": "npm-run-all -p typecheck-core typecheck-data typecheck-ui",
     "typecheck-core": "yarn workspace loom-core run typecheck",
     "typecheck-data": "yarn workspace loom-data run typecheck",
     "typecheck-ui": "yarn workspace loom-ui run typecheck",
-
     "build": "yarn run build-core && yarn run build-data",
     "build-core": "yarn workspace loom-core run build",
     "build-data": "yarn workspace loom-data run build",
-
     "ui": "yarn workspace loom-ui run dev",
-    "ui-dist": "yarn workspace loom-ui run dist"
+    "ui-dist": "yarn workspace loom-ui run dist",
+    "generate-css-properties": "node ./scripts/generateCSSProperties.js > ./packages/loom-ui/src/renderer/util/properties.ts"
   },
   "workspaces": [
     "packages/*"
