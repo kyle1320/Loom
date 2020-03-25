@@ -53,17 +53,20 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
           (i, k) => {
             const value = new LookupValue(rule.style, k, '');
             const comp = new PropertyField(
-              this.getFriendlyName(k),
+              k,
               this.getEditor(k, value),
-              () => fetch(
-                `https://developer.mozilla.org/en-US/docs/Web/CSS/${k}$json`
-              ).then(res => res.ok && res.json())
-                .then(json => json
-                  ? json.summary.replace(/<a.*?>(.*?)<\/a>/g, '$1')
-                  : 'Help info not found'
-                ),
-              k
-            );
+              {
+                helpText: () => fetch(
+                  `https://developer.mozilla.org/en-US/docs/Web/CSS/${k}$json`
+                ).then(res => res.ok && res.json())
+                  .then(json => json
+                    ? json.summary.replace(/<a.*?>(.*?)<\/a>/g, '$1')
+                    : 'Help info not found'
+                  ),
+                key: k,
+                canDelete: true
+              }
+            ).on('delete', () => rule.style.delete(k));
             comp.destroy.do(value);
             this.insertChild(comp, i);
           },
@@ -79,11 +82,6 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
   private select(key: string): void {
     const el = this.el.querySelector('[data-key='+key+']');
     if (el instanceof HTMLElement) el.click();
-  }
-
-  private getFriendlyName(key: string): string {
-    const data = C.css.properties[key];
-    return (data && data.name) || key;
   }
 
   private getEditor(key: string, value: WritableValue<string>): UIComponent {

@@ -104,6 +104,14 @@
     margin-right: 8px;
     line-height: 14px;
     padding: 4px 0;
+
+    .can-delete {
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: line-through;
+      }
+    }
   }
 
   .keyvaluelist {
