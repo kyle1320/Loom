@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "CommonJS"
   },
   "references": [{
     "path": "../loom-core"
