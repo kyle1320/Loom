@@ -66,6 +66,9 @@ export default class LoomUI extends UIComponent {
       );
       return def && def.onOff('delete', () => contentDef.set(null));
     });
+    this.data.watch(data => {
+      return data && data.source.onOff('delete', () => this.data.set(null));
+    })
 
     this.setSources(sources);
 
