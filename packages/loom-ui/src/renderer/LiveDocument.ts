@@ -310,6 +310,11 @@ export default class LiveDocument extends Frame<{
     comp.data && this.data.delete(comp.data);
   }
 
+  public getNode(data: DataTypes): Node | null {
+    const comp = this.data.get(data);
+    return comp && comp.getEl() || null;
+  }
+
   public select(node: LiveNode | null): void {
     this.ui.data.set(node && node.data);
   }

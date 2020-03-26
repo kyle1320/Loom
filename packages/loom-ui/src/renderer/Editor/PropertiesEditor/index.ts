@@ -1,4 +1,4 @@
-import { DictionaryKeys } from 'loom-data';
+import { DictionaryKeys, FilteredList } from 'loom-data';
 import * as loom from 'loom-core';
 
 import PropertyField from './PropertyField';
@@ -120,8 +120,19 @@ export default class PropertiesEditor extends UIComponent {
       case 'style':
         (() => {
           const sheet = this.ui.results.styles;
-          const selector = new WritableSelect(
+          const rules = new FilteredList(
             sheet.source.rules,
+            rule => {
+              let node = data && this.ui.liveDoc.get()!.getNode(data);
+              if (!(node instanceof HTMLElement)) {
+                node = node?.parentElement || null;
+              }
+              if (!node || !(node instanceof HTMLElement)) return true;
+              return node.matches(rule.selector.get());
+            }
+          );
+          const selector = new WritableSelect(
+            rules,
             rule => rule.selector
           );
           const rule = selector.selected;
