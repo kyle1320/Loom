@@ -213,14 +213,17 @@ export default class WYSIWYGEditor extends UIComponent<{
       const content = ui.content.get() as loom.Page | loom.Element;
       let head: UIComponent;
       let body: UIComponent;
+      let root: loom.Element;
 
       if (content instanceof loom.Page) {
         head = makeComponent(this, content.head, doc.head);
         body = makeComponent(this, content.body, doc.body);
+        root = content.body;
       } else {
         head = new UIComponent(doc.head);
         body = makeComponent(this, content);
         body.addTo(doc.body);
+        root = content;
       }
 
       const removeStyles = addStyles(doc, ui.results.styles);
@@ -229,8 +232,9 @@ export default class WYSIWYGEditor extends UIComponent<{
         const selection = doc.getSelection()!;
         if (doc.hasFocus()) {
           let node = selection.focusNode;
-          if (node && node.nodeType === 3) node = node.parentNode;
-          const comp = node && this.nodes.get(node) || null;
+          if (!node) return;
+          if (node.nodeType === 3) node = node.parentNode;
+          const comp = node && this.nodes.get(node) || this.data.get(root);
           ignoreEvents = true;
           comp && this.select(comp);
           ignoreEvents = false;
