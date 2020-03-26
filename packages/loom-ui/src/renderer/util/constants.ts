@@ -1,30 +1,40 @@
 /* eslint-disable max-len */
 import properties from './properties';
+import type { DeepReadonly } from '.';
 
-type Constants = Readonly<{
+type Constants = DeepReadonly<{
   css: {
     units: {
-      absoluteLengths: Readonly<string[]>;
-      relativeLengths: Readonly<string[]>;
-      lengths: Readonly<string[]>;
-      angles: Readonly<string[]>;
-      frequencies: Readonly<string[]>;
-      gridLengths: Readonly<string[]>;
-      resolutions: Readonly<string[]>;
-      times: Readonly<string[]>;
+      absoluteLengths: string[];
+      relativeLengths: string[];
+      lengths: string[];
+      angles: string[];
+      frequencies: string[];
+      gridLengths: string[];
+      resolutions: string[];
+      times: string[];
     };
-    colors: Readonly<string[]>;
+    colors: string[];
     properties: Record<string, {
       type: 'any' | 'color' | 'number';
       summary: string;
     } | {
       type: 'select';
-      values: Readonly<string[]>;
+      values: string[];
       summary: string;
     }>;
   };
   html: {
-    basicTags: Readonly<string[]>;
+    basicTags: string[];
+    metadata: string[];
+    flow: string[];
+    sectioning: string[];
+    heading: string[];
+    phrasing: string[];
+    embedded: string[];
+    interactive: string[];
+    form: string[];
+    empty: string[];
   };
 }>;
 
@@ -46,10 +56,16 @@ const constants: Constants = {
     properties
   },
   html: {
-    basicTags: [
-      'a', 'b', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'hr', 'ol', 'p', 'span', 'u', 'ul'
-    ]
+    basicTags: ['a', 'b', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'ol', 'p', 'span', 'table', 'u', 'ul'],
+    metadata: ['title', 'link', 'meta', 'script', 'style', 'base', 'noscript'],
+    flow: ['a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bdo', 'bdi', 'blockquote', 'br', 'button', 'canvas', 'cite', 'code', 'data', 'datalist', 'del', 'details', 'dfn', 'div', 'dl', 'em', 'embed', 'fieldset', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'label', 'main', 'map', 'mark', 'math', 'menu', 'meter', 'nav', 'noscript', 'object', 'ol', 'output', 'p', 'picture', 'pre', 'progress', 'q', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'svg', 'table', 'template', 'textarea', 'time', 'ul', 'var', 'video', 'wbr'],
+    sectioning: ['article', 'aside', 'nav', 'section'],
+    heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup'],
+    phrasing: ['a', 'abbr', 'audio', 'b', 'bdo', 'br', 'button', 'canvas', 'cite', 'code', 'command', 'data', 'datalist', 'dfn', 'em', 'embed', 'i', 'iframe', 'img', 'input', 'kbd', 'label', 'mark', 'math', 'meter', 'noscript', 'object', 'output', 'picture', 'progress', 'q', 'ruby', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'svg', 'textarea', 'time', 'var', 'video', 'wbr'],
+    embedded: ['audio', 'canvas', 'embed', 'iframe', 'img', 'math', 'object', 'picture', 'svg', 'video'],
+    interactive: ['a', 'button', 'details', 'embed', 'iframe', 'label', 'select', 'textarea'],
+    form: ['button', 'fieldset', 'input', 'label', 'meter', 'object', 'output', 'progress', 'select', 'textarea'],
+    empty: ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
   }
 };
 

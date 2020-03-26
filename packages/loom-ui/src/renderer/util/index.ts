@@ -1,5 +1,9 @@
 import { WritableValue, WritableDictionary } from 'loom-data';
 
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: DeepReadonly<T[P]>;
+}
+
 export class LookupValue extends WritableValue<string> {
   public constructor(
     private readonly sourceMap: WritableDictionary<string>,
