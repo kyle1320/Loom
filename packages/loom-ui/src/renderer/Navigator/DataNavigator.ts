@@ -5,6 +5,9 @@ import LoomUI from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { IconButton } from '@/common';
 import { makeElement } from '@/util/dom';
+import { showMenu } from '@/util/electron';
+import { validChildren, isValidChild } from '@/util/html';
+import C from '@/util/constants';
 
 import './DataNavigator.scss';
 
@@ -40,7 +43,42 @@ class DataNavigatorHeader extends UIComponent<{ back: void }> {
 
 class DataNavigatorContent extends UIComponent {
   public constructor(ui: LoomUI) {
-    super(makeElement('div', { className: 'data-nav__content' }));
+    super(makeElement('div', {
+      className: 'data-nav__content',
+      oncontextmenu: e => {
+        e.stopPropagation();
+        const content = ui.content.get()!;
+        const el = content instanceof loom.Element ? content : content.body;
+        const components = [...ui.sources.components.keys()].filter(name => {
+          return isValidChild(el, ui.sources.components.get(name)!);
+        });
+        showMenu([{
+          label: 'New Element',
+          submenu: [{
+            label: 'text',
+            click: () => ui.data.set(
+              el.children.addThrough(new loom.TextNodeDef('text'))
+            )
+          }, {
+            type: 'separator'
+          }, ...(validChildren(el.source) || C.html.basicTags).map(tag => ({
+            label: tag,
+            click: () => ui.data.set(
+              el.children.addThrough(new loom.ElementDef(tag))
+            )
+          }))]
+        }, {
+          label: 'Add Component',
+          submenu: components.map(name => ({
+            label: name,
+            click: () => ui.data.set(
+              el.children.addThrough(new loom.ComponentDef(name))
+            )
+          })),
+          enabled: components.length > 0
+        }]);
+      }
+    }));
 
     this.destroy.do(ui.content.watch(content => {
       this.empty();

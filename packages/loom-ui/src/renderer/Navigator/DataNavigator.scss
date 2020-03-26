@@ -6,6 +6,8 @@
   overflow-y: auto;
   border-right: 1px solid $primary-5;
   background-color: $primary-1;
+  display: flex;
+  flex-flow: column nowrap;
 
   &__header {
     display: flex;
@@ -15,6 +17,10 @@
     height: 30px;
     background-color: $primary-1;
     border-bottom: 1px solid $primary-3;
+  }
+
+  &__content {
+    flex-grow: 1;
   }
 
   &__location {

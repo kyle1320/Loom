@@ -5,6 +5,8 @@ import LoomUI, { DataTypes } from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { makeElement, toggleClass } from '@/util/dom';
 import { showMenu } from '@/util/electron';
+import { validChildren, isEmptyElement, isValidChild } from '@/util/html';
+import C from '@/util/constants';
 
 import './NodeNavigator.scss';
 
@@ -53,8 +55,47 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       },
       oncontextmenu: e => {
         e.stopPropagation();
+        const components = node instanceof loom.Element
+          ? [...ui.sources.components.keys()].filter(name => {
+            return isValidChild(node, ui.sources.components.get(name)!);
+          })
+          : [];
         showMenu([
-          ...(node.source.hasParent() ? [{
+          ...(node instanceof loom.Element && !isEmptyElement(node) ? [{
+            label: 'New Element',
+            submenu: [{
+              label: 'text',
+              click: () => ui.data.set(
+                node.children.addThrough(new loom.TextNodeDef('text'))
+              )
+            }, {
+              type: 'separator'
+            } as const, ...(validChildren(node.source) || C.html.basicTags)
+              .map(tag => ({
+                label: tag,
+                click: () => ui.data.set(
+                  node.children.addThrough(new loom.ElementDef(tag))
+                )
+              }))]
+          }, {
+            label: 'Add Component',
+            submenu: components.map(name => ({
+              label: name,
+              click: () => ui.data.set(
+                node.children.addThrough(new loom.ComponentDef(name))
+              )
+            })),
+            enabled: components.length > 0
+          }] : []),
+          ...(node instanceof loom.HeadElement ? [{
+            label: 'Add Title',
+            click: () => ui.data.set(
+              node.children.addThrough(new loom.ElementDef('title', {}, [
+                new loom.TextNodeDef('title')
+              ]))
+            )
+          }] : []),
+          ...(node.source.parent() ? [{
             label: 'Delete',
             click: () => node.source.delete()
           }] : [])
