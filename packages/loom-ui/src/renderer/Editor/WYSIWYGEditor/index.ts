@@ -6,6 +6,7 @@ import { UIComponent } from '@/UIComponent';
 import { Floating, Frame } from '@/common';
 import { addStyles } from '@/util/css';
 import { makeElement } from '@/util/dom';
+import { isEmptyElement } from '@/util/html';
 
 import './WYSIWYGEditor.scss';
 
@@ -175,8 +176,6 @@ export class WYSIWYGComponent extends UIComponent {
         editor.removeNode(this);
       }
     );
-
-    editor.addNode(this);
   }
 
   private update = (node: loom.Element | loom.UnknownComponent): void => {
@@ -208,59 +207,103 @@ export default class WYSIWYGEditor extends UIComponent<{
   public constructor(private readonly ui: LoomUI) {
     super(makeElement('div', { className: 'wysiwyg-editor__container' }));
 
+    let ignoreEvents = false;
+
+    const frame = new Frame((doc: Document) => {
+      const content = ui.content.get() as loom.Page | loom.Element;
+      let head: UIComponent;
+      let body: UIComponent;
+
+      if (content instanceof loom.Page) {
+        head = makeComponent(this, content.head, doc.head);
+        body = makeComponent(this, content.body, doc.body);
+      } else {
+        head = new UIComponent(doc.head);
+        body = makeComponent(this, content);
+        body.addTo(doc.body);
+      }
+
+      const removeStyles = addStyles(doc, ui.results.styles);
+
+      doc.addEventListener('selectionchange', () => {
+        const selection = doc.getSelection()!;
+        if (doc.hasFocus()) {
+          let node = selection.focusNode;
+          if (node && node.nodeType === 3) node = node.parentNode;
+          const comp = node && this.nodes.get(node) || null;
+          ignoreEvents = true;
+          comp && this.select(comp);
+          ignoreEvents = false;
+        } else if (selection.rangeCount) {
+          frame.getEl().contentWindow!.focus();
+        }
+      });
+
+      doc.designMode = 'on';
+      const observer = new MutationObserver(this.onEdit);
+      observer.observe(doc, {
+        characterData: true,
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
+
+      return () => {
+        removeStyles();
+        head.destroy();
+        body.destroy();
+        observer.disconnect();
+      };
+    });
+
     this.appendChild(
       new Floating(new UIComponent(
         makeElement('div', { className: 'wysiwyg-editor' }),
-        new Frame((doc: Document) => {
-          const content = ui.content.get() as loom.Page | loom.Element;
-          let head: UIComponent;
-          let body: UIComponent;
-
-          if (content instanceof loom.Page) {
-            head = makeComponent(this, content.head, doc.head);
-            body = makeComponent(this, content.body, doc.body);
-          } else {
-            head = new UIComponent(doc.head);
-            body = makeComponent(this, content);
-            body.addTo(doc.body);
-          }
-
-          const removeStyles = addStyles(doc, ui.results.styles);
-
-          doc.addEventListener('selectionchange', () => {
-            const selection = doc.getSelection() || null;
-            let node = selection && selection.focusNode;
-            if (node && node.nodeType === 3) node = node.parentNode;
-            const comp = node && this.nodes.get(node);
-            this.select(comp || null);
-          });
-
-          doc.designMode = 'on';
-          const observer = new MutationObserver(this.onEdit);
-          observer.observe(doc, {
-            characterData: true,
-            attributes: true,
-            childList: true,
-            subtree: true
-          });
-
-          return () => {
-            removeStyles();
-            head.destroy();
-            body.destroy();
-            observer.disconnect();
-          };
-        }),
+        frame,
         new EditFrame(this)
       )));
 
     this.destroy.do(ui.data.watch(data => {
       const comp = data && this.data.get(data) || null;
-      if (comp) {
-        const el = comp.getEl();
-        if (el instanceof HTMLElement) el.scrollIntoView({ block: 'nearest' });
-      }
       this.emit('select', comp);
+
+      const node = data instanceof loom.Component
+        ? data.element.get() : data;
+      if (node instanceof loom.Element) {
+        if (!node.children.size() && !isEmptyElement(node)) {
+          ui.data.set(node.children.addThrough(
+            new loom.ElementDef('br')
+          ));
+        }
+      }
+
+      if (ignoreEvents) return;
+
+      if (comp) {
+        const node = comp.getEl();
+        const doc = node.ownerDocument!;
+        const selection = doc.getSelection()!;
+
+        frame.getEl().contentWindow!.blur();
+
+        if (node instanceof HTMLElement) {
+          node.scrollIntoView({ block: 'nearest' });
+          selection.removeAllRanges();
+          if (node.textContent!.length) {
+            return;
+          }
+        }
+
+        const range = doc.createRange();
+        range.selectNodeContents(node);
+        range.collapse();
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        const doc = frame.getEl().contentDocument;
+        doc && doc.getSelection()!.removeAllRanges();
+      }
     }));
   }
 
@@ -286,8 +329,7 @@ export default class WYSIWYGEditor extends UIComponent<{
         ? _comp.node : _comp;
       if (!comp) return;
 
-      // TODO: just do this once outside of the loop?
-      node.normalize()
+      let needNormalize = false;
 
       switch (record.type) {
         case 'attributes':
@@ -305,6 +347,7 @@ export default class WYSIWYGEditor extends UIComponent<{
         case 'characterData':
           if (comp instanceof WYSIWYGTextNode) {
             comp.data.source.content.set(node.textContent || '');
+            needNormalize = true;
           }
           break;
         case 'childList':
@@ -314,15 +357,21 @@ export default class WYSIWYGEditor extends UIComponent<{
             record.addedNodes.forEach(newNode => {
               if (!this.nodes.has(newNode)) {
                 comp.makeAndInsertBefore(newNode, nextComp);
+                needNormalize = true;
               }
             });
             record.removedNodes.forEach(oldNode => {
               const oldComp = this.nodes.get(oldNode);
-              if (oldComp) comp.deleteChild(oldComp);
+              if (oldComp) {
+                comp.deleteChild(oldComp);
+                needNormalize = true;
+              }
             });
           }
           break;
       }
+
+      if (needNormalize) node.normalize();
     });
   }
 }
