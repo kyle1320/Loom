@@ -1,7 +1,8 @@
 import {
   WritableList,
   WritableDictionary,
-  WritableValue } from 'loom-data';
+  WritableValue,
+  EventEmitter } from 'loom-data';
 
 import { Definition, Sources } from '../definitions';
 import {
@@ -15,18 +16,22 @@ import {
   BodyElement,
   Node } from '../build/HTML';
 
-const nodeParentMap: WeakMap<NodeDef, ChildrenDef> = new WeakMap();
-export abstract class NodeDef implements Definition {
+const nodeParentMap: WeakMap<NodeDef, ElementDef> = new WeakMap();
+export abstract class NodeDef extends EventEmitter<{
+  delete: void;
+}> implements Definition {
   public delete(): boolean {
     const parent = nodeParentMap.get(this);
     if (parent) {
       nodeParentMap.delete(this);
-      return parent.remove(this);
+      const res = parent.children.remove(this);
+      res && this.emit('delete');
+      return res;
     }
     return false;
   }
-  public hasParent(): boolean {
-    return !!nodeParentMap.get(this);
+  public parent(): ElementDef | null {
+    return nodeParentMap.get(this) || null;
   }
 
   public abstract build(sources: Sources): Node;
@@ -74,13 +79,26 @@ export class AttributesDef
 }
 
 export class ChildrenDef extends WritableList<NodeDef> implements Definition {
+  public constructor(
+    public readonly element: ElementDef,
+    children: NodeDef[] = []
+  ) {
+    super([]);
+    for (const child of children) this.add(child);
+  }
+
   public build(sources: Sources): Children {
     return new Children(this, sources);
   }
 
   public add(value: NodeDef, index?: number): void {
-    nodeParentMap.set(value, this);
+    nodeParentMap.set(value, this.element);
     super.add(value, index);
+  }
+
+  public remove(value: NodeDef): boolean {
+    if (nodeParentMap.has(value)) return value.delete();
+    else return super.remove(value);
   }
 
   public serialize(): string {
@@ -128,7 +146,7 @@ export class ElementDef extends NodeDef {
     this.attrs = attrs instanceof AttributesDef
       ? attrs : new AttributesDef(attrs);
     this.children = children instanceof ChildrenDef
-      ? children : new ChildrenDef(children);
+      ? children : new ChildrenDef(this, children);
   }
 
   public build(sources: Sources): Element {
