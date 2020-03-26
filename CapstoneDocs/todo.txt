@@ -1,7 +1,6 @@
-Ability to add & remove style fields
-Ability to create & delete elements from UI
+Show inline styles in style editor
+Create targeted style rules based on selected data
+Ability to drag & drop elements
 Add advanced controls to WYSIWYG
-Make styles show only relevant rules
-  - Root UI maintains built document?
 Make field editors context-aware
   - e.g. a "Location" field for anchor elements
