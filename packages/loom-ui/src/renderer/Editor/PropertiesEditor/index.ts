@@ -77,18 +77,23 @@ export default class PropertiesEditor extends UIComponent {
         this.toolbar.appendChild(new Input(content!.key));
         this.toolbar.appendChild(
           new IconButton('sep fa fa-trash')
-            .on('click', () => this.ui.contentDef.get()!.delete()));
+            .on('click', () => content!.delete()));
         break;
       case 'component':
-        this.toolbar.appendChild(new ComboBox(
-          new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
-          data instanceof loom.Component
-            ? data.source.name
-            : content!.key
-        ));
-        this.toolbar.appendChild(
-          new IconButton('sep fa fa-trash')
-            .on('click', () => this.ui.contentDef.get()!.delete()));
+        if (data instanceof loom.Component) {
+          this.toolbar.appendChild(new ComboBox(
+            new DictionaryKeys<loom.ElementDef>(this.ui.sources.components),
+            data.source.name
+          ));
+          this.toolbar.appendChild(
+            new IconButton('sep fa fa-trash')
+              .on('click', () => data.source.delete()));
+        } else {
+          this.toolbar.appendChild(new Input(content!.key));
+          this.toolbar.appendChild(
+            new IconButton('sep fa fa-trash')
+              .on('click', () => content!.delete()));
+        }
         break;
       case 'element':
         if (data instanceof loom.TextNode) {
