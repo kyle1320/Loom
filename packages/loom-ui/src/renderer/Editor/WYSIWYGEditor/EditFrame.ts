@@ -1,19 +1,17 @@
-import WYSIWYGEditor, { WYSIWYGNode } from '.';
+import LiveDocument, { LiveNode } from '@/LiveDocument';
 import { UIComponent } from '@/UIComponent';
 import { makeElement } from '@/util/dom';
 
 import './EditFrame.scss';
 
 export default class EditFrame extends UIComponent<{}, HTMLElement> {
-  private node: WYSIWYGNode | null = null;
+  private node: LiveNode | null = null;
 
   private margin: HTMLElement;
   private border: HTMLElement;
   private padding: HTMLElement;
 
-  public constructor(
-    editor: WYSIWYGEditor
-  ) {
+  public constructor(doc: LiveDocument) {
     super(null!);
 
     this.el = makeElement('div', { className: 'edit-frame' },
@@ -23,7 +21,7 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
       )
     );
 
-    editor.on('select', node => {
+    doc.on('select', node => {
       if (!this.node) {
         this.node = node;
         this.refresh();

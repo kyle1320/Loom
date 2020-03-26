@@ -1,9 +1,10 @@
 import * as electron from 'electron';
-import { WritableValue, DictionaryRow, Value } from 'loom-data';
+import { WritableValue, DictionaryRow, Value, MappedValue } from 'loom-data';
 import * as loom from 'loom-core';
 
 import Editor from './Editor';
 import Navigator from './Navigator';
+import LiveDocument from './LiveDocument';
 import { UIComponent, UIContainer } from './UIComponent';
 import { Button } from './common';
 import { makeElement } from './util/dom';
@@ -25,6 +26,7 @@ export default class LoomUI extends UIComponent {
   public readonly contentDef:
   Value<DictionaryRow<loom.PageDef> | DictionaryRow<loom.ElementDef> | null>;
   public readonly content: Value<ContentTypes | null>;
+  public readonly liveDoc: Value<LiveDocument | null>;
   public readonly data: WritableValue<DataTypes | null>;
 
   private _sources!: loom.Sources | null;
@@ -43,6 +45,11 @@ export default class LoomUI extends UIComponent {
     DictionaryRow<loom.PageDef> | DictionaryRow<loom.ElementDef> | null
     >(null);
     const content = this.content = new WritableValue<ContentTypes | null>(null);
+    this.liveDoc = new MappedValue(
+      content,
+      c => c && new LiveDocument(this, c),
+      c => c && c.destroy()
+    );
     this.data = new WritableValue<DataTypes | null>(null);
 
     // when content changes, automatically build it & reset data

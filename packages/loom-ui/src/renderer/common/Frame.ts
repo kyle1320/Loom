@@ -3,7 +3,7 @@ import { makeElement } from '@/util/dom';
 
 import './Frame.scss';
 
-export default class Frame extends UIComponent<{}, HTMLIFrameElement> {
+export default class Frame<E = {}> extends UIComponent<E, HTMLIFrameElement> {
   private cleanup: null | (() => void) = null;
 
   public constructor(onload: (doc: Document) => () => void) {
