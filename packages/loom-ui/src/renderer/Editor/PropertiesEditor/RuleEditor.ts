@@ -34,6 +34,9 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
       this.empty();
 
       if (rule) {
+        this.appendChild(new UIComponent(makeElement('div', {
+          className: 'rule-editor__empty-placeholder'
+        })));
         this.appendChild(new UIComponent(makeElement('hr')));
         this.appendChild(
           new SuggestiveInput(
@@ -41,7 +44,6 @@ export class RuleEditor extends UIComponent<{}, HTMLElement> {
             'New Style Rule...',
             '{.fa.fa-plus}'
           ).on('submit', k => {
-            // TODO: get current value from WYSIWYG editor
             const value = '';
             rule.style.has(k) || rule.style.set(k, value);
             this.select(k);

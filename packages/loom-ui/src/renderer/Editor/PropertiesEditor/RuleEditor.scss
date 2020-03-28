@@ -2,4 +2,15 @@
   .suggestive-input {
     margin: 0 5px;
   }
+
+  &__empty-placeholder:first-child {
+    margin: 5px;
+    text-align: center;
+    font-size: .8em;
+    opacity: 0.8;
+
+    &:after {
+      content: 'No Styles';
+    }
+  }
 }
