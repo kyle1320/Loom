@@ -1,4 +1,4 @@
-import { DictionaryKeys, FilteredList } from 'loom-data';
+import { DictionaryKeys, FilteredList, PrependList } from 'loom-data';
 import * as loom from 'loom-core';
 
 import PropertyField from './PropertyField';
@@ -19,6 +19,7 @@ import { makeElement } from '@/util/dom';
 import C from '@/util/constants';
 
 import './PropertiesEditor.scss';
+import { InlineStyleRuleDef } from '@/util/css';
 
 type TabName = 'page' | 'component' | 'element' | 'style';
 
@@ -120,22 +121,29 @@ export default class PropertiesEditor extends UIComponent {
       case 'style':
         (() => {
           const sheet = this.ui.results.styles;
-          const rules = new FilteredList(
+          let node = data && this.ui.liveDoc.get()!.getNode(data);
+          if (node && node.nodeType !== 1) {
+            node = node.parentElement || null;
+          }
+          const el = node && node.nodeType === 1 ? (node as HTMLElement) : null;
+
+          const inline = el ? new InlineStyleRuleDef(el.style) : null;
+          const matchingRules = new FilteredList(
             sheet.source.rules,
-            rule => {
-              let node = data && this.ui.liveDoc.get()!.getNode(data);
-              if (!(node instanceof HTMLElement)) {
-                node = node?.parentElement || null;
-              }
-              if (!node || !(node instanceof HTMLElement)) return true;
-              return node.matches(rule.selector.get());
-            }
+            rule => el ? el.matches(rule.selector.get()) : true
           );
-          const selector = new WritableSelect(
-            rules,
-            rule => rule.selector
+          const all = new PrependList(
+            inline ? [inline] : [],
+            matchingRules
           );
+
+          const selector = new WritableSelect(all, rule => rule.selector);
+          selector.destroy.do(all);
+          selector.destroy.do(matchingRules);
+          inline && selector.destroy.do(inline);
+
           const rule = selector.selected;
+          matchingRules.size() && rule.set(matchingRules.get(0));
 
           this.toolbar.appendChild(selector);
           this.toolbar.appendChild(new IconButton('fa fa-trash')
