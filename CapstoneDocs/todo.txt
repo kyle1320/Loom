@@ -1,4 +1,3 @@
-Show inline styles in style editor
 Create targeted style rules based on selected data
 Ability to drag & drop elements
 Add advanced controls to WYSIWYG
