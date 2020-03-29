@@ -33,7 +33,23 @@ export function validTags(element: ElementDef): Readonly<string[]> {
 }
 
 export function isEmptyElement({ tag: tagVal }: Tagged): boolean {
-  return C.html.empty.indexOf(tagVal.get()) >= 0;
+  switch (tagVal.get()) {
+    case 'area':
+    case 'base':
+    case 'br':
+    case 'col':
+    case 'embed':
+    case 'hr':
+    case 'img':
+    case 'input':
+    case 'link':
+    case 'meta':
+    case 'param':
+    case 'source':
+    case 'track':
+    case 'wbr': return true;
+    default: return false;
+  }
 }
 
 export function isValidChild(
@@ -42,4 +58,19 @@ export function isValidChild(
 ): boolean {
   const valid = validChildren(parent);
   return valid ? valid.indexOf(childTag.get()) >= 0 : true;
+}
+
+export function supportsText(el: Tagged): boolean {
+  if (isEmptyElement(el)) return false;
+
+  switch (el.tag.get()) {
+    case 'head':
+    case 'table':
+    case 'thead':
+    case 'tbody':
+    case 'tr':
+    case 'ul':
+    case 'ol': return false;
+    default: return true;
+  }
 }

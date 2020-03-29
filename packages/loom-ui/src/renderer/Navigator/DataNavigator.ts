@@ -1,3 +1,4 @@
+import { MenuItemConstructorOptions } from 'electron';
 import * as loom from 'loom-core';
 
 import NodeNavigator from './NodeNavigator';
@@ -6,7 +7,7 @@ import { UIComponent } from '@/UIComponent';
 import { IconButton } from '@/common';
 import { makeElement } from '@/util/dom';
 import { showMenu } from '@/util/electron';
-import { validChildren, isValidChild } from '@/util/html';
+import { validChildren, isValidChild, supportsText } from '@/util/html';
 import C from '@/util/constants';
 
 import './DataNavigator.scss';
@@ -49,34 +50,7 @@ class DataNavigatorContent extends UIComponent {
         e.stopPropagation();
         const content = ui.content.get()!;
         const el = content instanceof loom.Element ? content : content.body;
-        const components = [...ui.sources.components.keys()].filter(name => {
-          return isValidChild(el, ui.sources.components.get(name)!);
-        });
-        showMenu([{
-          label: 'New Element',
-          submenu: [{
-            label: 'text',
-            click: () => ui.data.set(
-              el.children.addThrough(new loom.TextNodeDef('text'))
-            )
-          }, {
-            type: 'separator'
-          }, ...(validChildren(el.source) || C.html.basicTags).map(tag => ({
-            label: tag,
-            click: () => ui.data.set(
-              el.children.addThrough(new loom.ElementDef(tag))
-            )
-          }))]
-        }, {
-          label: 'Add Component',
-          submenu: components.map(name => ({
-            label: name,
-            click: () => ui.data.set(
-              el.children.addThrough(new loom.ComponentDef(name))
-            )
-          })),
-          enabled: components.length > 0
-        }]);
+        showMenu(getAddMenu(ui, el));
       }
     }));
 
@@ -102,4 +76,64 @@ export default class DataNavigator extends UIComponent<{ back: void }> {
     new DataNavigatorHeader(ui).on('back', () => this.emit('back')),
     new DataNavigatorContent(ui));
   }
+}
+
+export function getAddMenu(
+  ui: LoomUI,
+  el: loom.Element
+): MenuItemConstructorOptions[] {
+  const res: MenuItemConstructorOptions[] = [];
+  const components = [...el.sources.components.keys()].filter(name => {
+    return isValidChild(el, el.sources.components.get(name)!);
+  });
+  const elements: MenuItemConstructorOptions[] =
+    (validChildren(el) || C.html.basicTags)
+      .map(tag => ({
+        label: tag,
+        click: () => ui.data.set(
+          el.children.addThrough(new loom.ElementDef(tag))
+        )
+      }));
+  console.log(elements.length);
+
+  if (supportsText(el)) {
+    elements.unshift({
+      label: 'text',
+      click: () => ui.data.set(
+        el.children.addThrough(new loom.TextNodeDef('text'))
+      )
+    }, {
+      type: 'separator'
+    });
+  }
+
+  res.push({
+    label: 'New Element',
+    submenu: elements,
+    enabled: elements.length > 0
+  }, {
+    label: 'Add Component',
+    submenu: components.map(name => ({
+      label: name,
+      click: () => ui.data.set(
+        el.children.addThrough(new loom.ComponentDef(name))
+      )
+    })),
+    enabled: components.length > 0
+  });
+
+  if (el.tag.get() === 'head') {
+    res.push({
+      label: 'Add Title',
+      click: () => ui.data.set(
+        el.children.addThrough(new loom.ElementDef('title', {}, [
+          new loom.TextNodeDef('title')
+        ]))
+      )
+    })
+  }
+
+  console.log(res);
+
+  return res;
 }
