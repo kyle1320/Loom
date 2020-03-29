@@ -71,7 +71,7 @@ export class StyleRule implements BuildResult<StyleRuleDef> {
   }
 
   public serialize(): string {
-    return this.selector.get() + '{' + this.style.serialize() + '}';
+    return this.selector.get() + ' {\n' + this.style.serialize() + '}';
   }
 }
 
@@ -90,7 +90,7 @@ export class StyleDeclaration
     const data = this.asRecord();
     let res = '';
     for (const key in data) {
-      res += key + ':' + data[key] + ';';
+      res += '\t' + key + ': ' + data[key] + ';\n';
     }
     return res;
   }
