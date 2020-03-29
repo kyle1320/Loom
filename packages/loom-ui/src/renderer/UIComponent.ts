@@ -8,7 +8,6 @@ export class UIComponent<
   private parent: UIComponent | null = null;
   private __children: UIComponent[] = [];
 
-  // TODO use in subclasses
   protected children: Readonly<UIComponent[]> = this.__children;
 
   public constructor(
