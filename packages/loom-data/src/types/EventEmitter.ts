@@ -53,7 +53,7 @@ export class EventEmitter<T> implements Destroyable {
       // inside of callbacks does not affect this emit
       const callbacks = [...registered.values()];
       for (let i = 0; i < callbacks.length; i++) {
-        callbacks[i].apply(this, args);
+        callbacks[i](...args);
 
         // if a callback triggered another emit of the same type,
         // or this event was cancelled via stopEmit, stop.
