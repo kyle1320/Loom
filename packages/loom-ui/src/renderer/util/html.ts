@@ -5,6 +5,10 @@ import C from './constants';
 
 type Tagged = { tag: Value<string> };
 
+export function isElement(node: Node): node is Element {
+  return node.nodeType === 1;
+}
+
 export function validChildren(node: Tagged): Readonly<string[]> | null {
   const tag = node.tag.get();
 

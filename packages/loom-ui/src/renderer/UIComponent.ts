@@ -1,5 +1,6 @@
 import { EventEmitter } from 'loom-data';
 import { makeElement } from './util/dom';
+import { isElement } from './util/html';
 
 export class UIComponent<
   E = {}, H extends Node = Node
@@ -44,7 +45,7 @@ export class UIComponent<
   }
 
   protected changeEl(el: H): void {
-    if (this.el instanceof HTMLElement) {
+    if (isElement(this.el)) {
       this.el.replaceWith(el);
     } else {
       this.el.parentNode?.insertBefore(el, this.el);

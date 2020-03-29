@@ -1,6 +1,7 @@
 import LiveDocument, { LiveNode } from '@/LiveDocument';
 import { UIComponent } from '@/UIComponent';
 import { makeElement } from '@/util/dom';
+import { isElement } from '@/util/html';
 
 import './EditFrame.scss';
 
@@ -56,10 +57,7 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
     }
 
     const n = this.node && this.node.getEl();
-    const el = n
-      ? n.nodeType === 3 ? n.parentElement
-        : n.nodeType === 1 ? n as unknown as HTMLElement : null
-      : null;
+    const el = n && (isElement(n) ? n : n.parentElement);
     if (el) {
       const bounds = el.getBoundingClientRect();
 

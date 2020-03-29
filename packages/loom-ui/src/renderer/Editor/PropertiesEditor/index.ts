@@ -16,10 +16,11 @@ import {
   WritableSelect } from '@/common';
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
+import { InlineStyleRuleDef } from '@/util/css';
+import { isElement } from '@/util/html';
 import C from '@/util/constants';
 
 import './PropertiesEditor.scss';
-import { InlineStyleRuleDef } from '@/util/css';
 
 type TabName = 'page' | 'component' | 'element' | 'style';
 
@@ -122,10 +123,10 @@ export default class PropertiesEditor extends UIComponent {
         (() => {
           const sheet = this.ui.results.styles;
           let node = data && this.ui.liveDoc.get()!.getNode(data);
-          if (node && node.nodeType !== 1) {
+          if (node && !isElement(node)) {
             node = node.parentElement || null;
           }
-          const el = node && node.nodeType === 1 ? (node as HTMLElement) : null;
+          const el = node && isElement(node) ? (node as HTMLElement) : null;
 
           const inline = el ? new InlineStyleRuleDef(el.style) : null;
           const matchingRules = new FilteredList(
