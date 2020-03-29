@@ -4,7 +4,7 @@ import LoomUI, { DataTypes } from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { Frame } from '@/common';
 import { addStyles } from '@/util/css';
-import { isEmptyElement } from '@/util/html';
+import { supportsText, isElement } from '@/util/html';
 
 function makeNodeDef(node: Node): loom.ElementDef | loom.TextNodeDef | null {
   switch (node.nodeType) {
@@ -223,18 +223,15 @@ export default class LiveDocument extends Frame<{
       const removeStyles = addStyles(doc, ui.results.styles);
 
       doc.addEventListener('selectionchange', () => {
+        if (ignoreEvents) return;
+
         const selection = doc.getSelection()!;
-        if (doc.hasFocus()) {
-          let node = selection.focusNode;
-          if (!node) return;
-          if (node.nodeType === 3) node = node.parentNode;
-          const comp = node && this.nodes.get(node) || this.data.get(root);
-          ignoreEvents = true;
-          comp && this.select(comp);
-          ignoreEvents = false;
-        } else if (selection.rangeCount) {
-          this.el.contentWindow!.focus();
-        }
+        const node = selection.focusNode;
+        if (!node) return;
+        const comp = node && this.nodes.get(node) || this.data.get(root);
+        ignoreEvents = true;
+        comp && this.select(comp);
+        ignoreEvents = false;
       });
 
       doc.designMode = 'on';
@@ -263,36 +260,50 @@ export default class LiveDocument extends Frame<{
       const node = data instanceof loom.Component
         ? data.element.get() : data;
       if (node instanceof loom.Element) {
-        if (!node.children.size() && !isEmptyElement(node)) {
-          ui.data.set(node.children.addThrough(
-            new loom.ElementDef('br')
-          ));
+        if (!node.children.size() && supportsText(node)) {
+          node.children.addThrough(new loom.ElementDef('br'));
         }
       }
 
       if (ignoreEvents) return;
 
       if (comp) {
-        const node = comp.getEl();
+        let node: Node | null = comp.getEl();
         const doc = node.ownerDocument!;
         const selection = doc.getSelection()!;
 
         this.el.contentWindow!.blur();
 
-        if (node instanceof HTMLElement) {
+        if (isElement(node)) {
           node.scrollIntoView({ block: 'nearest' });
           selection.removeAllRanges();
-          if (node.textContent!.length) {
+          console.log(node.firstElementChild, node.textContent);
+          if (!node.firstElementChild || !node.textContent) {
+            node = node.firstChild;
+          } else {
             return;
           }
         }
 
+        if (!node) return;
+        console.log(node);
+
+        ignoreEvents = true;
+
         const range = doc.createRange();
         range.selectNodeContents(node);
-        range.collapse();
 
         selection.removeAllRanges();
         selection.addRange(range);
+
+        const el = node && !isElement(node) ? node.parentElement : node;
+        this.el.contentWindow!.setTimeout(() => {
+          if (el && doc.body.contains(el)) {
+            doc.body.focus();
+            (el as HTMLElement).focus();
+          }
+          ignoreEvents = false;
+        }, 0);
       } else {
         const doc = this.el.contentDocument;
         doc && doc.getSelection()!.removeAllRanges();
