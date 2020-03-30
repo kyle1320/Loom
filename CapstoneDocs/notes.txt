@@ -8,6 +8,14 @@ Goals:
     - Novice user can figure it out quickly
     - Advanced user has adequate power to change things
     - High velocity
+  - Usability
+    - Ability to create / delete / rename HTML pages
+    - Ability to create / delete / edit HTML elements within pages
+    - Ability to create / edit / delete styles
+      - Target at specific elements / classes / etc.
+      - Friendly editors for at least some styles
+    - Ability to save / load work
+    - Ability to export project to static web files
 
 Scope for Capstone:
   - HTML / CSS only (no scripts or media files)
