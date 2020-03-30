@@ -13,7 +13,7 @@ import './NodeNavigator.scss';
 
 type Node = loom.Element | loom.TextNode | loom.Component;
 
-let drag: Node | null = null;
+let drag: NodeNavigator | null = null;
 const dropMarker: HTMLElement = parseElement('.drop-marker');
 
 export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
@@ -22,7 +22,7 @@ export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
 
   public constructor(
     ui: LoomUI,
-    node: Node,
+    public readonly node: Node,
     depth = 0
   ) {
     super(makeElement('div', {
@@ -30,15 +30,15 @@ export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
       draggable: !!node.source.parent(),
       ondragstart: e => {
         e.stopPropagation();
-        drag = node;
+        drag = this;
       },
       ondragend: () => {
         drag = null;
         dropMarker.remove();
       },
       ondragover: e => {
-        if (drag && drag !== node && node instanceof loom.Element &&
-          isValidChild(node, drag)) {
+        if (drag && !drag.el.contains(this.el) &&
+          node instanceof loom.Element && isValidChild(node, drag.node)) {
           e.stopPropagation();
           e.preventDefault();
           e.dataTransfer!.dropEffect = 'move';
@@ -54,11 +54,11 @@ export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
         }
       },
       ondrop: e => {
-        if (drag && drag !== node && node instanceof loom.Element &&
-          isValidChild(node, drag)) {
+        if (drag && !drag.el.contains(this.el) &&
+          node instanceof loom.Element && isValidChild(node, drag.node)) {
           e.stopPropagation();
           e.preventDefault();
-          drag && this.drop(e.clientX, e.clientY, drag);
+          drag && this.drop(e.clientX, e.clientY, drag.node);
         }
       }
     }));
@@ -226,7 +226,7 @@ class ElementChildrenNavigator extends UIComponent {
       node.source.delete();
       this.node.children.source.add(
         node.source,
-        existingIndex >= 0 && existingIndex <= i ? i - 1 : i
+        existingIndex >= 0 && existingIndex < i ? i - 1 : i
       );
     } else {
       dropMarker.remove();
