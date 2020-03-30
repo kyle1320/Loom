@@ -23,6 +23,18 @@ function nameForTab(tab: TabName): string {
   }
 }
 
+function getPageName(sources: loom.Sources, prefix = 'index'): string {
+  let counter = 0;
+  while (sources.pages.has(prefix + (counter || '') + '.html')) counter++;
+  return prefix + (counter || '') + '.html';
+}
+
+function getComponentName(sources: loom.Sources, prefix = 'component'): string {
+  let counter = 0;
+  while (sources.components.has(prefix + (counter || ''))) counter++;
+  return prefix + (counter || '');
+}
+
 class DefinitionNavigatorContents extends UIComponent {
   private selected!: TabName;
 
@@ -39,13 +51,13 @@ class DefinitionNavigatorContents extends UIComponent {
       this.appendChild(selected === 'pages'
         ? new NameList(
           this.ui.sources.pages,
-          () => new loom.PageDef(),
+          () => [getPageName(this.ui.sources), new loom.PageDef()],
           { addButtonText: 'New Page' },
           this.ui.selectedPage
         )
         : new NameList(
           this.ui.sources.components,
-          () => new loom.ElementDef('div'),
+          () => [getComponentName(this.ui.sources), new loom.ElementDef('div')],
           { addButtonText: 'New Component' },
           this.ui.selectedComponent
         )

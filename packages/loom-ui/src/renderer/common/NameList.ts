@@ -27,8 +27,8 @@ class NameListContent<T> extends UIComponent {
     }));
   }
 
-  public add(val: T): void {
-    this.newRow = new DictionaryRow(this.data, '', val);
+  public add(key: string, val: T): void {
+    this.newRow = new DictionaryRow(this.data, key, val);
     const row = new NameListRow(this.newRow, this.selected);
     this.appendChild(row);
     row.edit();
@@ -146,7 +146,7 @@ interface NameListOptions {
 export default class NameList<T> extends UIComponent<{ add: void }> {
   public constructor(
     data: WritableDictionary<T>,
-    factory: () => T,
+    factory: () => [string, T],
     options: NameListOptions = {},
     public readonly selected: WritableValue<DictionaryRow<T> | null>
     = new WritableValue<DictionaryRow<T> | null>(null)
@@ -161,7 +161,7 @@ export default class NameList<T> extends UIComponent<{ add: void }> {
     this.appendChild(content);
     this.appendChild(
       new Button('{i.fa.fa-plus} ' + (options.addButtonText || 'New'))
-        .on('click', () => content.add(factory()))
+        .on('click', () => content.add(...factory()))
     );
   }
 }
