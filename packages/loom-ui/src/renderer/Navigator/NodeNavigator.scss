@@ -68,3 +68,17 @@
     }
   }
 }
+
+.drop-marker {
+  position: relative;
+  &:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    content: '';
+    border: 1px solid $accent;
+    pointer-events: none;
+    z-index: 1;
+  }
+}

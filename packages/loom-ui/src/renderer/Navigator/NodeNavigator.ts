@@ -7,29 +7,81 @@ import { UIComponent } from '@/UIComponent';
 import { IconButton } from '@/common';
 import { makeElement, toggleClass, parseElement } from '@/util/dom';
 import { showMenu } from '@/util/electron';
+import { isValidChild } from '@/util/html';
 
 import './NodeNavigator.scss';
 
 type Node = loom.Element | loom.TextNode | loom.Component;
 
+let drag: Node | null = null;
+const dropMarker: HTMLElement = parseElement('.drop-marker');
+
 export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
+  private readonly childrenNav:
+  ElementChildrenNavigator | ComponentChildrenNavigator | null;
+
   public constructor(
     ui: LoomUI,
     node: Node,
     depth = 0
   ) {
-    super(makeElement('div', { className: 'node-nav__container' }));
+    super(makeElement('div', {
+      className: 'node-nav__container',
+      draggable: !!node.source.parent(),
+      ondragstart: e => {
+        e.stopPropagation();
+        drag = node;
+      },
+      ondragend: () => {
+        drag = null;
+        dropMarker.remove();
+      },
+      ondragover: e => {
+        if (drag && drag !== node && node instanceof loom.Element &&
+          isValidChild(node, drag)) {
+          e.stopPropagation();
+          e.preventDefault();
+          e.dataTransfer!.dropEffect = 'move';
+          drag && this.drop(e.clientX, e.clientY);
+          toggleClass(this.el, 'dropping', true);
+        }
+      },
+      ondragleave: e => {
+        if (node instanceof loom.Element) {
+          e.stopPropagation();
+          e.preventDefault();
+          dropMarker.remove();
+        }
+      },
+      ondrop: e => {
+        if (drag && drag !== node && node instanceof loom.Element &&
+          isValidChild(node, drag)) {
+          e.stopPropagation();
+          e.preventDefault();
+          drag && this.drop(e.clientX, e.clientY, drag);
+        }
+      }
+    }));
 
     if (node instanceof loom.Element) {
       this.appendChild(new ElementNavigator(ui, node, depth));
-      this.appendChild(new ElementChildrenNavigator(ui, node, depth));
+      this.appendChild(
+        this.childrenNav = new ElementChildrenNavigator(ui, node, depth));
     } else if (node instanceof loom.TextNode) {
       this.appendChild(new TextNodeNavigator(ui, node, depth));
+      this.childrenNav = null;
     } else if (node instanceof loom.Component) {
       this.el.className += ' node-nav__container--component'
       this.appendChild(new ComponentNavigator(ui, node, depth));
-      this.appendChild(new ComponentChildrenNavigator(ui, node, depth));
+      this.appendChild(
+        this.childrenNav = new ComponentChildrenNavigator(ui, node, depth));
+    } else {
+      this.childrenNav = null;
     }
+  }
+
+  public drop(x: number, y: number, node: Node | null = null): void {
+    this.childrenNav && this.childrenNav.drop(x, y, node);
   }
 }
 
@@ -149,7 +201,7 @@ class ElementNavigator extends SingleNodeNavigator<loom.Element> {
 class ElementChildrenNavigator extends UIComponent {
   public constructor(
     ui: LoomUI,
-    node: loom.Element,
+    private readonly node: loom.Element,
     depth = 0
   ) {
     super(makeElement('div', { className: 'node-nav__children' }));
@@ -159,6 +211,27 @@ class ElementChildrenNavigator extends UIComponent {
         this.insertChild(new NodeNavigator(ui, value, depth + 1), index),
       index => this.removeChild(index)
     ));
+  }
+
+  public drop(x: number, y: number, node: Node | null = null): void {
+    const children = this.children as NodeNavigator[];
+    let i = 0;
+    for (; i < children.length; i++) {
+      const rect = children[i].getEl().getBoundingClientRect();
+      console.log(y, rect.top, rect.bottom);
+      if ((rect.top + rect.bottom) / 2 > y) break;
+    }
+    if (node) {
+      const existingIndex = this.node.children.asArray().indexOf(node);
+      node.source.delete();
+      this.node.children.source.add(
+        node.source,
+        existingIndex >= 0 && existingIndex <= i ? i - 1 : i
+      );
+    } else {
+      dropMarker.remove();
+      this.el.insertBefore(dropMarker, children[i]?.getEl());
+    }
   }
 }
 
@@ -178,6 +251,8 @@ class ComponentNavigator extends SingleNodeNavigator<loom.Component> {
 }
 
 class ComponentChildrenNavigator extends UIComponent {
+  private rootNode: NodeNavigator | null = null;
+
   public constructor(
     ui: LoomUI,
     node: loom.Component,
@@ -188,8 +263,14 @@ class ComponentChildrenNavigator extends UIComponent {
     this.destroy.do(node.element.watch(el => {
       this.empty();
       if (!(el instanceof loom.UnknownComponent)) {
-        this.insertChild(new NodeNavigator(ui, el, depth + 1));
+        this.insertChild(this.rootNode = new NodeNavigator(ui, el, depth + 1));
+      } else {
+        this.rootNode = null;
       }
     }));
+  }
+
+  public drop(x: number, y: number, node: Node | null = null): void {
+    this.rootNode && this.rootNode.drop(x, y, node);
   }
 }

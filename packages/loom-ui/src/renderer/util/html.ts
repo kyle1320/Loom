@@ -1,5 +1,5 @@
 import { Value } from 'loom-data';
-import { ElementDef } from 'loom-core';
+import * as loom from 'loom-core';
 
 import C from './constants';
 
@@ -31,7 +31,7 @@ export function validChildren(node: Tagged): Readonly<string[]> | null {
   }
 }
 
-export function validTags(element: ElementDef): Readonly<string[]> {
+export function validTags(element: loom.ElementDef): Readonly<string[]> {
   const parent = element.parent();
   return parent && validChildren(parent) || C.html.basicTags;
 }
@@ -58,10 +58,14 @@ export function isEmptyElement({ tag: tagVal }: Tagged): boolean {
 
 export function isValidChild(
   parent: Tagged,
-  { tag: childTag }: Tagged
+  child: loom.Element | loom.Component | loom.TextNode |
+  loom.UnknownComponent | loom.ElementDef
 ): boolean {
   const valid = validChildren(parent);
-  return valid ? valid.indexOf(childTag.get()) >= 0 : true;
+  if (child instanceof loom.TextNode) return supportsText(parent);
+  if (child instanceof loom.Component) child = child.element.get();
+  if (child instanceof loom.UnknownComponent) return isEmptyElement(parent);
+  return valid ? valid.indexOf(child.tag.get()) >= 0 : true;
 }
 
 export function supportsText(el: Tagged): boolean {
