@@ -94,7 +94,6 @@ export function getAddMenu(
           el.children.addThrough(new loom.ElementDef(tag))
         )
       }));
-  console.log(elements.length);
 
   if (supportsText(el)) {
     elements.unshift({
@@ -132,8 +131,6 @@ export function getAddMenu(
       )
     })
   }
-
-  console.log(res);
 
   return res;
 }

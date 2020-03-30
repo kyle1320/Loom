@@ -280,7 +280,6 @@ export default class LiveDocument extends Frame<{
         if (isElement(node)) {
           node.scrollIntoView({ block: 'nearest' });
           selection.removeAllRanges();
-          console.log(node.firstElementChild, node.textContent);
           if (!node.firstElementChild || !node.textContent) {
             node = node.firstChild;
           } else {
@@ -289,7 +288,6 @@ export default class LiveDocument extends Frame<{
         }
 
         if (!node) return;
-        console.log(node);
 
         ignoreEvents = true;
 
