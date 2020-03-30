@@ -8,10 +8,13 @@ export default class IconButton extends UIComponent<{
   focus: void;
   blur: void;
 }> {
-  public constructor(icon: string) {
+  public constructor(icon: string, options: { disabled?: boolean } = {}) {
     super(makeElement('div', {
-      className: 'icon-btn fa ' + icon,
+      className: `icon-btn${options.disabled ? ' icon-btn--disabled' : ''} fa `
+        + icon,
       onclick: e => {
+        if (options.disabled) return;
+
         e.preventDefault();
         e.stopPropagation();
         this.emit('click');
@@ -19,7 +22,7 @@ export default class IconButton extends UIComponent<{
       onfocus: () => this.emit('focus'),
       onblur: () => this.emit('blur'),
       onkeydown: e => e.keyCode == 13 && this.emit('click'),
-      tabIndex: 0
+      tabIndex: 0,
     }));
   }
 }
