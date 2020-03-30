@@ -130,7 +130,10 @@ export class LiveElement extends UIComponent<{}, HTMLElement> {
 
     el.addEventListener('mousedown', e => {
       e.stopPropagation();
-      this.editor.select(this);
+      if (this.editor.ui.data.get() !== this.data) {
+        e.preventDefault();
+        this.editor.select(this);
+      }
     });
 
     return el;
@@ -201,7 +204,7 @@ export default class LiveDocument extends Frame<{
   private nodes: WeakMap<Node, LiveNode> = new WeakMap();
 
   public constructor(
-    private readonly ui: LoomUI,
+    public readonly ui: LoomUI,
     content: loom.Page | loom.Element
   ) {
     super((doc: Document) => {
