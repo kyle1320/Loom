@@ -22,13 +22,14 @@ import C from '@/util/constants';
 
 import './PropertiesEditor.scss';
 
-type TabName = 'page' | 'component' | 'element' | 'style';
+type TabName = 'page' | 'component' | 'element' | 'text' | 'style';
 
 function iconForTab(tab: TabName): string {
   switch (tab) {
     case 'page': return 'fa fa-file';
     case 'component': return 'fa fa-clone';
     case 'element': return 'fa fa-code';
+    case 'text': return 'fa fa-font'
     case 'style': return 'fa fa-brush';
   }
 }
@@ -38,6 +39,7 @@ function nameForTab(tab: TabName): string {
     case 'page': return 'Page';
     case 'component': return 'Component';
     case 'element': return 'Element';
+    case 'text': return 'Text';
     case 'style': return 'Styles';
   }
 }
@@ -97,10 +99,18 @@ export default class PropertiesEditor extends UIComponent {
               .on('click', () => content!.delete()));
         }
         break;
-      case 'element':
+      case 'text':
         if (data instanceof loom.TextNode) {
           this.addField('Content', new TextArea(data.source.content));
-        } else if (data instanceof loom.Element) {
+        }
+        if (data) {
+          this.toolbar.appendChild(
+            new IconButton('sep fa fa-trash')
+              .on('click', () => data.source.delete()));
+        }
+        break;
+      case 'element':
+        if (data instanceof loom.Element) {
           this.toolbar.appendChild(new ComboBox(
             C.html.basicTags,
             data.source.tag,
@@ -177,7 +187,11 @@ export default class PropertiesEditor extends UIComponent {
     }
 
     if (data) {
-      allTabs.push(data instanceof loom.Component ? 'component' : 'element');
+      allTabs.push(data instanceof loom.Component
+        ? 'component'
+        : data instanceof loom.TextNode
+          ? 'text'
+          : 'element');
     }
 
     allTabs.push('style');
