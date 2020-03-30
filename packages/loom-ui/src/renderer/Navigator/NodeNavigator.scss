@@ -1,12 +1,14 @@
 @import "~@/variables";
 
 .node-nav {
-  padding: 5px 10px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 5px;
   border-bottom: 1px solid $primary-1;
   background-color: $primary-0;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   position: relative;
   align-items: center;
   height: 27px;
@@ -19,12 +21,23 @@
     background-color: #FFE8D0;
   }
 
-  &:hover {
-    background-color: $primary-hl-0;
+  & > * {
+    flex-shrink: 0;
   }
 
   &__title {
-    display: inline;
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sep {
+    margin-left: auto;
+  }
+
+  .icon-btn {
+    font-size: 10px;
+    display: none;
   }
 
   i {
@@ -34,12 +47,24 @@
     text-align: center;
   }
 
+  &:hover {
+    background-color: $primary-hl-0;
+
+    .icon-btn {
+      display: inline-block;
+    }
+  }
+
   &.selected {
     background-color: $accent;
     color: white;
 
     i {
       color: white;
+    }
+
+    .icon-btn {
+      display: inline-block;
     }
   }
 }

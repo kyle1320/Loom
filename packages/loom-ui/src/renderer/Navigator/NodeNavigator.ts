@@ -4,7 +4,8 @@ import * as loom from 'loom-core';
 import { getAddMenu } from './DataNavigator';
 import LoomUI, { DataTypes } from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
-import { makeElement, toggleClass } from '@/util/dom';
+import { IconButton } from '@/common';
+import { makeElement, toggleClass, parseElement } from '@/util/dom';
 import { showMenu } from '@/util/electron';
 
 import './NodeNavigator.scss';
@@ -68,6 +69,15 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     this.titleEl =
       makeElement('div', { className: 'node-nav__title' }, title.get());
     this.el.appendChild(this.titleEl);
+    this.el.appendChild(parseElement('.sep'));
+
+    this.appendChild(new IconButton('fa fa-trash', {
+      disabled: !node.source.parent()
+    }).on('click', () => node.source.delete()));
+    const addMenu = node instanceof loom.Element ? getAddMenu(ui, node) : [];
+    this.appendChild(new IconButton('fa fa-plus', {
+      disabled: !addMenu.some(x => x.enabled ?? true)
+    }).on('click', () => showMenu(addMenu)));
 
     this.destroy.do(
       ui.data.watch(this.updateSelected),
