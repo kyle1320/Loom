@@ -24,9 +24,12 @@
   }
 
   &__location {
-    padding-right: 20px;
+    padding: 0 15px 0 5px;
     text-align: center;
     flex-grow: 1;
     color: $accent;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 }
