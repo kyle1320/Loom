@@ -21,9 +21,15 @@ import './RuleEditor.scss';
 
 const styleSuggestions: SuggestiveInput.SuggestionValue[] = [];
 for (const key in C.css.properties) {
-  styleSuggestions.push({
-    value: key
-  });
+  const property = C.css.properties[key];
+  const summary = property.summary;
+  const index = summary.indexOf('CSS property');
+  const suggestion: SuggestiveInput.SuggestionValue = {
+    value: key,
+    details: index < 0 ? summary : summary.substring(index + 13),
+    keywords: property.keywords
+  };
+  styleSuggestions.push(suggestion);
 }
 
 export class RuleEditor extends UIComponent<{}, HTMLElement> {

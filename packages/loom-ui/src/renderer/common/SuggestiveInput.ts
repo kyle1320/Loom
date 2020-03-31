@@ -39,7 +39,7 @@ function highlight(
   return el;
 }
 
-class Suggestion extends UIComponent<{ select: void }> {
+class Suggestion extends UIComponent<{ select: void }, HTMLElement> {
   public constructor(
     result: Fuse.FuseResultWithMatches<SuggestiveInput.SuggestionValue>
   ) {
@@ -49,6 +49,10 @@ class Suggestion extends UIComponent<{ select: void }> {
       onclick: () => this.emit('select'),
       onkeydown: e => e.keyCode === 13 && this.emit('select')
     }, highlight(result.item.value, 'value', result.matches)));
+
+    const details = makeElement('div', { className: 'suggestion__details' });
+    details.innerHTML = result.item.details || '';
+    this.el.appendChild(details);
   }
 }
 
@@ -66,13 +70,10 @@ class Suggestions extends UIComponent<{ select: string }, HTMLElement> {
       threshold: 0.3,
       keys: [{
         name: 'value',
-        weight: 0.4
-      }, {
-        name: 'name',
-        weight: 0.4
+        weight: 0.6
       }, {
         name: 'keywords',
-        weight: 0.2
+        weight: 0.4
       }]
     });
 
@@ -119,9 +120,9 @@ class Suggestions extends UIComponent<{ select: string }, HTMLElement> {
 
 namespace SuggestiveInput {
   export interface SuggestionValue {
-    name?: string;
     value: string;
-    keywords?: string[];
+    details?: string;
+    keywords?: string;
   }
 }
 
