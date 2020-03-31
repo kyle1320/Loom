@@ -6,7 +6,7 @@ import Editor from './Editor';
 import Navigator from './Navigator';
 import LiveDocument from './LiveDocument';
 import { UIComponent, UIContainer } from './UIComponent';
-import { Button } from './common';
+import { Button, Prompt } from './common';
 import { makeElement } from './util/dom';
 import { isValidChild, validChildren, supportsText } from './util/html';
 import C from './util/constants';
@@ -30,6 +30,8 @@ export default class LoomUI extends UIComponent {
   public readonly content: Value<ContentTypes | null>;
   public readonly liveDoc: Value<LiveDocument | null>;
   public readonly data: WritableValue<DataTypes | null>;
+
+  public prompt!: Prompt;
 
   private _sources!: loom.Sources | null;
   private _results: loom.Results | null = null;
@@ -111,6 +113,8 @@ export default class LoomUI extends UIComponent {
     } else {
       this.appendChild(new WelcomePage(this));
     }
+
+    this.appendChild(this.prompt = new Prompt());
   }
 
   public create(): void {

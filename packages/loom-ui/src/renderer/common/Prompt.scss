@@ -1,0 +1,59 @@
+@import "~@/variables";
+
+.prompt {
+  background-color: $primary-0;
+  padding: 20px 30px;
+  border-radius: 5px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+
+  &__container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    &.show {
+      display: flex;
+    }
+  }
+
+  &__title {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  &__error {
+    display: none;
+    color: $warn;
+    text-align: center;
+    font-size: 0.8em;
+    margin-bottom: 2px;
+
+    .error & {
+      display: block;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  &.error input {
+    border-color: $warn;
+  }
+
+  &__controls {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+}
