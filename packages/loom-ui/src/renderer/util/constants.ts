@@ -18,10 +18,12 @@ type Constants = DeepReadonly<{
     properties: Record<string, {
       type: 'any' | 'color' | 'number';
       summary: string;
+      keywords: string;
     } | {
       type: 'select';
       values: string[];
       summary: string;
+      keywords: string;
     }>;
   };
   html: {
