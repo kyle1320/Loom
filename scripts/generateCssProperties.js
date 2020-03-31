@@ -14,7 +14,7 @@ const fetch = require('node-fetch');
   const resolving = {};
   function resolveSyntax(syntax) {
     // cycle
-    if (syntax in resolving) return '';
+    if (syntax in resolving) return syntax;
     resolving[syntax] = true;
     const syntaxParts = syntax.split(' | ');
     let res = '';

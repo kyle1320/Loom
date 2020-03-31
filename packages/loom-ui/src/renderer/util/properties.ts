@@ -125,13 +125,8 @@ export default {
     "summary": "The <strong><code>background-clip</code></strong> CSS property sets whether an element's background extends underneath its border box, padding box, or content box."
   },
   "background-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>background-color</code></strong> CSS property sets the background color of an element."
   },
   "background-image": {
@@ -402,13 +397,8 @@ export default {
     "summary": "The <strong><code>border-left</code></strong> shorthand CSS property set an element's left border."
   },
   "border-left-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>border-left-color</code></strong> CSS property sets the color of an element's left border."
   },
   "border-left-style": {
@@ -432,13 +422,8 @@ export default {
     "summary": "The <strong><code>border-right</code></strong> shorthand CSS property sets an element's right border."
   },
   "border-right-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>border-right-color</code></strong> CSS property sets the color of an element's right border. It can also be set with the shorthand CSS properties <code>border-color</code> or <code>border-right</code>."
   },
   "border-right-style": {
@@ -477,13 +462,8 @@ export default {
     "summary": "The <strong><code>border-top</code></strong> shorthand CSS property set an element's top border."
   },
   "border-top-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>border-top-color</code></strong> CSS property sets the color of an element's top border."
   },
   "border-top-left-radius": {
@@ -698,13 +678,8 @@ export default {
     "summary": "The <strong><code>caption-side</code></strong> CSS property puts the content of a table's <code>&lt;caption&gt;</code> on the specified side. The values are relative to the <code>writing-mode</code> of the table."
   },
   "caret-color": {
-    "type": "select",
-    "keywords": "auto",
-    "values": [
-      "auto",
-      "initial",
-      "inherit"
-    ],
+    "type": "any",
+    "keywords": "auto color",
     "summary": "The <strong><code>caret-color</code></strong> CSS property sets the color of the insertion caret, the visible marker where the next character typed will be inserted."
   },
   "clear": {
@@ -733,13 +708,8 @@ export default {
     "summary": "The <code><strong>clip-path</strong></code> CSS property creates a clipping region that sets what part of an element should be shown. Parts that are inside the region are shown, while those outside are hidden."
   },
   "color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>color</code></strong> CSS property sets the foreground color value of an element's text and text decorations, and sets the <code>currentcolor</code> value."
   },
   "color-adjust": {
@@ -781,13 +751,8 @@ export default {
     "summary": "The <strong><code>column-rule</code></strong> shorthand CSS property sets the width, style, and color of the line drawn between columns in a multi-column layout."
   },
   "column-rule-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The<strong> <code>column-rule-color</code></strong> CSS property sets the color of the line drawn between columns in a multi-column layout."
   },
   "column-rule-style": {
@@ -1630,13 +1595,8 @@ export default {
     "summary": "The <strong><code>offset</code></strong> CSS property is a shorthand property for animating an element along a defined path. It sets the values of <code>offset-position</code>, <code>offset-path</code>, <code>offset-distance</code>, <code>offset-rotate</code>, and <code>offset-anchor</code>."
   },
   "offset-anchor": {
-    "type": "select",
-    "keywords": "auto",
-    "values": [
-      "auto",
-      "initial",
-      "inherit"
-    ],
+    "type": "any",
+    "keywords": "auto position",
     "summary": "The <strong><code>offset-anchor</code></strong> CSS property specifies the point inside the box of an element travelling along an <code>offset-path</code> that is actually moving along the path."
   },
   "offset-distance": {
@@ -1650,13 +1610,8 @@ export default {
     "summary": "The <strong><code>offset-path</code></strong> CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system."
   },
   "offset-position": {
-    "type": "select",
-    "keywords": "auto",
-    "values": [
-      "auto",
-      "initial",
-      "inherit"
-    ],
+    "type": "any",
+    "keywords": "auto position",
     "summary": "The <strong><code>offset-position</code></strong> CSS property defines the initial position of the <code>offset-path</code>."
   },
   "offset-rotate": {
@@ -1685,13 +1640,8 @@ export default {
     "summary": "The <strong><code>outline</code></strong> CSS property is a shorthand to set various outline properties in a single declaration: <code>outline-style</code>, <code>outline-width</code>, and <code>outline-color</code>."
   },
   "outline-color": {
-    "type": "select",
-    "keywords": "invert",
-    "values": [
-      "invert",
-      "initial",
-      "inherit"
-    ],
+    "type": "any",
+    "keywords": "color invert",
     "summary": "The <strong><code>outline-color</code></strong> CSS property sets the color of an element's outline."
   },
   "outline-offset": {
@@ -1967,12 +1917,7 @@ export default {
   },
   "perspective-origin": {
     "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "keywords": "position",
     "summary": "The <strong><code>perspective-origin</code></strong> CSS property determines the position at which the viewer is looking. It is used as the <em>vanishing point</em> by the <code>perspective</code> property."
   },
   "place-content": {
@@ -2251,12 +2196,7 @@ export default {
   },
   "scroll-snap-destination": {
     "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "keywords": "position",
     "summary": "The <strong><code>scroll-snap-destination</code></strong> CSS property defines the position in x and y coordinates within the scroll container's visual viewport which element snap points align with."
   },
   "scroll-snap-points-x": {
@@ -2383,13 +2323,8 @@ export default {
     "summary": "The <strong><code>text-decoration</code></strong> shorthand CSS property sets the appearance of decorative lines on text."
   },
   "text-decoration-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>text-decoration-color</code></strong> CSS property sets the color of decorations added to text by <code>text-decoration-line</code>."
   },
   "text-decoration-line": {
@@ -2439,13 +2374,8 @@ export default {
     "summary": "The <strong><code>text-emphasis</code></strong> CSS property applies emphasis marks to text (except spaces and control characters). It is a shorthand for <code>text-emphasis-style</code> and <code>text-emphasis-color</code>."
   },
   "text-emphasis-color": {
-    "type": "any",
-    "keywords": "",
-    "values": [
-      "",
-      "initial",
-      "inherit"
-    ],
+    "type": "color",
+    "keywords": "color",
     "summary": "The <strong><code>text-emphasis-color</code></strong> CSS property sets the color of emphasis marks. This value can also be set using the <code>text-emphasis</code> shorthand."
   },
   "text-emphasis-position": {
