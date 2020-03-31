@@ -190,7 +190,7 @@ export default class LoomUI extends UIComponent {
     }
 
     res.push({
-      label: 'New Element',
+      label: 'Add Element',
       submenu: elements,
       enabled: elements.length > 0
     }, {
@@ -204,15 +204,37 @@ export default class LoomUI extends UIComponent {
       enabled: components.length > 0
     });
 
-    if (el.tag.get() === 'head') {
-      res.push({
-        label: 'Add Title',
-        click: () => this.data.set(
-          el.children.addThrough(new loom.ElementDef('title', {}, [
-            new loom.TextNodeDef('title')
-          ]))
-        )
-      })
+    switch (el.tag.get()) {
+      case 'head':
+        res.push({
+          label: 'Add Title',
+          click: () => this.data.set(
+            el.children.addThrough(new loom.ElementDef('title', {}, [
+              new loom.TextNodeDef('title')
+            ]))
+          )
+        });
+        break;
+      case 'table':
+        res.push({
+          label: 'Add Row',
+          click: () => this.data.set(
+            el.children.addThrough(new loom.ElementDef('tr'))
+          )
+        });
+        break;
+      case 'tr':
+        res.push({
+          label: 'Add Heading',
+          click: () => this.data.set(
+            el.children.addThrough(new loom.ElementDef('th'))
+          )
+        }, {
+          label: 'Add Data',
+          click: () => this.data.set(
+            el.children.addThrough(new loom.ElementDef('td'))
+          )
+        });
     }
 
     return res;
