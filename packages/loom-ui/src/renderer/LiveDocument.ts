@@ -128,13 +128,20 @@ export class LiveElement extends UIComponent<{}, HTMLElement> {
       el.setAttribute(key, this.data.attrs.get(key)!);
     }
 
+    // use capture propagation
+    // select this node if the current selection is not a descendant
+    // this will cause the selection to "descend" down the elements
     el.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      if (this.editor.ui.data.get() !== this.data) {
-        e.preventDefault();
-        this.editor.select(this);
+      const data = this.editor.ui.data.get();
+      const node = data && this.editor.getNode(data);
+      if (e.eventPhase === e.AT_TARGET || !this.el.contains(node)) {
+        e.stopPropagation();
+        if (data !== this.data) {
+          e.preventDefault();
+          this.editor.select(this);
+        }
       }
-    });
+    }, true);
 
     return el;
   }
