@@ -1,5 +1,2 @@
-Create targeted style rules based on selected data
-Ability to drag & drop elements
-Add advanced controls to WYSIWYG
 Make field editors context-aware
   - e.g. a "Location" field for anchor elements
