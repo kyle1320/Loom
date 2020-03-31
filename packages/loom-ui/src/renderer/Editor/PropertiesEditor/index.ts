@@ -163,7 +163,18 @@ export default class PropertiesEditor extends UIComponent {
             }));
           this.toolbar.appendChild(new IconButton('fa fa-plus')
             .on('click', () => {
-              const newRule = new loom.StyleRuleDef('*', {});
+              let selectorText = '*';
+              if (node && isElement(node)) {
+                selectorText = node.tagName.toLowerCase();
+                if (node.classList.length) {
+                  selectorText = '';
+                  for (let i = 0; i < node.classList.length; i++) {
+                    selectorText += '.' + node.classList.item(0);
+                  }
+                }
+                if (node.id) selectorText = '#' + node.id;
+              }
+              const newRule = new loom.StyleRuleDef(selectorText, {});
               sheet.source.rules.add(newRule);
               selector.selected.set(newRule);
             }));
