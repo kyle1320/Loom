@@ -134,7 +134,10 @@ export class LiveElement extends UIComponent<{}, HTMLElement> {
     el.addEventListener('mousedown', e => {
       const data = this.editor.ui.data.get();
       const node = data && this.editor.getNode(data);
-      if (e.eventPhase === e.AT_TARGET || !this.el.contains(node)) {
+      if ((e.eventPhase === e.AT_TARGET &&
+        (node?.nodeType !== 3 || node?.parentNode !== this.el)) ||
+        !this.el.contains(node)) {
+        console.log('targeting', this, node);
         e.stopPropagation();
         if (data !== this.data) {
           e.preventDefault();
@@ -209,6 +212,7 @@ export default class LiveDocument extends Frame<{
 }> {
   private data: WeakMap<DataTypes, LiveNode> = new WeakMap();
   private nodes: WeakMap<Node, LiveNode> = new WeakMap();
+  private readonly placeholder = new loom.ElementDef('br');
 
   public constructor(
     public readonly ui: LoomUI,
@@ -266,12 +270,13 @@ export default class LiveDocument extends Frame<{
     this.destroy.do(ui.data.watch(data => {
       const comp = data && this.data.get(data) || null;
       this.emit('select', comp);
+      this.placeholder.delete();
 
       const node = data instanceof loom.Component
         ? data.element.get() : data;
       if (node instanceof loom.Element) {
         if (!node.children.size() && supportsText(node)) {
-          node.children.addThrough(new loom.ElementDef('br'));
+          node.children.addThrough(this.placeholder);
         }
       }
 
