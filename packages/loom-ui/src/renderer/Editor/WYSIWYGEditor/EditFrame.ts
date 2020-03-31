@@ -104,7 +104,7 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
       this.el.style.width = bounds.width + 'px';
       this.el.style.height = bounds.height + 'px';
 
-      this.controls.positionOutside(bounds.height < 20);
+      this.controls.positionOutside(bounds.height < 30);
 
       const margin = getValues(
         this.style.marginTop, this.style.marginRight,
