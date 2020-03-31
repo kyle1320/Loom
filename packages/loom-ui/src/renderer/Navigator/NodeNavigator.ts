@@ -1,7 +1,6 @@
 import { Value } from 'loom-data';
 import * as loom from 'loom-core';
 
-import { getAddMenu } from './DataNavigator';
 import LoomUI, { DataTypes } from '@/LoomUI';
 import { UIComponent } from '@/UIComponent';
 import { IconButton } from '@/common';
@@ -107,7 +106,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       },
       oncontextmenu: e => {
         e.stopPropagation();
-        const menu = node instanceof loom.Element ? getAddMenu(ui, node) : [];
+        const menu = node instanceof loom.Element ? ui.getAddMenu(node) : [];
         if (node.source.parent()) menu.push({
           label: 'Delete',
           click: () => node.source.delete()
@@ -126,7 +125,7 @@ abstract class SingleNodeNavigator<N extends Node = Node>
     this.appendChild(new IconButton('fa fa-trash', {
       disabled: !node.source.parent()
     }).on('click', () => node.source.delete()));
-    const addMenu = node instanceof loom.Element ? getAddMenu(ui, node) : [];
+    const addMenu = node instanceof loom.Element ? ui.getAddMenu(node) : [];
     this.appendChild(new IconButton('fa fa-plus', {
       disabled: !addMenu.some(x => x.enabled ?? true)
     }).on('click', () => showMenu(addMenu)));

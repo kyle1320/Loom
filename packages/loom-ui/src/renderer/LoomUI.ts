@@ -8,6 +8,8 @@ import LiveDocument from './LiveDocument';
 import { UIComponent, UIContainer } from './UIComponent';
 import { Button } from './common';
 import { makeElement } from './util/dom';
+import { isValidChild, validChildren, supportsText } from './util/html';
+import C from './util/constants';
 
 import './LoomUI.scss';
 
@@ -160,6 +162,60 @@ export default class LoomUI extends UIComponent {
   public close(): void {
     // TODO: alert user to save before closing
     this.setSources(null);
+  }
+
+  public getAddMenu(el: loom.Element): electron.MenuItemConstructorOptions[] {
+    const res: electron.MenuItemConstructorOptions[] = [];
+    const components = [...el.sources.components.keys()].filter(name => {
+      return isValidChild(el, el.sources.components.get(name)!);
+    });
+    const elements: electron.MenuItemConstructorOptions[] =
+      (validChildren(el) || C.html.basicTags)
+        .map(tag => ({
+          label: tag,
+          click: () => this.data.set(
+            el.children.addThrough(new loom.ElementDef(tag))
+          )
+        }));
+
+    if (supportsText(el)) {
+      elements.unshift({
+        label: 'text',
+        click: () => this.data.set(
+          el.children.addThrough(new loom.TextNodeDef('text'))
+        )
+      }, {
+        type: 'separator'
+      });
+    }
+
+    res.push({
+      label: 'New Element',
+      submenu: elements,
+      enabled: elements.length > 0
+    }, {
+      label: 'Add Component',
+      submenu: components.map(name => ({
+        label: name,
+        click: () => this.data.set(
+          el.children.addThrough(new loom.ComponentDef(name))
+        )
+      })),
+      enabled: components.length > 0
+    });
+
+    if (el.tag.get() === 'head') {
+      res.push({
+        label: 'Add Title',
+        click: () => this.data.set(
+          el.children.addThrough(new loom.ElementDef('title', {}, [
+            new loom.TextNodeDef('title')
+          ]))
+        )
+      })
+    }
+
+    return res;
   }
 }
 
