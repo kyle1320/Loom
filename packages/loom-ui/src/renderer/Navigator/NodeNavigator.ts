@@ -107,7 +107,28 @@ abstract class SingleNodeNavigator<N extends Node = Node>
       oncontextmenu: e => {
         e.stopPropagation();
         const menu = node instanceof loom.Element ? ui.getAddMenu(node) : [];
+        if (node instanceof loom.Element && node.source.parent()) menu.push({
+          type: 'separator'
+        }, {
+          label: 'Make Component',
+          click: () => ui.prompt.show(
+            'Enter a name for the new component',
+            name => {
+              if (!name) return 'Please enter a value';
+              if (ui.sources.components.has(name)) {
+                return 'A component with this name already exists. '
+                + 'Please choose another name.';
+              } else {
+                ui.sources.components.set(name, node.source);
+                node.source.replace(new loom.ComponentDef(name));
+              }
+              return void 0;
+            }
+          )
+        });
         if (node.source.parent()) menu.push({
+          type: 'separator'
+        }, {
           label: 'Delete',
           click: () => node.source.delete()
         });
