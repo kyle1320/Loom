@@ -1,16 +1,51 @@
-import LiveDocument, { LiveNode } from '@/LiveDocument';
+import * as loom from 'loom-core';
+
 import { UIComponent } from '@/UIComponent';
-import { makeElement } from '@/util/dom';
+import LiveDocument, { LiveNode } from '@/LiveDocument';
+import { makeElement, toggleClass } from '@/util/dom';
 import { isElement } from '@/util/html';
+import { IconButton } from '@/common';
+import { showMenu } from '@/util/electron';
 
 import './EditFrame.scss';
 
+class EditFrameButtonPanel extends UIComponent<{}, HTMLElement> {
+  public constructor(private readonly doc: LiveDocument) {
+    super(makeElement('div', { className: 'edit-frame__button-panel' }));
+  }
+
+  public update(data: loom.Node | null): void {
+    this.empty();
+
+    if (!data) return;
+
+    if (data instanceof loom.Element) {
+      const menu = this.doc.ui.getAddMenu(data);
+      const nonEmpty = menu.some(x => x.enabled ?? true);
+      nonEmpty && this.appendChild(new IconButton('fa fa-plus')
+        .on('click', () => showMenu(menu)));
+    }
+
+    if (data.source.parent()) {
+      this.appendChild(new IconButton('fa fa-trash btn-red')
+        .on('click', () => data.source.delete()));
+    }
+  }
+
+  public positionOutside(outside: boolean): void {
+    toggleClass(this.el, 'outside', outside);
+  }
+}
+
 export default class EditFrame extends UIComponent<{}, HTMLElement> {
   private node: LiveNode | null = null;
+  private style: CSSStyleDeclaration | null = null;
 
   private margin: HTMLElement;
   private border: HTMLElement;
   private padding: HTMLElement;
+
+  private controls: EditFrameButtonPanel;
 
   public constructor(doc: LiveDocument) {
     super(null!);
@@ -22,13 +57,14 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
       )
     );
 
+    this.appendChild(this.controls = new EditFrameButtonPanel(doc));
+
     doc.on('select', node => {
-      if (!this.node) {
-        this.node = node;
-        this.refresh();
-      } else {
-        this.node = node;
-      }
+      const oldNode = this.node;
+      this.node = node;
+      this.style = null;
+      this.controls.update(node && node.data);
+      if (!oldNode) this.refresh();
     });
   }
 
@@ -58,7 +94,8 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
 
     const n = this.node && this.node.getEl();
     const el = n && (isElement(n) ? n : n.parentElement);
-    if (el) {
+    this.style = this.style || (el && window.getComputedStyle(el));
+    if (el && this.style && this.style.display !== 'none') {
       const bounds = el.getBoundingClientRect();
 
       this.el.style.display = 'block';
@@ -67,11 +104,11 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
       this.el.style.width = bounds.width + 'px';
       this.el.style.height = bounds.height + 'px';
 
-      const style = window.getComputedStyle(el);
+      this.controls.positionOutside(bounds.height < 20);
 
       const margin = getValues(
-        style.marginTop, style.marginRight,
-        style.marginBottom, style.marginLeft
+        this.style.marginTop, this.style.marginRight,
+        this.style.marginBottom, this.style.marginLeft
       );
       this.margin.style.top = -Math.max(0, margin.top) + 'px';
       this.margin.style.right = -Math.max(0, margin.right) + 'px';
@@ -80,12 +117,12 @@ export default class EditFrame extends UIComponent<{}, HTMLElement> {
 
       setBorders(this.margin.style, margin);
       setBorders(this.border.style, getValues(
-        style.borderTopWidth, style.borderRightWidth,
-        style.borderBottomWidth, style.borderLeftWidth
+        this.style.borderTopWidth, this.style.borderRightWidth,
+        this.style.borderBottomWidth, this.style.borderLeftWidth
       ));
       setBorders(this.padding.style, getValues(
-        style.paddingTop, style.paddingRight,
-        style.paddingBottom, style.paddingLeft
+        this.style.paddingTop, this.style.paddingRight,
+        this.style.paddingBottom, this.style.paddingLeft
       ));
     } else {
       this.el.style.display = 'none';
