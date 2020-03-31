@@ -30,6 +30,21 @@ export abstract class NodeDef extends EventEmitter<{
     }
     return false;
   }
+
+  public replace(other: NodeDef): boolean {
+    const parent = nodeParentMap.get(this);
+    if (parent) {
+      nodeParentMap.delete(this);
+      const index = parent.children.asArray().indexOf(this);
+      if (index < 0) return false;
+      parent.children.removeIndex(index);
+      this.emit('delete');
+      parent.children.add(other, index);
+      return true;
+    }
+    return false;
+  }
+
   public parent(): ElementDef | null {
     return nodeParentMap.get(this) || null;
   }
