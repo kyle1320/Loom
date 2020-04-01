@@ -71,14 +71,22 @@
 
 .drop-marker {
   position: relative;
+
   &:after {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
+    height: 3px;
     content: '';
-    border: 1px solid $accent;
+    background: linear-gradient(to bottom, $accent, transparent);
     pointer-events: none;
     z-index: 1;
+  }
+
+  &:last-child:after {
+    bottom: 0;
+    top: auto;
+    background: linear-gradient(to top, $accent, transparent);
   }
 }

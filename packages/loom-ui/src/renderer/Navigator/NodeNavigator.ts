@@ -16,9 +16,6 @@ let drag: NodeNavigator | null = null;
 const dropMarker: HTMLElement = parseElement('.drop-marker');
 
 export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
-  private readonly childrenNav:
-  ElementChildrenNavigator | ComponentChildrenNavigator | null;
-
   public constructor(
     ui: LoomUI,
     public readonly node: Node,
@@ -34,53 +31,19 @@ export default class NodeNavigator extends UIComponent<{}, HTMLElement> {
       ondragend: () => {
         drag = null;
         dropMarker.remove();
-      },
-      ondragover: e => {
-        if (drag && !drag.el.contains(this.el) &&
-          node instanceof loom.Element && isValidChild(node, drag.node)) {
-          e.stopPropagation();
-          e.preventDefault();
-          e.dataTransfer!.dropEffect = 'move';
-          drag && this.drop(e.clientX, e.clientY);
-          toggleClass(this.el, 'dropping', true);
-        }
-      },
-      ondragleave: e => {
-        if (node instanceof loom.Element) {
-          e.stopPropagation();
-          e.preventDefault();
-          dropMarker.remove();
-        }
-      },
-      ondrop: e => {
-        if (drag && !drag.el.contains(this.el) &&
-          node instanceof loom.Element && isValidChild(node, drag.node)) {
-          e.stopPropagation();
-          e.preventDefault();
-          drag && this.drop(e.clientX, e.clientY, drag.node);
-        }
       }
     }));
 
     if (node instanceof loom.Element) {
       this.appendChild(new ElementNavigator(ui, node, depth));
-      this.appendChild(
-        this.childrenNav = new ElementChildrenNavigator(ui, node, depth));
+      this.appendChild(new ElementChildrenNavigator(ui, node, depth));
     } else if (node instanceof loom.TextNode) {
       this.appendChild(new TextNodeNavigator(ui, node, depth));
-      this.childrenNav = null;
     } else if (node instanceof loom.Component) {
       this.el.className += ' node-nav__container--component'
       this.appendChild(new ComponentNavigator(ui, node, depth));
-      this.appendChild(
-        this.childrenNav = new ComponentChildrenNavigator(ui, node, depth));
-    } else {
-      this.childrenNav = null;
+      this.appendChild(new ComponentChildrenNavigator(ui, node, depth));
     }
-  }
-
-  public drop(x: number, y: number, node: Node | null = null): void {
-    this.childrenNav && this.childrenNav.drop(x, y, node);
   }
 }
 
@@ -224,7 +187,33 @@ class ElementChildrenNavigator extends UIComponent {
     private readonly node: loom.Element,
     depth = 0
   ) {
-    super(makeElement('div', { className: 'node-nav__children' }));
+    super(makeElement('div', {
+      className: 'node-nav__children',
+      ondragover: e => {
+        if (drag && !drag.getEl().contains(this.el) &&
+          node instanceof loom.Element && isValidChild(node, drag.node)) {
+          e.stopPropagation();
+          e.preventDefault();
+          e.dataTransfer!.dropEffect = 'move';
+          drag && this.drop(e.clientX, e.clientY);
+        }
+      },
+      ondragleave: e => {
+        if (node instanceof loom.Element) {
+          e.stopPropagation();
+          e.preventDefault();
+          dropMarker.remove();
+        }
+      },
+      ondrop: e => {
+        if (drag && !drag.getEl().contains(this.el) &&
+          node instanceof loom.Element && isValidChild(node, drag.node)) {
+          e.stopPropagation();
+          e.preventDefault();
+          drag && this.drop(e.clientX, e.clientY, drag.node);
+        }
+      }
+    }));
 
     this.destroy.do(node.children.watch(
       (index, value) =>
@@ -271,8 +260,6 @@ class ComponentNavigator extends SingleNodeNavigator<loom.Component> {
 }
 
 class ComponentChildrenNavigator extends UIComponent {
-  private rootNode: NodeNavigator | null = null;
-
   public constructor(
     ui: LoomUI,
     node: loom.Component,
@@ -283,14 +270,8 @@ class ComponentChildrenNavigator extends UIComponent {
     this.destroy.do(node.element.watch(el => {
       this.empty();
       if (!(el instanceof loom.UnknownComponent)) {
-        this.insertChild(this.rootNode = new NodeNavigator(ui, el, depth + 1));
-      } else {
-        this.rootNode = null;
+        this.insertChild(new NodeNavigator(ui, el, depth + 1));
       }
     }));
-  }
-
-  public drop(x: number, y: number, node: Node | null = null): void {
-    this.rootNode && this.rootNode.drop(x, y, node);
   }
 }
