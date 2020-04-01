@@ -6,25 +6,26 @@ import { makeElement } from '@/util/dom';
 class SelectOption<T> extends UIComponent<{}, HTMLOptionElement> {
   public constructor(
     source: T,
-    watch: (value: T, cb: (name: string) => void) => () => void
+    watch: (value: T, cb: (name: string, subtitle?: string) => void)
+    => (() => void) | void
   ) {
     super(makeElement('option'));
 
-    watch && this.destroy.do(watch(
+    this.destroy.do(watch(
       source,
-      name => this.el.textContent = name
-    ));
+      (name, subtitle) => {
+        this.el.value = name;
+        this.el.textContent = subtitle ? name + ' — ' + subtitle : name;
+      }
+    ) || null);
   }
 }
 
 export default class Select<T> extends UIComponent<{}, HTMLSelectElement> {
   public constructor(
     source: List<T> | Readonly<T[]>,
-    watch: (value: T, cb: (name: string) => void) => () => void
-    = (val, cb) => {
-      cb(String(val));
-      return () => { /**/ };
-    },
+    watch: (value: T, cb: (name: string, subtitle?: string) => void)
+    => (() => void) | void = (val, cb) => cb(String(val)),
     public readonly selected: WritableValue<T | null>
     = new WritableValue<T | null>(null)
   ) {

@@ -17,7 +17,7 @@ import {
 import { LookupValue } from '@/util';
 import { makeElement } from '@/util/dom';
 import { InlineStyleRuleDef } from '@/util/css';
-import { isElement } from '@/util/html';
+import { isElement, getElementName } from '@/util/html';
 import C from '@/util/constants';
 
 import './PropertiesEditor.scss';
@@ -114,8 +114,11 @@ export default class PropertiesEditor extends UIComponent {
           this.toolbar.appendChild(new ComboBox(
             C.html.basicTags,
             data.source.tag,
-            data instanceof loom.HeadElement ||
-            data instanceof loom.BodyElement));
+            {
+              disabled: data instanceof loom.HeadElement ||
+                data instanceof loom.BodyElement,
+              subtitle: tag => getElementName(tag)
+            }));
           this.addField('Id', new Input(
             new LookupValue(data.source.attrs, 'id')));
           this.addField('Class',
