@@ -36,12 +36,12 @@
   }
 
   &__button-panel {
-    display: flex;
-    flex-flow: row nowrap;
+    text-align: center;
+    white-space: nowrap;
     position: absolute;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     opacity: 0.7;
 
     &.outside {
@@ -60,7 +60,7 @@
     color: white;
     width: 16px;
     height: 16px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
