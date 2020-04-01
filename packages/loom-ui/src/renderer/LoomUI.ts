@@ -8,7 +8,11 @@ import LiveDocument from './LiveDocument';
 import { UIComponent, UIContainer } from './UIComponent';
 import { Button, Prompt } from './common';
 import { makeElement } from './util/dom';
-import { isValidChild, validChildren, supportsText } from './util/html';
+import {
+  isValidChild,
+  validChildren,
+  supportsText,
+  getElementName } from './util/html';
 import C from './util/constants';
 
 import './LoomUI.scss';
@@ -175,12 +179,17 @@ export default class LoomUI extends UIComponent {
     });
     const elements: electron.MenuItemConstructorOptions[] =
       (validChildren(el) || C.html.basicTags)
-        .map(tag => ({
-          label: tag,
-          click: () => this.data.set(
-            el.children.addThrough(new loom.ElementDef(tag))
-          )
-        }));
+        .map(tag => {
+          let label = tag;
+          const name = getElementName(tag);
+          if (name) label += ' — ' + name;
+          return {
+            label,
+            click: () => this.data.set(
+              el.children.addThrough(new loom.ElementDef(tag))
+            )
+          };
+        });
 
     if (supportsText(el)) {
       elements.unshift({
