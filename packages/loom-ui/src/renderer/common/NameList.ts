@@ -74,6 +74,8 @@ class EditableName extends UIComponent<{ blur: void }> {
       });
       this.changeEl(el);
       el.select();
+      const dot = el.value.lastIndexOf('.');
+      el.setSelectionRange(0, dot < 0 ? el.value.length : dot);
     } else {
       this.changeEl(
         makeElement('div', { className: 'namelist__title' }, this.value.get())
