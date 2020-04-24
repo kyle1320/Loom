@@ -343,6 +343,7 @@
 %
 \usepackage[cmex10]{amsmath}
 \usepackage{color}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{fancyhdr}
 \usepackage[caption=false,font=footnotesize]{subfig}
 
@@ -402,7 +403,7 @@ kjc9861@cs.rit.edu}}
 
 
 \begin{abstract}
-Loom is a desktop application designed to bridge the gap between beginner and expert web development tools. Existing tools in the domain provide either easy-to-use interfaces intended for novice users, sacrificing expressiveness, or advanced interfaces intended for developers who already know web technologies, but inaccessible by ordinary users. Loom is a first-of-its-kind tool which provides novice users the full power of web technologies such as HTML and CSS without the need to write code. In addition, Loom aims to impart the basics of these technologies to users as they work with the tool, teaching valuable concepts that can be carried over to other tools.
+Loom is a desktop application designed to bridge the gap between beginner and expert web development tools. Existing tools in the domain provide either easy-to-use interfaces intended for novice users, sacrificing expressiveness, or advanced interfaces which are intended for developers who already know web technologies, but are inaccessible by ordinary users. Loom is a first-of-its-kind tool that provides novice users the full power of web technologies such as HTML and CSS without the need to write code. In addition, Loom aims to impart the basics of these technologies to users as they work with the tool, teaching valuable concepts that can be carried over to other tools.
 \end{abstract}
 
 % \begin{IEEEkeywords}
@@ -415,30 +416,35 @@ Loom is a desktop application designed to bridge the gap between beginner and ex
 
 
 \section{Introduction}
-There are many existing web-development tools intended for a wide range of users. Some of these tools are targeted at novice users, and provide very easy-to-use interfaces with high-level features such as drag-and-drop and WYSIWYG editing. Other tools are intended for developers, and provide textual interfaces for working with code. Others still are intended for designers. The separation of these tools, and the incompatibilities between them, leads to several problems:
+There are many existing web-development tools intended for a wide range of users. Some of these tools are targeted at novice users, and provide very easy-to-use interfaces with high-level features such as drag-and-drop and WYSIWYG editing. Other tools are intended for developers, and provide textual interfaces for working with code. Others still are intended for designers. The separation of these tools and the incompatibilities between them, lead to several problems:
 \begin{itemize}
-    \item Coordination between these groups is difficult. If a novice user using a tool such as Wix or Squarespace decides they need a developer to continue their work, existing work will likely be wasted as the developer chooses to use a different tool.
-    \item The work done by designers in tools such as Figma, Sketch or Invision has to be mirrored by developers, wasting effort.
+  % TODO: add rferences
+    \item Coordination between these groups is difficult. If a novice user using a tool such as Wix\cite{Wix} or Squarespace\cite{Squarespace} decides they need a developer to continue their work, existing work will likely be wasted as the developer chooses to use a different tool.
+    \item The work done by designers in tools such as Figma\cite{Figma}, Sketch\cite{Sketch} or InVision\cite{InVision} has to be mirrored by developers, wasting effort.
     \item Novice users are learning how to use a specific tool -- not the underlying technologies. Experience with this tool likely will not carry over to another.
 \end{itemize}
 
-Some tools try to target more than one type of user. For example, Wordpress has a code editor, enabling developers to directly edit HTML code. Blocs, a desktop application, provides designer-friendly tools, WYSIWYG editing and templates for beginners, and code editing for developers. But one problem with these tools still remains: novice users may never learn how to use "advanced" features such as code editing without doing their own research into web development.
+Some tools try to target more than one type of user. For example, WorPpress\cite{WordPress} has a code editor, enabling developers to directly edit HTML code. Blocs\cite{Blocs}, a desktop application, provides designer-friendly tools, WYSIWYG editing and templates for beginners, and code editing for developers. But one problem with these tools still remains: novice users may never learn how to use "advanced" features such as code editing without doing their own research into web development.
 
 
 \section{Approach}
-Loom takes a different approach from most existing tools. It provides one common interface which is closely related to the underlying web technologies. This way, every user has the potential to use the full power of these technologies. The remaining challenge is making the interface intuitive to beginners, and familiar to developers and designers. To accomplish this, Loom uses two strategies:
+Loom takes a different approach from most existing tools. It provides one common interface which is closely related to the underlying web technologies. This way, every user has the potential to use the full power of these technologies. The remaining challenge is making the interface intuitive to beginners, and familiar to developers and designers. To accomplish this, Loom uses a few strategies:
 \begin{itemize}
-    \item \textbf{Provide helpful, simple abstractions over existing technologies:} working directly with web technologies can be frustrating, even for developers. Loom aims to provide a handful of simple, but useful, abstractions over these technologies to make working with them easier.
-    \item \textbf{Provide a user interface that "scales" with the user:} The interface should be easy for novices to pick up, but provide the full power for those who want it. For example, WYSIWYG editing and graphical components such as color pickers should make styling easy for beginners, but developers should be able to enter textual values for these properties as well.
+  \item \textbf{Provide helpful, simple abstractions over existing technologies:} working directly with web technologies can be frustrating, even for developers. Loom aims to provide a handful of simple, but useful, abstractions over these technologies to make working with them easier.
+  \item \textbf{Provide a user interface that "scales" with the user:} The interface should be easy for novices to pick up, but provide the full power for those who want it. For example, WYSIWYG editing and graphical components such as color pickers should make styling easy for beginners, but developers should be able to enter textual values for these properties as well.
 \end{itemize}
+
+% TODO: add section of different kinds of users here
+% \subsection{User Categories}
+% To accomplish the goal of providing a tool that can work for "everyone", we first define the different categories of users targeted by Loom. These categories may overlap, but each have a different set of needs.
 
 Loom has the following motivating goals:
 
 \subsection{Powerful}
-Loom strives to give users the full power of the underlying technologies. For example, the user has the ability to use arbitrary HTML tags and attributes, use the full range of CSS selectors, or other advanced features. These features may not necessarily have beginner-friendly interfaces, but should be accessible and intuitive to developers.
+Loom strives to give users the full power of the underlying technologies. For example, the user has the ability to use arbitrary HTML tags and attributes, use the full range of CSS selectors, or other advanced features. These features may not all necessarily have beginner-friendly interfaces, but should be accessible and intuitive to developers.
 
 \subsection{Unified}
-Loom's tagline is "one web development tool for everyone". But everyone has different needs. For example, designers are most interested in fast prototyping and easy styling tools, but end clients will be interested in combing through the details of each page and making sure everything is perfect, while developers will be concerned with the underlying workings of the site and modifying those in detail. In addition, a user may find themselves taking on multiple different roles with different needs -- in which case, they should have the easy ability to do so without having to learn a new interface. So Loom must accommodate each user's needs, while remaining intuitive to those with different needs. This is the motivation behind Loom's "scaling" user interface.
+Loom's tagline is "one web development tool for everyone". But everyone has different needs. For example, designers are most interested in fast prototyping and easy styling tools, but developers will be concerned with the underlying workings of the site and modifying those in detail, and novice users will be focused on learning the basics. In addition, a user may find themselves taking on multiple different roles -- for example, a developer who is also learning web technologies -- in which case, they should have the easy ability to do so without having to learn a new interface. So Loom must accommodate each user's needs, while remaining intuitive to those with different needs. This is the motivation behind Loom's "scaling" user interface.
 
 \subsection{Educational}
 For users who are not familiar with web technologies, Loom aims to be a tool they can use to learn these technologies. This includes both technical and non-technical users. For example, Loom should provide help with HTML and CSS whenever possible, and provide context clues and familiar interfaces to help the user make associations between the actions they perform and the resulting changes made to the data.
@@ -544,15 +550,17 @@ Loom should be easy for anyone to learn to use. This includes novice users all t
 % command of the stfloats package.
 
 \section{Design}
-((Logical design - pages, elements, global style, components, input \& output formats))
+To accomplish its goals, Loom must have a logical design that allows users to create and edit every aspect of a website. There are three top-level types of objects the user can modify with Loom: Pages, Components, and Styles.
 
 \subsection{Pages}
 Loom aims to give users the ability to create entire static websites. The ability to create multiple pages is essential to this goal and is therefore one of the fundamental features in Loom. The user has the ability to create and name many different pages within a project. Each page represents a separate HTML page within the site.
 
 Following standard HTML practices, in Loom all pages contain two elements nested within a root \texttt{html} element: a \texttt{head} and a \texttt{body}. Loom gives users the ability to modify these elements and their children by setting attributes, and creating and deleting elements and text content.
 
+Elements are standard HTML elements -- consisting of a tag, zero or more attributes, and zero or more child elements or text. Therefore page contents form a tree-like structure just like standard HTML.
+
 \subsection{Components}
-In standard HTML, every Element belongs to just one parent. Thus there is no concept of "reusable" Elements in pure HTML – if you want multiple identical elements, you have to repeat yourself. This quickly becomes a pain to manage, especially across many pages. Loom includes the ability to create reusable elements by the name of "Components". Components are essentially just named, reusable Elements.
+In standard HTML, every Element belongs to just one parent. Thus there is no concept of "reusable" Elements in pure HTML – if you want multiple identical elements, you have to repeat yourself. This quickly becomes a pain to manage, especially across many pages. Loom includes the ability to create reusable elements by the name of "Components". Components are essentially just named Elements which can be reused across pages.
 
 One common use case for components is to implement a site header and footer. Most websites reuse a header and footer across all pages. These often include things like navigation, a site logo, and contact information. In plain HTML, there is no way to reuse these across several pages without repeating yourself. But with Loom, the user can create components for the "header" and "footer", and then include them in several pages. Any changes to these components will then immediately be reflected across all pages using them. In a way, there are two "halves" to components: the definition, which associates an element with a given name, and references, which look up the component of a given name and insert its element in their place.
 
@@ -561,7 +569,7 @@ In Loom, the user has the ability to create new Components, update their content
 \subsection{Styles}
 In general, every HTML Page can "link" to one or more CSS Stylesheets, whose styles will then be applied to that Page. However, this requires management of every page, ensuring that the correct Stylesheets are included for any elements on that page. In combination with components, it can become difficult to track which Stylesheets must be included on each page.
 
-Loom simplifies this by using one shared Stylesheet across the entire project / website. This Stylesheet will be used by every page, and contains the styles for every Component. This greatly simplifies the management needed to ensure the correct styles get used on each page, but it also means the Stylesheet can become large and complex. The UI compensates for this by providing mechanisms to help the user easily find the style rules they are looking for, such as only showing styles applicable to a selected element.
+Loom simplifies this by using one shared Stylesheet across the entire project / website. This Stylesheet will be used by every page, and contains the styles for every Component. This greatly simplifies the management needed to ensure the correct styles get used on each page, but it also means the Stylesheet can become large and complex. The UI compensates for this by providing mechanisms to help the user easily find the style rules they are looking for, such as only showing styles applicable to a selected element. Note that this simplification can also be considered a drawback: splitting styles across multiple stylesheets can improve code organization and modularity, and would likely be a desirable feature for developers. Adding the ability to edit multiple stylesheets is an item for future work.
 
 Loom gives the user the ability to create, delete, and update style rules in order to style the elements in the website. These rules use standard CSS syntax, and Loom provides simplified interfaces for working with many of the properties CSS provides.
 
@@ -572,37 +580,46 @@ For Loom to accomplish its goals, it must have a sensibly designed UI. The UI of
   \centering
   \includegraphics[width=3in]{../ui_outline.png}
   \caption{Main Sections of Loom's UI}
-  \label{fig:dataflow}
+  \label{fig:uioutline}
 \end{figure}
 
 \subsection{Navigator}
-The Navigator allows the user to navigate between pages and components, as well as to select data such as elements within them. The navigator has a two-step interface to achieve this: the user first selects a page or component to edit (and can navigate between the two types of definitions using a tabbed interface), and then is presented with a hierarchical layout showing the HTML contents of the selected definition. In the second step, the user has the ability to create, move, and delete the displayed contents, as well as to select a data item (either an Element, Component, or Text) for editing.
+The Navigator allows the user to navigate between Pages and Components, as well as to select data such as elements or text within them. In this section, the term \textbf{definition} is used to refer to either a Page or Component, and the term \textbf{data} is used to refer to objects within a definition: either an Element, Component reference, or Text. The navigator has a two-step interface to achieve this: the user first selects a definition to edit, and then is presented with a hierarchical layout showing the HTML contents of the selected definition. In the second step, the user has the ability to create, move, or delete any data within these content, as well as to select a data item for editing.
 
-Both levels of selection (definitions and data) are used by the other areas of the UI as the target for editing.
+Both levels of selection (definition and data) are used by the other areas of the UI as the target for editing.
 
 \subsection{WYSIWYG Editor}
 The WYSIWYG (What-You-See-Is-What-You-Get) Editor gives the user a live preview of what the selected page will look like, and allows them to interact with the page contents. When a page is selected in the Navigator, the editor will display the entire contents of the page. If the user clicks on an element in the page, that element will become editable and will be selected in the Navigator for editing. The user can edit the contents of the element simply by typing. Some keyboard shortcuts are also available to make the text bold, italic, etc. For example, Ctrl+B will make the selected text bold by wrapping it in a new element with the \texttt{b} tag. This connection between familiar shortcuts and creation of HTML elements should help teach novice users about how HTML works, and some of the basic tags used for tasks such as bolding text.
 
-In addition to the editability of selected content, a frame around the selected data will be shown in the editor, displaying an outline of the data along with a few basic floating controls for tasks such as creation and deletion of content. This serves as a visual marker so the user can quickly see where the content they have selected resides on the page, including its visual dimensions and other visual properties such as padding and margins.
+In addition to the editability of selected content, a frame around the selected data will be shown in the editor, displaying an outline of the data along with a few basic floating controls for tasks such as creation and deletion of content (see Figure \ref{fig:editframe}). This serves as a visual marker so the user can quickly see where the content they have selected resides on the page, including its visual dimensions and other visual properties such as padding and margins.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=3in]{../editframe.png}
+  \caption{The edit frame shown in the WYSIWYG editor, highlighting the selected element. Margins (outside of the element) are highlighted in yellow and padding (inside of the element) are highlighted in green.}
+  \label{fig:editframe}
+\end{figure}
 
 \subsection{Properties Editor}
 The Properties Editor shows information about the currently selected definition / data, and allows the user to modify properties about these objects such as HTML attributes and styles.
 
 The properties editor is organized into various tabs where the user can modify various aspects of the selected content. There are 4 potential tabs that may be shown depending on the current selection:
 \begin{itemize}
-  \item \textbf{Element:} When an HTML element is selected, this tab displays properties about that element such as the tag name and attributes. The user can modify all of these (with the exception of the tags on \texttt{head} and \texttt{body} elements).
+  \item \textbf{Element:} When an HTML element is selected, this tab displays properties about that element such as the tag name and attributes. The user can modify all of these (with the exception of the tags on \texttt{head} and \texttt{body} elements, which cannot be changed, though attributes on these elements are modifiable).
   \item \textbf{Component:} When a component definition is selected, this tab gives the user a way to rename the component. When a component reference is selected, this tab allows the user to choose another component to reference instead.
   \item \textbf{Text:} When a piece of text is selected, this tab gives the user another way of editing the text content.
-  \item \textbf{Style:} This tab is always shown, but shows slightly different things depending on the selection. For example, if an element is selected, only the style rules which apply to that element will be shown. If a page is selected, but no data within that page is selected, all style rules will be shown. Text selections will show the style rules for their parent element, and component selections will show the style rules for their root element.
+  \item \textbf{Style:} This tab is always shown, but shows slightly different things depending on the selection. For example, if an element is selected, only the style rules that apply to that element will be shown. If a page is selected, but no data within that page is selected, all style rules will be shown. Text selections will show the style rules for their parent element, and component selections will show the style rules for their root element.
 \end{itemize}
 
-The properties editor makes use of various user-friendly inputs in order to assist novice users. For example, the editor makes heavy use of a 'combo-box' style input. This allows the user to both type text freely, or to select from a pre-defined list of curated values. This provides power to users such as developers, who may wish to enter a value other than those which have been pre-defined, while providing an easy-access option to novice users who may not otherwise know what values can be used.
+The properties editor makes use of various user-friendly inputs in order to assist novice users. For example, the editor makes heavy use of a 'combo-box' style input. This allows the user to both type text freely, or to select from a pre-defined list of curated values. This provides power to more technical users, such as developers, who may wish to enter a value other than those which have been pre-defined, while providing an easy-access option to novice users who may not otherwise know what values can be used.
 
 \section{Implementation}
-Loom is implemented using TypeScript and the Electron framework. Implementing Loom using web technologies enables a high level of code reuse, and means that Loom can take advantage of Web APIs in order to implement some features, simplifying the codebase. Using the Electron framework means that Loom works across Mac, Windows, and Linux. Loom is divided into two main areas: the UI, and the "Core".
+Loom is implemented using TypeScript\cite{TypeScript} and the Electron\cite{Electron} framework. Implementing Loom using web technologies enables a high level of code reuse, and means that Loom can take advantage of Web APIs in order to implement some features, simplifying the codebase. The Electron framework enables web applications to act as native applications by making native APIs available to scripts running in a pre-packaged web browser. Electron has built-in cross-platform support, meaning that Loom works across Mac, Windows, and Linux.
+
+The implementation of Loom is divided into two primary packages: the UI, and the "Core".
 
 \subsection{Core}
-The Core portion of Loom contains the underlying data structures used to implement Loom's features. These are conceptually divided into two halves: definitions, or source data, which is the data the user directly modifies with Loom, and "built" data, which corresponds directly with web technologies such as HTML and CSS. The separation of the two halves enables abstractions; for example, reusable components exist only within definitions, and get duplicated across pages within built objects.
+The Core portion of Loom contains the underlying data structures used to implement Loom's features. These are conceptually divided into two halves: definitions, or source data, which is the data the user directly modifies with Loom, and "built" data, which corresponds directly with web technologies such as HTML and CSS. The separation of the two halves enables abstractions. For example, components only exist within definitions, and get replaced with their corresponding elements (thereby duplicating the elements) within built objects.
 
 The build process to transform Definitions into Built Objects is "reactive". That is, a set of Built Objects (collectively called Results) automatically updates along with the corresponding Definitions (collectively called Sources), so that if any value within the Sources change, the Results will update appropriately as well. To enable this reactive connection, Loom makes heavy use of event-driven programming, including a collection of event-driven data structures specifically created for use within Loom, creatively titled "Loom Data".
 
@@ -613,14 +630,14 @@ The build process to transform Definitions into Built Objects is "reactive". Tha
   \label{fig:core}
 \end{figure}
 
-Figure \ref{fig:core} shows the relationship between each type of Definition and their corresponding Built Objects. Page and Element Definitions can both make use of Component references, but their corresponding Built Objects cannot -- the references must be replaced with concrete Elements.
+Figure \ref{fig:core} shows the relationship between each type of Definition and its corresponding Built Objects. Page and Element Definitions can both make use of Component references, but their corresponding Built Objects cannot -- the references must be replaced with concrete Elements.
 
 \subsection{UI}
 The UI implements all GUI aspects of Loom using the Electron framework. The primary function of the UI is to display the data from Built Objects, and allow the user to modify the corresponding data within Definitions. The resulting data flow is similar to that of an MVC architecture (where Built Objects are the model and Definitions take the place of a Controller) and helps maintain a logical separation between the UI and Core. Figure \ref{fig:dataflow} visualizes this data flow.
 
 Due to the heavy use of event-driven programming within Loom Core, the UI portion of loom does not use any UI frameworks such as React -- instead using a custom solution that is designed to work well with the event-driven behavior and data structures present in Loom Core.
 
-Every component within the UI inherits from a base class which enables components to emit events, manage their child components, and define lifecycle behaviors for creation and destruction. This allows components to easily watch for events from a data source, update their contents when events happen, and remove any event listeners when they get destroyed (a very common pattern).
+Every component within the UI inherits from a base class that enables components to emit events, manage their child components, and define lifecycle behaviors for creation and destruction. This allows components to easily watch for events from a data source, update their contents when events happen, and remove any event listeners when they get destroyed (a very common pattern).
 
 The root component of the UI also stores global states such as the loaded project and selected data. Many components within the UI read and modify this data in order to implement their behavior -- for example, the Navigator reads and modifies the selected data, and the Properties editor reads the selected data to determine what to display. Events are emitted whenever these values change, so that components can update themselves accordingly.
 
@@ -636,7 +653,7 @@ Loom allows the user to save \& load projects, and export projects to web-ready 
 
 A saved project is a directory consisting of:
 \begin{itemize}
-  \item A "pages" or "src" directory, containing all of the pages in the project. These are HTML format, except component references which use the XML namespace '\texttt{loom:}' to differentiate themselves from HTML elements.
+  \item A "pages" or "src" directory, containing all of the pages in the project. These are HTML format, except component references, which use the XML namespace '\texttt{loom:}' to differentiate themselves from HTML elements.
   \item A "components" directory, containing all of the components in the project. The name of each html file in this directory determines the name of the component, with the root element in each file being the root element for that component.
   \item A "loom.json" file, containing metadata about the project. At present this may specify custom paths for the pages and components directories.
 \end{itemize}
@@ -646,47 +663,100 @@ When a project is exported, its contents are built and the built objects are ser
 \section{Evaluation}
 To evaluate how well Loom achieves its goals, we evaluate the ability to perform various target tasks from the point of view of each category of user, including novice users, developers, and designers.
 
+\begin{table*}[!t]
+\renewcommand{\arraystretch}{1.3}
+\caption{Evaluated Goals for Novice Users}
+\label{table:novice_goals}
+\centering
+\begin{tabular}{|r|c|p{8cm}|}
+\hline
+Goal & Evaluation & Comments \\
+\hline \hline
+Create and Delete Pages & \textbf{\color{ForestGreen}good} & "Add Page" button is shown when choosing a page. Deletion controls are available in right-click menu and Properties editor when a page is selected. \\
+\hline
+Create and Delete Elements & \textbf{\color{ForestGreen}good} & Controls for creation are shown in the navigator and WYSIWYG editor. Controls for deletion are shown in all three parts of the interface \\
+\hline
+Bold / Italic / Underline Text & \textbf{\color{Dandelion}fair} & Keyboard shortcuts are supported, but no button controls that novice users would be familiar with \\
+\hline
+Create Images / Links & \textbf{\color{Red}poor} & Currently unsupported \\
+\hline
+Set Basic Styles & \textbf{\color{Dandelion}fair} & Search functionality and friendly style choosers for some styles, but not all -- and CSS style names may not be obvious to novice users \\
+\hline
+Save Project as Static Pages & \textbf{\color{ForestGreen}good} & Export option within "File" menu allows exporting sites in a few clicks \\
+\hline
+Associate Visual Content with HTML & \textbf{\color{ForestGreen}good} & Selected text / Elements are highlighted in the WYSIWYG editor \\
+\hline
+Associate Visual Content with CSS & \textbf{\color{Red}poor} & There is currently no way to associate styles on the page with the CSS rules applying them, other than changing the CSS value and witnessing the style changes. \\
+\hline
+Get Help with HTML & \textbf{\color{Red}poor} & There is currently no help text for HTML elements, attributes, etc. \\
+\hline
+Get Help with CSS & \textbf{\color{Dandelion}fair} & CSS properties have a "help text" icon that shows information about the property when clicked. However, this help is technical and may not be entirely useful for novice users. \\
+\hline
+\end{tabular}
+\end{table*}
+
+\begin{table*}[!t]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Evaluated Goals for Developers}
+  \label{table:developer_goals}
+  \centering
+  \begin{tabular}{|r|c|p{8cm}|}
+    \hline
+    Goal & Evaluation & Comments \\
+    \hline \hline
+    Set Custom HTML Attributes & \textbf{\color{ForestGreen}good} & A key-value entry interface within the Properties editor allows users to edit arbitrary HTML attributes \\
+    \hline
+    Set Custom CSS Property values & \textbf{\color{Dandelion}fair} & Arbitrary CSS properties can be set within the Style tab of the Properties editor. However, some aspects of CSS such as media queries are currently unsupported \\
+    \hline
+    View Properties of an Element & \textbf{\color{ForestGreen}good} & A key-value interface within the Properties editor displays all set properties of the selected element \\
+    \hline
+    View Styles for an Element & \textbf{\color{ForestGreen}good} & All CSS styles can be viewed within the Propertied editor. In addition, when an emelemt is selected, only style rules which apply to that element are shown \\
+    \hline
+    Create Custom CSS Rules & \textbf{\color{Dandelion}fair} & Creation of CSS rules with arbitrary selectors is supported. However, some aspects of CSS such as media queries are currently unsupported \\
+    \hline
+    Create and Edit Scripts & \textbf{\color{Red}poor} & Currently unsupported \\
+    \hline
+  \end{tabular}
+\end{table*}
+
+\begin{table*}[!t]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Evaluated Goals for Designers}
+  \label{table:designer_goals}
+  \centering
+  \begin{tabular}{|r|c|p{8cm}|}
+    \hline
+    Goal & Evaluation & Comments \\
+    \hline \hline
+    Create Elements Quickly & \textbf{\color{ForestGreen}good} & There are several ways to create new elements \\
+    \hline
+    See Immediate Output & \textbf{\color{ForestGreen}good} & Any time the content or style of any element is changed, the WYSIWYG editor immediately updates to display the change \\
+    \hline
+    Layout Content Quickly & \textbf{\color{Red}poor} & Organizing content on the page is currently a very "manual" process -- involving creating elements and tweaking their CSS layout properties. Elements also cannot be moved from within the WYSIWYG editor \\
+    \hline
+    Create Flows Across Pages & \textbf{\color{Red}poor} & Currently unsupported \\
+    \hline
+    Modify Font Styles & \textbf{\color{Dandelion}fair} & CSS properties allow modification of font styles, however finding the correct properties to apply may be a frustrating process for designers \\
+    \hline
+    Set Padding and Margins & \textbf{\color{Dandelion}fair} & CSS properties allow modification of padding and margins, however there is currently no "friendly" interface for this and so this may be frustrating to designers \\
+    \hline
+    Copy and Tweak Existing Pages & \textbf{\color{Red}poor} & Currently unsupported \\
+    \hline
+    Palette of Standard Colors & \textbf{\color{Red}poor} & Currently unsupported \\
+    \hline
+  \end{tabular}
+\end{table*}
+
 \subsection{Novice Users}
-Novice users include those who have little knowledge about web technologies, and potentially minimal experience with other web design tools. Loom aims to give these users the ability to accomplish simple tasks with little or no frustration. The following goals for novice users are evaluated:
-\begin{itemize}
-  \item Create and Delete Pages (good)
-  \item Create and Delete Elements (good)
-  \item Bold / Italic / Underline Text (fair)
-  \item Create Images / Links (poor)
-  \item Set Basic Styles (fair)
-  \item Save Project as Static Pages (good)
-  \item Associate Visual Content with HTML (good)
-  \item Associate Visual Content with CSS (poor)
-  \item Get Help with HTML (poor)
-  \item Get Help with CSS (fair)
-\end{itemize}
-\textbf{TODO: break down each goal}
+Novice users include those who have little knowledge about web technologies, and potentially minimal experience with other web design tools. We do however assume that they are experienced web users in general. Loom aims to give these users the ability to accomplish simple tasks with little or no frustration. The evaluated goals for novice users are shown in table \ref{table:novice_goals}.
+
 
 \subsection{Developers}
-Developers may already be familiar with web technologies, or may just be learning them. In either case, Loom aims to give power to these users and enable rapid prototyping. The following goals for developers are evaluated:
-\begin{itemize}
-  \item Set Custom HTML Attributes (good)
-  \item Set Custom CSS Property values (fair)
-  \item View Properties of an Element (good)
-  \item View Styles for an Element (good)
-  \item Create Custom CSS Rules (fair)
-  \item Create and Edit Scripts (poor)
-\end{itemize}
-\textbf{TODO: break down each goal}
+Developers may already be familiar with web technologies, or may just be learning them. In either case, Loom aims to give power to these users and enable rapid prototyping. The evaluated goals for developers are shown in table \ref{table:developer_goals}.
 
 \subsection{Designers}
-Designers are less interested in the underlying working of a layout, and are instead looking for a way to rapidly create layouts and style components before they hand it off to a developer. The following goals for designers are evaluated:
-\begin{itemize}
-  \item Create Elements Quickly (good)
-  \item See Immediate Output (good)
-  \item Layout Content Quickly (poor)
-  \item Create Flows Across Pages (poor)
-  \item Modify Font Styles (fair)
-  \item Set Padding and Margins (fair)
-  \item Copy and Tweak Existing Pages (poor)
-  \item Palette of Standard Colors (poor)
-\end{itemize}
-\textbf{TODO: break down each goal}
+Designers are less interested in the underlying working of a layout, and are instead looking for a way to rapidly create layouts and style components before they hand it off to a developer. The evaluated goals for designers are shown in table \ref{table:designer_goals}.
+
 
 \section{Conclusion}
 (Did we achieve what we set out to do? What issues remain? What future work is there?)
@@ -702,6 +772,7 @@ There is much future work to be done on Loom. At present, the user interface is 
   \item Better UI for renaming pages and organizing site structure
   \item Other general bugfixes and UX improvements
 \end{itemize}
+
 Further evaluation of Loom such as user testing could also help identify additional areas for improvement.
 
 \medskip
@@ -748,8 +819,7 @@ In addition to usability improvements, there are several additional features the
 
 
 \bibliographystyle{IEEEtran}
-% TODO: uncomment when there are bibliography items
-% \bibliography{IEEEabrv,IEEEexample}
+\bibliography{IEEEabrv,report}
 
 
 % argument is your BibTeX string definitions and bibliography database(s)
