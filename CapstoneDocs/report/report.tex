@@ -418,7 +418,6 @@ Loom is a desktop application designed to bridge the gap between beginner and ex
 \section{Introduction}
 There are many existing web-development tools intended for a wide range of users. Some of these tools are targeted at novice users, and provide very easy-to-use interfaces with high-level features such as drag-and-drop and WYSIWYG editing. Other tools are intended for developers, and provide textual interfaces for working with code. Others still are intended for designers and may not support web technologies at all. The separation of these tools and the incompatibilities between them lead to several problems:
 \begin{itemize}
-  % TODO: add rferences
     \item Coordination between these groups is difficult. If a novice user using a tool such as Wix\cite{Wix} or Squarespace\cite{Squarespace} decides they need a developer to continue their work, existing work will likely be wasted as the developer chooses to use a different tool.
     \item The work done by designers in tools such as Figma\cite{Figma}, Sketch\cite{Sketch} or InVision\cite{InVision} has to be mirrored by developers, wasting effort.
     \item Novice users are learning how to use a specific tool -- not the underlying technologies. Experience with one tool often does not carry over to others.
@@ -613,7 +612,7 @@ The Properties Editor shows information about the currently selected definition 
 The properties editor is organized into various tabs where the user can modify different aspects of the selected content. There are 4 potential tabs that may be shown depending on the current selection:
 \begin{itemize}
   \item \textbf{Element:} When an HTML element is selected, this tab displays properties about that element such as the tag name and attributes. The user can modify all of these (with the exception of the tags on \texttt{head} and \texttt{body} elements, which cannot be changed, though attributes on these elements are still modifiable).
-  \item \textbf{Component:} When a component definition is selected, this tab gives the user a way to rename the component. When a component reference is selected, this tab allows the user to choose another component to reference instead.
+  \item \textbf{Component:} When a component definition is selected (in the first step of the Navigator), this tab gives the user a way to rename the component. When a component reference (inside of a page or component definition) is selected, this tab allows the user to choose another component to reference instead.
   \item \textbf{Text:} When a piece of text is selected, this tab gives the user another way of editing the text content.
   \item \textbf{Style:} This tab is always shown, but shows slightly different things depending on the selection. For example, if an element is selected, only the style rules that apply to that element will be shown. If a page is selected, but no data within that page is selected, all style rules will be shown. Text selections will show the style rules for their parent element, and component selections will show the style rules for their root element.
 \end{itemize}
@@ -637,12 +636,12 @@ The build process to transform Definitions into Built Objects is "reactive". Tha
   \label{fig:core}
 \end{figure}
 
-Figure \ref{fig:core} shows the relationship between each basic type of Definition and its corresponding Built Objects. Page and Element Definitions can both make use of Component references, but their corresponding Built Objects cannot -- the references must be replaced with concrete Elements.
+Figure \ref{fig:core} shows the relationship between each basic type of Definition and its corresponding Built Object. Page and Element Definitions can both make use of Component references, but their corresponding Built Objects cannot -- the references must be replaced with concrete Elements.
 
 \subsection{UI}
 The UI implements all GUI aspects of Loom using the Electron framework. The primary function of the UI is to display the data from Built Objects and allow the user to modify the corresponding data within Definitions. The resulting data flow is similar to that of an MVC architecture (where Built Objects are the model and Definitions take the place of a Controller) and helps maintain a logical separation between the UI and Core. Figure \ref{fig:dataflow} visualizes this data flow.
 
-Due to the heavy use of event-driven programming and custom data structures within Loom Core, the UI portion of loom does not use any UI frameworks such as React -- instead using a custom solution that is designed to work well with the event-driven behavior and data structures present in Loom Core.
+Due to the heavy use of event-driven programming and custom data structures within Loom Core, the UI portion of loom does not use any UI frameworks such as React\cite{React} -- instead using a custom solution that is designed to work well with the event-driven behavior and data structures present in Loom Core.
 
 Every component within the UI inherits from a base class that enables components to emit events, manage their child components, and define lifecycle behaviors for creation and destruction. This allows components to easily watch for events from a data source, update their contents when events happen, and remove any event listeners when they get destroyed (a very common pattern).
 
@@ -660,7 +659,7 @@ Loom allows the user to save \& load projects, and export projects to web-ready 
 
 A saved project is a directory consisting of:
 \begin{itemize}
-  \item A "pages" or "src" directory, containing all of the pages in the project. These are HTML format, except component references, which use the XML namespace '\texttt{loom:}' to differentiate themselves from HTML elements.
+  \item A "pages" or "src" directory, containing all of the pages in the project. These are XHTML format, except for component references, which use the XML namespace '\texttt{loom:}' to differentiate themselves from HTML elements.
   \item A "components" directory, containing all of the components in the project. The name of each html file in this directory determines the name of the component, with the root element in each file being the root element for that component.
   \item A "loom.json" file, containing metadata about the project. At present this may specify custom paths for the pages and components directories.
 \end{itemize}
@@ -691,13 +690,13 @@ Set Basic Styles & \textbf{\color{Dandelion}fair} & Search functionality and fri
 \hline
 Save Project as Static Pages & \textbf{\color{ForestGreen}good} & Export option within "File" menu allows exporting sites in a few clicks \\
 \hline
-Associate Visual Content with HTML & \textbf{\color{ForestGreen}good} & Selected text / Elements are highlighted in the WYSIWYG editor \\
+Associate Visual Content with HTML & \textbf{\color{ForestGreen}good} & Selected text / Elements are highlighted in the WYSIWYG editor and update immediately when modified \\
 \hline
-Associate Visual Content with CSS & \textbf{\color{Red}poor} & There is currently no way to associate styles on the page with the CSS rules applying them, other than changing the CSS value and witnessing the style changes. \\
+Associate Visual Content with CSS & \textbf{\color{Dandelion}fair} & Changes made to styles can be seen immediately within the WYSIWYG editor, but this is currently the only way to associate styles on the page with the CSS rules applying them  \\
 \hline
 Get Help with HTML & \textbf{\color{Red}poor} & There is currently no help text for HTML elements, attributes, etc. \\
 \hline
-Get Help with CSS & \textbf{\color{Dandelion}fair} & CSS properties have a "help text" icon that shows information about the property when clicked. However, this help is technical and may not be entirely useful for novice users. \\
+Get Help with CSS & \textbf{\color{Dandelion}fair} & CSS properties have a "help text" icon that shows information about the property when clicked. However, this help is technical and may not be entirely useful for novice users \\
 \hline
 \end{tabular}
 \end{table*}
