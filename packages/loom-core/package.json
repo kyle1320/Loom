@@ -1,6 +1,6 @@
 {
   "name": "loom-core",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "GPL-3.0-or-later",
@@ -21,6 +21,6 @@
   "dependencies": {
     "css": "^2.2.4",
     "htmlparser2": "^4.0.0",
-    "loom-data": "^1.0.0"
+    "loom-data": "^0.1.0"
   }
 }

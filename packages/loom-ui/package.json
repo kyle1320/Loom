@@ -1,6 +1,6 @@
 {
   "name": "loom-ui",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "scripts": {
     "dev": "electron-webpack dev",
@@ -25,8 +25,8 @@
   "dependencies": {
     "@simonwep/pickr": "^1.5.1",
     "fuse.js": "^3.6.1",
-    "loom-core": "^1.0.0",
-    "loom-data": "^1.0.0",
+    "loom-core": "^0.1.0",
+    "loom-data": "^0.1.0",
     "source-map-support": "^0.5.16"
   },
   "electronWebpack": {
