@@ -38,8 +38,7 @@
     "productName": "Loom",
     "appId": "com.kylecutler.loom",
     "mac": {
-      "identity": false,
-      "target": "dmg"
+      "identity": false
     }
   }
 }

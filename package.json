@@ -29,6 +29,7 @@
     "build-data": "yarn workspace loom-data run build",
     "ui": "yarn workspace loom-ui run dev",
     "ui-dist": "yarn workspace loom-ui run dist",
+    "ui-release": "yarn workspace loom-ui run dist -mwl",
     "generate-css-properties": "node ./scripts/generateCSSProperties.js > ./packages/loom-ui/src/renderer/util/properties.ts"
   },
   "workspaces": [
